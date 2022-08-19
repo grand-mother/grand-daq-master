@@ -218,10 +218,10 @@
   buffer definitions for the scope readout process.
  */
 
-#define BUFSIZE 3000            //!< store up to 3000 events in circular buffer
+#define BUFSIZE 1000            //!< store up to 3000 events in circular buffer
 
 #define GPSSIZE 35              //!< buffer upto 35 GPS seconds info in circular buffer
-#define MAXT3 20               //!< 200 T3 events in circular cuffer
+#define MAXT3 20               //!< 20 T3 events in circular cuffer
 
 // next: what did we read from the scope?
 

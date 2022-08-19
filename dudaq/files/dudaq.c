@@ -41,8 +41,8 @@ extern int errno; //!< the number of the error encountered
 extern uint32_t shadowlist[Reg_End>>2];
 
 
-#define SOCKETS_BUFFER_SIZE  131072
-#define SOCKETS_TIMEOUT      1600
+#define SOCKETS_BUFFER_SIZE  1048576//131072
+#define SOCKETS_TIMEOUT      100//1600
 
 int du_port;       //!<port number on which to connect to the central daq
 
@@ -432,7 +432,7 @@ int send_server_data(){
     sentBytes = 0;
     ntry = 0;
     while(sentBytes<length && ntry < 1000){
-      if(length-sentBytes>400) bsent=400;
+      if(length-sentBytes>40000) bsent=40000;
       else
         bsent = length-sentBytes;
       rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
@@ -469,7 +469,7 @@ int send_server_data(){
   sentBytes = 0;
   ntry = 0;
   while(sentBytes<length && ntry < 1000){
-    if(length-sentBytes>400) bsent=400;
+    if(length-sentBytes>40000) bsent=40000;
     else
       bsent = length-sentBytes;
     rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
@@ -538,8 +538,8 @@ int send_t3_event()
   length = 2*DU_output[0]+2;
   sentBytes = 0;
   ntry = 0;
-  while(sentBytes<length && ntry < 1000){
-    if(length-sentBytes>400) bsent=400;
+  while(sentBytes<length && ntry < 100){
+    if(length-sentBytes>40000) bsent=40000;
     else 
       bsent = length-sentBytes;
     rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
@@ -552,7 +552,7 @@ int send_t3_event()
     if(rsend>0) {
       sentBytes +=rsend;
       ntry = 0;
-      usleep(20);
+      //usleep(20);
     } else{
       ntry++;
       usleep(20);
@@ -636,7 +636,7 @@ void du_scope_check_commands()
 	if(msg_tag == DU_GET_MINBIAS_EVENT)trflag = TRIGGER_T3_MINBIAS;
 	if(msg_tag == DU_GET_RANDOM_EVENT)trflag = TRIGGER_T3_RANDOM;
 	ssec = (getevt->NS3+(getevt->NS2<<8)+(getevt->NS1<<16));
-	printf("Requesting Event %d %d %d %d\n",getevt->event_nr,msg_tag,getevt->sec,ssec);
+	printf("Requesting Event %d %d %d %d (%d)\n",getevt->event_nr,msg_tag,getevt->sec,ssec,*shm_cmd.next_read);
 	scope_event_to_shm(getevt->event_nr,trflag,getevt->sec,ssec);
         break;
       default:

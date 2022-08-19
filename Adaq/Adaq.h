@@ -12,7 +12,7 @@ Altering the code without explicit consent of the author is forbidden
 #include <arpa/inet.h>
 #include "ad_shm.h"
 
-#define MAXDU 100 //max number of Detector Units
+#define MAXDU 10 //max number of Detector Units
 #define ERROR -1
 #define NORMAL 1
 #define DEFAULT_CONFIGFILE "conf/Adaq.conf"
@@ -34,7 +34,7 @@ typedef struct{
 #define T3SIZE (6+3*MAXDU) //Max. size (in shorts) for T3 info in 1 message
 
 #define NEVBUF 10 // maximal 10 event buffers
-#define EVSIZE 80000 //Max. size (in shorts) for evsize for each DU
+#define EVSIZE 65000 //Max. size (in shorts) for evsize for each DU
 
 #define CMDBUF 20 // leave 20 command buffers
 #define CMDSIZE 5000 //Max. size (in shorts) for command (should be able to hold config file)

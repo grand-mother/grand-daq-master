@@ -31,8 +31,8 @@ extern int errno;
 void du_send();
 uint16_t du_read_initfile();
 
-#define SOCKETS_BUFFER_SIZE  131072
-#define SOCKETS_TIMEOUT      600
+#define SOCKETS_BUFFER_SIZE  1048576//131072
+#define SOCKETS_TIMEOUT      100
 
 /*!
  \func du_interpret(uint16_t *buffer)
@@ -339,7 +339,7 @@ void du_read()
       if(buffer[0] > 0 &&bytesRead == 2*(buffer[0]+1)&&recvRet>0) {
         du_interpret(buffer);
       }else{
-	printf("DU Error in Receive %d %d %d\n",bytesRead,2*buffer[0]+2,recvRet);
+	printf("DU Error in Receive %d %d %ld\n",bytesRead,2*buffer[0]+2,recvRet);
       }
       DUinfo[i].LSTconnect = tnow.tv_sec;
     }
@@ -517,7 +517,7 @@ void du_write()
             evtinfo->NS1 = T3info->t3station[it3].NS1;
             evtinfo->NS2 = T3info->t3station[it3].NS2;
             evtinfo->NS3 = T3info->t3station[it3].NS3;
-            //printf("DU: Requesting a T3 %d %d\n",evtinfo->DU_id,evtinfo->sec);
+            printf("DU: Requesting a T3 %d %d\n",evtinfo->DU_id,evtinfo->sec);
             du_send(get_t3event,il);
           }
         }

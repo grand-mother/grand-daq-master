@@ -131,9 +131,9 @@ void t3_gett2()
         if(t3_rand>0){
           if(irandom >=t3_rand){
             irandom = 0;
-            //printf("T3: A random event %d.%09d ",t2evts[t2write].sec,t2evts[t2write].nsec);
+            if(idebug) printf("T3: A random event %d %u.%09d ",stat,t2evts[t2write].sec,t2evts[t2write].nsec);
             t2evts[t2write].trigflag = (t2evts[t2write].trigflag|8);
-            //printf("%x\n",t2evts[t2write].trigflag);
+            if(idebug) printf("%x\n",t2evts[t2write].trigflag);
           }
         }
         t2evts[t2write].stat = stat;
@@ -245,8 +245,8 @@ void t3_maket3()
     else isten = 0;
     if(t2evts[ind].trigflag&0x8) israndom = 1;
     else israndom = 0;
-    if(isten == 1) printf("A 10 sec trigger %u\n",t2evts[ind].sec);
-    //if(israndom == 1) printf("A Random trigger %u\n",t2evts[ind].sec);
+    if(idebug && isten == 1) printf("A 10 sec trigger %u %d\n",t2evts[ind].sec,t2evts[ind].stat);
+    if(idebug && israndom == 1) printf("A Random trigger %u %d\n",t2evts[ind].sec,t2evts[ind].stat);
     for(i=ind-1;i>=0;i--){
       if(t2evts[i].sec-t2evts[ind].sec > 1) tdif = TCOINC+1;
       else if(t2evts[i].sec-t2evts[ind].sec == 1){
