@@ -90,7 +90,8 @@ void t3_gett2()
   struct timezone tz;
   
   gettimeofday(&tp,&tz);
-  if(idebug) printf("Get T2 %d %ld\n",t2write,tp.tv_sec);
+  if(idebug)
+    printf("Get T2 %d %ld\n",t2write,tp.tv_sec);
   while(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] == 1){ // loop over the input
     msg = (AMSG *)(&(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)+1]));
     if(msg->tag == DU_T2){    // work on T2 messages only
@@ -114,6 +115,8 @@ void t3_gett2()
       for(isub=0;isub<nsub;isub++){
         t2ss = &(t2b->t2ssec[isub]);
         nsec = T2NSEC(t2ss)+(((t2ss->ADC)&0xf)<<2); //lower bits removed (not according to specs, we have 28 bits?)
+        if(idebug)
+          printf("T2s: %d %d\n",nsec,prev_nsec);
         if(nsec < prev_nsec) sec++;
         prev_nsec = nsec;
         if(t2write> 0){
@@ -142,6 +145,8 @@ void t3_gett2()
         }
         t2evts[t2write].used = 0;
         t2write+= 1;
+        if(idebug)
+          printf("Now t2write = %d\n",t2write);
         gotdata = 1;
         if(t2write >=NEVT) {
           printf("T3: Full buffer %d\n",t2write);
@@ -150,7 +155,8 @@ void t3_gett2()
         }
       }
     }
-    //printf("After loop, t2write = %d\n",t2write);
+    if(idebug)
+      printf("After loop, t2write = %d\n",t2write);
     shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] = 0;
     *shm_t2.next_read = (*shm_t2.next_read) + 1;
     if( *shm_t2.next_read >= *shm_t2.nbuf) *shm_t2.next_read = 0;

@@ -15,3 +15,5 @@ Nancay1.pdf
 ScopeNancay.pdf
 SpecNancaydet.pdf
 SpecNancayfull.pdf
+*.pdf
+tools/noise.txt

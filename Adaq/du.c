@@ -51,7 +51,8 @@ void du_interpret(uint16_t *buffer)
   while(i<buffer[0]-1){
     msg = (AMSG *)(&(buffer[i]));
     t2b = (T2BODY *)msg->body;
-    //printf("DU: received message %d First word %d %d %d\n",msg->tag,msg->body[0],msg->body[1],msg->body[2]);
+    if(idebug)
+      printf("DU: received message %d First word %d %d %d\n",msg->tag,msg->body[0],msg->body[1],msg->body[2]);
     switch(msg->tag){ //based on tag, data is moved to different servers
       case DU_T2:
         if(msg->length<T2SIZE){
@@ -79,8 +80,8 @@ void du_interpret(uint16_t *buffer)
         //printf("DU: Receive monitor info Stat=%d Sec=%d rate=%d\n",buffer[i+2]&0xff,*(int *)&buffer[i+3],buffer[i+5]);
         //  break;
       case DU_EVENT:
-        //if(idebug)
-	  printf("Received an event\n");
+        if(idebug)
+          printf("Received an event\n");
       case DU_NO_EVENT:
         if(msg->length<EVSIZE){
           // wait until the shared memory is not full
@@ -517,7 +518,7 @@ void du_write()
             evtinfo->NS1 = T3info->t3station[it3].NS1;
             evtinfo->NS2 = T3info->t3station[it3].NS2;
             evtinfo->NS3 = T3info->t3station[it3].NS3;
-            printf("DU: Requesting a T3 %d %d\n",evtinfo->DU_id,evtinfo->sec);
+            //printf("DU: Requesting a T3 %d %d\n",evtinfo->DU_id,evtinfo->sec);
             du_send(get_t3event,il);
           }
         }

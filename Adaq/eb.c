@@ -228,7 +228,7 @@ void eb_getdata(){
     //printf("EB getdata: loop over input. TAG = %d\n",msg->tag);
     if(msg->tag == DU_EVENT){
       DUinfo = (uint16_t *)msg->body;
-      printf("Trying to copy event of length %d (max is %d)\n",DUinfo[EVT_LENGTH],EVSIZE);
+      //printf("Trying to copy event of length %d (max is %d)\n",DUinfo[EVT_LENGTH],EVSIZE);
       if(DUinfo[EVT_LENGTH] < EVSIZE){
 	if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,2*DUinfo[EVT_LENGTH]);
 	if(running ==1) i_DUbuffer +=1;
