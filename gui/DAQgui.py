@@ -522,7 +522,7 @@ def DUfile(button):
           iconf += (1<<9)
         elif conf == "Channel 1":
           iconf += (1<<8)
-        elif conf == "Ch1 AND Ch2":
+        elif conf == "Ch 1 AND Ch 2":
           iconf += (1<<7)
         elif conf == "20 Hz":
           iconf += (1<<6)
