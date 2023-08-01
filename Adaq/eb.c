@@ -159,25 +159,25 @@ void eb_getui()
   AMSG *msg;
   
   
-  while((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)]) !=  0){ // loop over the UI input
-    if(((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)]) &2) ==  2){ // loop over the UI input
-      msg = (AMSG *)(&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)+1]));
-      printf("EB: A GUI command\n");
+  while((shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)]) !=  0){ // loop over the UI input
+    if(((shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)]) &2) ==  2){ // loop over the UI input
+      msg = (AMSG *)(&(shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)+1]));
+      //printf("EB: A GUI command\n");
       if(msg->tag == DU_STOP){
         running = 0;
         if(fpout != NULL) eb_close();
       }
       else if(msg->tag == DU_START){
         ad_init_param(configfile);
-        printf("EB: Starting the run\n");
+        //printf("EB: Starting the run\n");
         running = 1;
         i_DUbuffer = 0; // get rid of old data
         eb_sub = 1;
       }
-      shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)] &= ~2;
+      shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)] &= ~2;
     }
-    *shm_cmd.next_readb = (*shm_cmd.next_readb) + 1;
-    if( *shm_cmd.next_readb >= *shm_cmd.nbuf) *shm_cmd.next_readb = 0;
+    *shm_ebcmd.next_readb = (*shm_ebcmd.next_readb) + 1;
+    if( *shm_ebcmd.next_readb >= *shm_ebcmd.nbuf) *shm_ebcmd.next_readb = 0;
   }
 }
 
@@ -365,23 +365,23 @@ void eb_main()
   sprintf(fname,"%s/eb",LOG_FOLDER);
   fp_log = fopen(fname,"w");
   printf("Starting EB\n");
-  int nloop = 0;
+  //int nloop = 0;
   while(1) {
     fseek(fp_log,0,SEEK_SET);
     eb_getui();
     eb_gett3();
     eb_getdata();
-    if(nloop == 1000) {
-      printf("Running.... %d\n",running);
-      nloop = 0;
-    }
+    //if(nloop == 1000) {
+    //  printf("Running.... %d\n",running);
+    //  nloop = 0;
+    //}
     if(running == 1) eb_write_events();
     fprintf(fp_log,"To Disk: Run %6d, file %4d\n",eb_run,eb_sub);
     fprintf(fp_log,"AD events: %5d\n",write_sub[0]);
     fprintf(fp_log,"MD events: %5d\n",write_sub[2]);
     fprintf(fp_log,"TD events: %5d\n",write_sub[1]);
     usleep(1000);
-    nloop ++;
+    //nloop ++;
   }
   fclose(fp_log);
 }

@@ -32,11 +32,15 @@ void cmd_run(uint16_t mode)
     printf("UI: Wait for buffer \n");
     usleep(1000); // wait for buffer to be free
   }
-  printf("UI: Writing to SHM\n");
+  //printf("UI: Writing to SHM\n");
   memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)cmdlist,2*cmdlist[0]);
-  shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 3; // to be read by du(1)+eb(2)!
+  shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 1; // to be read by du(1)+eb(2)!
   *shm_cmd.next_write = *shm_cmd.next_write + 1;
   if(*shm_cmd.next_write >= *shm_cmd.nbuf) *shm_cmd.next_write = 0;
+  memcpy((void *)&(shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_write)+1]),(void *)cmdlist,2*cmdlist[0]);
+  shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_write)] = 2; // to be read by du(1)+eb(2)!
+  *shm_ebcmd.next_write = *shm_ebcmd.next_write + 1;
+  if(*shm_ebcmd.next_write >= *shm_ebcmd.nbuf) *shm_ebcmd.next_write = 0;
 }
 
 /**

@@ -254,12 +254,13 @@ void t3_maket3()
     if(idebug && isten == 1) printf("A 10 sec trigger %u %d\n",t2evts[ind].sec,t2evts[ind].stat);
     if(idebug && israndom == 1) printf("A Random trigger %u %d\n",t2evts[ind].sec,t2evts[ind].stat);
     for(i=ind-1;i>=0;i--){
-      if(t2evts[i].sec-t2evts[ind].sec > 1) tdif = TCOINC+1;
+      if(t2evts[i].sec-t2evts[ind].sec > 1) tdif = t3_time+1;
       else if(t2evts[i].sec-t2evts[ind].sec == 1){
         tdif = GIGA+t2evts[i].nsec-t2evts[ind].nsec;
       }else{
         tdif = t2evts[i].nsec-t2evts[ind].nsec;
       }
+      if(tdif<0) tdif = t3_time+1;
       /*if(tdif <= ctimes[t2evts[i].unit][t2evts[ind].unit]) { // later when we have a field
         if ((isten && (t2evts[i].trigflag&0x4)) || (isten==0 &&(t2evts[i].trigflag&0x4))==0){
           eventindex[evsize] = i;

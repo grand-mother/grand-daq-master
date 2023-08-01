@@ -36,8 +36,10 @@ typedef struct{
 #define NEVBUF 40 // maximal 40 event buffers
 #define EVSIZE 65000 //Max. size (in shorts) for evsize for each DU
 
-#define CMDBUF 40 // leave 20 command buffers
+#define CMDBUF 40 // leave 40 command buffers
 #define CMDSIZE 5000 //Max. size (in shorts) for command (should be able to hold config file)
+#define CMDEBBUF 10 // leave 10 command buffers for EB
+#define CMDEBSIZE 50 //Max. size (in shorts) for command
 #define LOG_FOLDER "/tmp/daq"
 
 #define TCOINC 2000  // Maximum coincidence time window
@@ -51,6 +53,7 @@ shm_struct shm_t2;
 shm_struct shm_t3;
 shm_struct shm_cmd;
 shm_struct shm_eb;
+shm_struct shm_ebcmd;
 //next EB parameters
 int eb_run = 1;
 int eb_run_mode = 0;
@@ -67,6 +70,7 @@ extern shm_struct shm_t2;
 extern shm_struct shm_t3;
 extern shm_struct shm_eb;
 extern shm_struct shm_cmd;
+extern shm_struct shm_ebcmd;
 extern int eb_run ;
 extern int eb_run_mode;
 extern int eb_max_evts ;

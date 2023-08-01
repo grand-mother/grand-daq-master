@@ -201,6 +201,10 @@ void ad_initialize(char *file)
         printf("An error occured creating the Command buffer space\n");
         exit(-1);
     }
+  if(ad_shm_create(&shm_ebcmd,CMDEBBUF,CMDEBSIZE) == ERROR){
+      printf("An error occured creating the EB Command buffer space\n");
+      exit(-1);
+  }
     pid_du = ad_spawn_du();
     pid_t3 = ad_spawn_t3();
     pid_eb = ad_spawn_eb();
