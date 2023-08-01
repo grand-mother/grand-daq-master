@@ -33,10 +33,10 @@ typedef struct{
 #define NT3BUF 500 // max 500 T3 buffers (small messages anyway)
 #define T3SIZE (6+3*MAXDU) //Max. size (in shorts) for T3 info in 1 message
 
-#define NEVBUF 10 // maximal 10 event buffers
+#define NEVBUF 40 // maximal 40 event buffers
 #define EVSIZE 65000 //Max. size (in shorts) for evsize for each DU
 
-#define CMDBUF 20 // leave 20 command buffers
+#define CMDBUF 40 // leave 20 command buffers
 #define CMDSIZE 5000 //Max. size (in shorts) for command (should be able to hold config file)
 #define LOG_FOLDER "/tmp/daq"
 

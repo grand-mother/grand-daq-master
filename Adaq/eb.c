@@ -162,6 +162,7 @@ void eb_getui()
   while((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)]) !=  0){ // loop over the UI input
     if(((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)]) &2) ==  2){ // loop over the UI input
       msg = (AMSG *)(&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_readb)+1]));
+      printf("EB: A GUI command\n");
       if(msg->tag == DU_STOP){
         running = 0;
         if(fpout != NULL) eb_close();
@@ -217,7 +218,7 @@ void eb_getdata(){
   int inew=0;
   int firmware;
   
-  while(((shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)]) &1) ==  1){ // loop over the input
+  while(((shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)]) &1) ==  1){ // loop over the inputb
     //printf("EB: Get Data %d %d\n",*shm_eb.next_read,shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)]);
     if(i_DUbuffer >= NDU) {
       printf("EB: Cannot accept more data\n");
@@ -364,17 +365,23 @@ void eb_main()
   sprintf(fname,"%s/eb",LOG_FOLDER);
   fp_log = fopen(fname,"w");
   printf("Starting EB\n");
+  int nloop = 0;
   while(1) {
     fseek(fp_log,0,SEEK_SET);
     eb_getui();
     eb_gett3();
     eb_getdata();
+    if(nloop == 1000) {
+      printf("Running.... %d\n",running);
+      nloop = 0;
+    }
     if(running == 1) eb_write_events();
     fprintf(fp_log,"To Disk: Run %6d, file %4d\n",eb_run,eb_sub);
     fprintf(fp_log,"AD events: %5d\n",write_sub[0]);
     fprintf(fp_log,"MD events: %5d\n",write_sub[2]);
     fprintf(fp_log,"TD events: %5d\n",write_sub[1]);
     usleep(1000);
+    nloop ++;
   }
   fclose(fp_log);
 }
