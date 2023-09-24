@@ -19,9 +19,9 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
-#include <sys/time.h>
 #ifdef Fake
 #include <math.h>
+#include <sys/time.h>
 #else
 #include <sys/mman.h>
 #endif
@@ -29,7 +29,7 @@
 #include<errno.h>
 
 #include "ad_shm.h"
-// #include "du_monitor.h"
+#include "du_monitor.h"
 #include "scope.h"
 
 
@@ -42,7 +42,6 @@
 DEV dev = 0;                    //!< Device id
 void *axi_ptr;
 uint32_t page_offset;
-uint32_t last_sec;
 
 extern int station_id;
 extern shm_struct shm_ev;
@@ -84,10 +83,7 @@ void scope_raw_write(uint32_t reg_addr, uint32_t value)
   *((unsigned int *)(axi_ptr+page_offset+reg_addr)) = value;
 }
 
-uint32_t scope_raw_read(uint32_t reg_addr) 
-{
-  return *((unsigned int *)(axi_ptr+page_offset+reg_addr));
-}
+#define scope_raw_read(reg_addr) *((unsigned int *)(axi_ptr+page_offset+reg_addr))
 
 void scope_flush()
 {
@@ -233,7 +229,7 @@ int scope_fake_gps()
   ppsbuf[offset+PPS_DAYMONTH] = 100*now->tm_mday+now->tm_mon+1;
   ppsbuf[offset+PPS_MINHOUR] = 100*now->tm_min+now->tm_hour;
   ppsbuf[offset+PPS_STATSEC] = now->tm_sec;
-  printf("PPS %d %d %d %d\n",evgps,ppsbuf[offset+PPS_TRIG_RATE] ,ppsbuf[offset+PPS_MINHOUR],ppsbuf[offset+PPS_STATSEC]);
+  //printf("PPS %d %d %d %d\n",evgps,ppsbuf[offset+PPS_TRIG_RATE] ,ppsbuf[offset+PPS_MINHOUR],ppsbuf[offset+PPS_STATSEC]);
   prevgps = evgps;
   evgps++;
   if(evgps>=GPSSIZE)evgps = 0;
@@ -340,15 +336,8 @@ int scope_fake_event(int32_t ioff)
 }
 #endif
 
-int scope_t2()
-{
-  return(1);
-}
-
 int scope_read_event(int32_t ioff)
 {
-  /** temp fix for ARG */
-  //struct timeval tv;
   static uint16_t evtnr=0;
   int offset = ptr_evt*evtlen;
   int32_t rread,nread,ntry;
@@ -356,7 +345,6 @@ int scope_read_event(int32_t ioff)
   struct tm tt;
   int length,i;
   double fracsec;
-  uint32_t CTP,CTD;
   uint32_t *sec,*nanosec;
   int next_write = *(shm_ts.next_write);
 
@@ -390,47 +378,29 @@ int scope_read_event(int32_t ioff)
     tt.tm_mday = (evtbuf[offset+EVT_DAYMONTH]>>8)&0xff;
     tt.tm_mon = (evtbuf[offset+EVT_DAYMONTH]&0xff)-1;
     tt.tm_year = evtbuf[offset+EVT_YEAR] - 1900;
-    CTP = *(uint32_t *)&evtbuf[offset+EVT_CTP];
-    CTD = *(uint32_t *)&evtbuf[offset+EVT_CTD];
-    if((CTP&0x80000000) || (CTD &0x80000000) ){
-      CTP &=0x7fffffff;
-      *(uint32_t *)&evtbuf[offset+EVT_CTP] = CTP;
-      CTD &=0x7fffffff;
-      *(uint32_t *)&evtbuf[offset+EVT_CTD] = CTD;
-    }
-    *sec = (unsigned int)timegm(&tt);
-    if(*sec > 1690000000 && *sec < 2000000000)
-      last_sec = *sec;
-    fracsec = (double)(CTD)/(double)(CTP);
+    *sec = (unsigned int)timegm(&tt);    
+    fracsec = (double)(*(uint32_t *)&evtbuf[offset+EVT_CTD])/(double)(*(uint32_t *)&evtbuf[offset+EVT_CTP]);
     nanosec = (uint32_t *)&evtbuf[offset+EVT_NANOSEC];
     *nanosec = 1.E9*fracsec;
-    /* temp fix ARG */
-    //gettimeofday(&tv,NULL);
-    //*sec = tv.tv_sec;
-    //*nanosec= 1000*tv.tv_usec;
-
     evtbuf[offset+EVT_TRIGGERPOS] = shadowlist[Reg_Time1_Pre>>1]+shadowlist[Reg_Time_Common>>1];
     evtbuf[offset+EVT_ID] = evtnr++;
     evtbuf[offset+EVT_HARDWARE] = station_id;
-    // evtbuf[offset+EVT_ATM_TEMP] = shm_mon.Ubuf[MON_TEMP];
-    // evtbuf[offset+EVT_ATM_PRES] = shm_mon.Ubuf[MON_PRESSURE];
-    // evtbuf[offset+EVT_ATM_HUM] = shm_mon.Ubuf[MON_HUMIDITY];
-    // evtbuf[offset+EVT_ACCEL_X] = shm_mon.Ubuf[MON_AccX];
-    // evtbuf[offset+EVT_ACCEL_Y] = shm_mon.Ubuf[MON_AccY];
-    // evtbuf[offset+EVT_ACCEL_Z] = shm_mon.Ubuf[MON_AccZ];
-    // evtbuf[offset+EVT_BATTERY] = shm_mon.Ubuf[MON_BATTERY];
+    evtbuf[offset+EVT_ATM_TEMP] = shm_mon.Ubuf[MON_TEMP];
+    evtbuf[offset+EVT_ATM_PRES] = shm_mon.Ubuf[MON_PRESSURE];
+    evtbuf[offset+EVT_ATM_HUM] = shm_mon.Ubuf[MON_HUMIDITY];
+    evtbuf[offset+EVT_ACCEL_X] = shm_mon.Ubuf[MON_AccX];
+    evtbuf[offset+EVT_ACCEL_Y] = shm_mon.Ubuf[MON_AccY];
+    evtbuf[offset+EVT_ACCEL_Z] = shm_mon.Ubuf[MON_AccZ];
+    evtbuf[offset+EVT_BATTERY] = shm_mon.Ubuf[MON_BATTERY];
     timestampbuf[next_write].ts_seconds = *sec;
     timestampbuf[next_write].ts_nanoseconds = *nanosec;
     timestampbuf[next_write].event_nr = evtbuf[offset+EVT_ID];
     timestampbuf[next_write].trigmask = evtbuf[offset+EVT_TRIG_PAT];
-    if(scope_t2() == 1 &&
-       (*sec > 1690000000 && *sec < 2000000000)) {
-      next_write+=ioff;
-      if(next_write >=BUFSIZE) next_write = 0;
-      *shm_ts.next_write = next_write;
-      ptr_evt +=ioff;
-      if(ptr_evt>=BUFSIZE) ptr_evt = 0; // remember: circular buffer
-    }
+    next_write+=ioff;
+    if(next_write >=BUFSIZE) next_write = 0;
+    *shm_ts.next_write = next_write;
+    ptr_evt +=ioff;
+    if(ptr_evt>=BUFSIZE) ptr_evt = 0; // remember: circular buffer
     return(SCOPE_EVENT);                  // success!
   } else{ //flushing, but why???
     if(length<0) length = 10000;
@@ -450,7 +420,6 @@ int32_t scope_read_pps()
   int offset = evgps*WCNT_PPS;
   uint32_t Is_Data,tbuf,*pbuf,ctp;
   int length;
-  static int nzero = 0;
   
   if(axi_ptr == NULL) return(-1);
   Is_Data = scope_raw_read(Reg_GenStatus);
@@ -474,12 +443,6 @@ int32_t scope_read_pps()
   }
   ctp = *(uint32_t *)&ppsbuf[offset+PPS_CTP];
   ctp = ctp&0x7fffffff;
-  if(ppsbuf[offset+PPS_TRIG_RATE]>0)nzero = 0;
-  else nzero++;
-  if(nzero>12) scope_start_run();
-  printf("PPS %d %d %d %d\n",evgps,ppsbuf[offset+PPS_TRIG_RATE] ,ppsbuf[offset+PPS_MINHOUR],ppsbuf[offset+PPS_STATSEC]);
-  // next: update GPS seconds
-  scope_calc_t3nsec(&ppsbuf[offset]);
   prevgps = evgps;
   evgps++;
   if(evgps>=GPSSIZE)evgps = 0;
@@ -523,49 +486,28 @@ int scope_run_read()
   return iret;
 }
 
-int scope_calc_t3nsec(uint16_t *pps)
-{
-  int i;
-  int offset = 0;
-  uint32_t sec,nanosec;
-  for(i=0;i<BUFSIZE;i++){
-    nanosec = *(uint32_t *)&evtbuf[offset+EVT_NANOSEC];
-    offset += evtlen;
-  }
-  return(1);
-}
-
 void scope_event_to_shm(uint16_t evnr,uint16_t trflag, uint16_t sec,uint32_t ssec)
 {
   int i;
   int offset = 0;
-  int ifound = 0;
   uint32_t nanosec;
-  uint32_t *fullsec;
   int next_write = *(shm_ev.next_write);
   
-  
+
   for(i=0;i<BUFSIZE;i++){
     nanosec = *(uint32_t *)&evtbuf[offset+EVT_NANOSEC];
-    fullsec = (uint32_t *)&evtbuf[offset+EVT_SECOND];
-    if((last_sec - *fullsec)<50){
-      if(sec == (evtbuf[offset+EVT_SECOND]&0xff)){
-        if(nanosec>>6 == ssec) {
-          evtbuf[offset+EVT_ID]=evnr;
-          evtbuf[offset+EVT_T3FLAG] = trflag;
-          memcpy(&t3buf[next_write*evtlen],&evtbuf[offset],evtbuf[offset+EVT_LENGTH]*sizeof(uint16_t));
-          //printf("Found event%d Buffer-id %d Flag = %d\n",evnr,next_write,trflag);
-          ifound = 1;
-          next_write++;
-          if(next_write >= MAXT3) next_write = 0;
-          *(shm_ev.next_write) = next_write;
-          break;
-        }
-      }
+    if(sec == (evtbuf[offset+EVT_SECOND]&0xff)){
+      if(nanosec>>6 == ssec) {
+	evtbuf[offset+EVT_ID]=evnr;
+	evtbuf[offset+EVT_T3FLAG] = trflag;
+	memcpy(&t3buf[next_write*evtlen],&evtbuf[offset],evtbuf[offset+EVT_LENGTH]*sizeof(uint16_t));
+	printf("Found event %d Buffer-id %d Flag = %d\n",evnr,next_write,trflag);
+	next_write++;
+	if(next_write >= MAXT3) next_write = 0;
+	*(shm_ev.next_write) = next_write;
+	break;
+      } 
     }
     offset += evtlen;
-  }
-  if(ifound == 0){
-    printf("Error: Did not find requested event\n");
   }
 }

@@ -6,6 +6,10 @@ import socket
 import sys
 import os
 import time
+import struct
+
+def float_to_hex(f):
+    return hex(struct.unpack('<I', struct.pack('<f', f))[0])
 
 def testPulseRange(tp):
   value = app.getEntry(tp)
@@ -48,12 +52,23 @@ def VerifyRanges(tp):
   volth = app.getEntry("BatHigh")
   if volth == None: volth = 15
   if volth > 15: volth = 15
-  if voltl > (volth - 2):
-    if voltl < 7: voltl = 5
+  if voltl > (volth - 1):
+    if voltl < 7: voltl = 7
     if voltl > 12: voltl = 12
-    volth = voltl + 2
+    volth = voltl + 1
   app.setEntry("BatLow",voltl)
   app.setEntry("BatHigh",volth)
+# Temperature ranges
+  templ = app.getEntry("TempLow")
+  if templ == None: templ = 50.0
+  temph = app.getEntry("TempHigh")
+  if temph == None: temph = 58.0
+  if temph > 65: temph = 65
+  if templ < 45: templ = 45
+  if templ > (temph -2): templ = temph-2
+  # should add consistency checks for the temperature values !!!!!!!!!!
+  app.setEntry("TempLow",templ)
+  app.setEntry("TempHigh",temph)
 # All timings
   Tover = app.getEntry("Tover")
   if Tover != None:
@@ -326,7 +341,7 @@ def DUfile(button):
               app.setOptionBox("Configuration","1PPS",False)
             else:
               app.setOptionBox("Configuration","1PPS",True)
-            if (value & 1<<6) == 0:
+            if (value & 1<<7) == 0:
               app.setOptionBox("Configuration","Fake ADC",False)
             else:
               app.setOptionBox("Configuration","Fake ADC",True)
@@ -487,8 +502,20 @@ def DUfile(button):
     print("Trying to write to "+fname)
     fp=open(fname,"w")
     fp.write("#Automatically generated from Gui\n")
-    boxlist = app.getOptionBox("Configuration")
+    boxlist = app.getOptionBox("Temp. Source")
     iconf = 0
+    if boxlist == "ADC chip":
+      iconf = (1<<4)
+      selector = 0
+    elif boxlist == "GPS chip":
+      iconf = (1<<5)
+      selector = 1
+    elif boxlist == "Nut sensor":
+      iconf = (1<<6)
+      selector = 2
+#    fp.write("q "+hex(iconf)+"\n")
+    boxlist = app.getOptionBox("Configuration")
+#    iconf = 0
     for conf,tick in boxlist.items():
       if tick == True:
         if conf == "Auto reboot":
@@ -502,7 +529,7 @@ def DUfile(button):
         elif conf == "Filter 1":
           iconf += (1<<8)
         elif conf == "Fake ADC":
-          iconf += (1<<6)
+          iconf += (1<<7)
         elif conf == "1PPS":
           iconf += (1<<1)
         elif conf == "Enable DAQ":
@@ -559,7 +586,6 @@ def DUfile(button):
         newrate = int(1000000/divider)
         if rate >= newrate and rate < oldrate :
           iread+=(idiv<<8)
-          app.setEntry("Test Pulse",newrate)
         oldrate = newrate
     for ch in range(1,5):
         if app.getOptionBox("Channel "+str(ch)) != "Off":
@@ -584,17 +610,7 @@ def DUfile(button):
     fp.write("1 0x006 "+hex(int(app.getEntry("Tover")/2))+"\n")
     fp.write("2 0x008 "+hex(iselector)+"\n")
     voltl = app.getEntry("BatLow")
-    if voltl == None: voltl = 5
-    if voltl < 5: voltl = 5
     volth = app.getEntry("BatHigh")
-    if volth == None: volth = 15
-    if volth > 15: volth = 15
-    if voltl > (volth - 2):
-      if voltl < 7: voltl = 5
-      if voltl > 12: voltl = 12
-      volth = voltl + 2
-    app.setEntry("BatLow",voltl)
-    app.setEntry("BatHigh",volth)
     value = int(voltl*(18*4096)/(2.5*(18+91)))
     fp.write("3 0x00C "+hex(value)+"\n")
     value = int(volth*(18*4096)/(2.5*(18+91)))
@@ -605,12 +621,32 @@ def DUfile(button):
       TPost = hex(int(app.getEntry("C"+str(ch)+"TPost")/2))
       fp.write(str(3+ch)+" "+hex(int(12+4*int(ch)))+" "+TPre+"\n")
       fp.write(str(3+ch)+" "+hex(int(14+4*int(ch)))+" "+TPost+"\n")
+#Temperature Ranges
+    templ = app.getEntry("TempLow")
+    if templ == None: templ = 50
+    temph = app.getEntry("TempHigh")
+    if temph == None: temph = 55
+    if selector == 0:
+        value = int((temph-25)*2.654+819)
+        fp.write("10 0x028 "+hex(value)+"\n")
+        value = int((templ-25)*2.654+819)
+        fp.write("10 0x02A "+hex(value)+"\n")
+    elif selector == 2:
+        value = int((temph*19.5+400)/1000*4096/2.5)
+        fp.write("10 0x028 "+hex(value)+"\n")
+        value = int((templ*19.5+400)/1000*4096/2.5)
+        fp.write("10 0x02A "+hex(value)+"\n")
+    else:
+        value = float_to_hex(float(temph))
+        fp.write("13 0x036 "+value[0: 6]+"\n")
+        fp.write("13 0x034 0x"+value[6:10]+"\n")
+        value = float_to_hex(float(templ))
+        fp.write("16 0x042 "+value[0: 6]+"\n")
+        fp.write("16 0x040 0x"+value[6:10]+"\n")
+
 # Channel Property
     for ch in range(1,5):
       GaindB = app.getEntry("C"+str(ch)+"Gain")
-      if GaindB < -14: GaindB = -14
-      if GaindB > 23.5: GaindB = 23.5
-      app.setEntry("C"+str(ch)+"Gain",GaindB)
       Gain = hex(int((4096*(GaindB+14)/(37.5*2.5))+0.5))
       ITim = hex(int(app.getEntry("C"+str(ch)+"Int"))<<8)
       BMin = hex(int(app.getEntry("C"+str(ch)+"BMin")))
@@ -712,6 +748,14 @@ app.addNumericEntry("BatLow",row,1)
 app.setEntry("BatLow",9.0)
 app.addNumericEntry("BatHigh",row,2)
 app.setEntry("BatHigh",12.5)
+row = row+1
+app.addLabel("Temp","Temperature Limits (off, on) Celcius")
+app.addNumericEntry("TempHigh",row,1)
+app.setEntry("TempHigh",58.0)
+app.addNumericEntry("TempLow",row,2)
+app.setEntry("TempLow",50.0)
+app.addLabelOptionBox("Temp. Source",["ADC chip","GPS chip","Nut sensor"],row,3)
+app.setOptionBox("Temp. Source","GPS chip",True)
 row = row+1
 app.addLabel("DU","Detector Unit")
 app.addTickOptionBox("Configuration",["Auto reboot","Filter 1","Filter 2","Filter 3",

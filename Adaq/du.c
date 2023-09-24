@@ -16,6 +16,7 @@
 #include <sys/time.h>
 #include "Adaq.h"
 #include "amsg.h"
+#include "scope.h"
 
 extern int idebug;
 #define MAXLOG 8 //max 8 lines output (monitor!)
@@ -82,22 +83,25 @@ void du_interpret(uint16_t *buffer)
       case DU_EVENT:
         if(idebug)
           printf("Received an event\n");
+        uint16_t *DUinfo;
+        DUinfo = (uint16_t *)msg->body;
+        printf("DU: Found event %d (%d, %d)\n",DUinfo[EVT_ID],DUinfo[EVT_HARDWARE], *(uint32_t *)&DUinfo[EVT_SECOND]);
       case DU_NO_EVENT:
         if(msg->length<EVSIZE){
           // wait until the shared memory is not full
-	  ntry = 0;
+          ntry = 0;
           while(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] == 1 && ntry <100) {//infinite loop, potential problem!
             printf("DU: Wait for EB\n");
-	    ntry++;
+            ntry++;
             usleep(1000); // wait for the event builder to be ready
           }
           // copy the event/monitor data
           if(ntry<100){
-	    memcpy((void *)&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)+1]),(void *)msg,2*msg->length);
-	    shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] = 1;
-	    *shm_eb.next_write = *shm_eb.next_write + 1;
-	    if(*shm_eb.next_write >= *shm_eb.nbuf) *shm_eb.next_write = 0;
-	  }
+            memcpy((void *)&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)+1]),(void *)msg,2*msg->length);
+            shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] = 1;
+            *shm_eb.next_write = *shm_eb.next_write + 1;
+            if(*shm_eb.next_write >= *shm_eb.nbuf) *shm_eb.next_write = 0;
+          }
         } else{
           printf("DU: Error: Too much EVENT information in a single message, data ignored\n");
         }

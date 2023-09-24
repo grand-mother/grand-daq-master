@@ -218,10 +218,10 @@
   buffer definitions for the scope readout process.
  */
 
-#define BUFSIZE 3000            //!< store up to 3000 events in circular buffer
+#define BUFSIZE 1000            //!< store up to 3000 events in circular buffer
 
 #define GPSSIZE 35              //!< buffer upto 35 GPS seconds info in circular buffer
-#define MAXT3 50               //!< 20 T3 events in circular cuffer
+#define MAXT3 20               //!< 20 T3 events in circular cuffer
 
 // next: what did we read from the scope?
 
@@ -265,6 +265,5 @@ int scope_read(int ioff);
 int scope_no_run_read();
 int scope_run_read();
 void scope_event_to_shm(uint16_t evnr,uint16_t trflag,uint16_t sec,uint32_t ssec);
-int scope_calc_t3nsec(uint16_t *pps);
 //
 

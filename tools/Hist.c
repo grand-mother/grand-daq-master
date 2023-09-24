@@ -193,10 +193,10 @@ void print_du(uint16_t *du)
       sprintf(fname,"HSFTime%d_%d",DU_id[idu],ic);
       sprintf(hname,"HSFTime%d_%d",DU_id[idu],ic);
       HFTime[idu][ic] = new TProfile2D(fname,hname,du[EVT_TOT_SAMPLES+1]/2,0.,250,240,0.,24.);
-      sprintf(fname,"HB%d",DU_id[idu]);
-      sprintf(hname,"HB%d",DU_id[idu]);
-      HBattery[idu] = new TProfile(fname,hname,14400,0.,24,0.,30.);
     }
+    sprintf(fname,"HB%d",DU_id[idu]);
+    sprintf(hname,"HB%d",DU_id[idu]);
+    HBattery[idu] = new TProfile(fname,hname,14400,0.,24,0.,30.);
   }
   for(ic=1;ic<=4;ic++){
     if(du[EVT_TOT_SAMPLES+ic]>0){

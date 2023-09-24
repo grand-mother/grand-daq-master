@@ -98,12 +98,12 @@ void t3_gett2()
       t2b = (T2BODY *)msg->body;
       stat = t2b->DU_id; // the indices of my array start at 0, stations at 1
       sec = T0(t2b->t0);  // obtain the seconds
-      /**if(sec>0x80000000) {
+      if(sec>2000000000) {
         shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] = 0;
         *shm_t2.next_read = (*shm_t2.next_read) + 1;
         if( *shm_t2.next_read >= *shm_t2.nbuf) *shm_t2.next_read = 0;
         continue;
-      }**/
+      }
       if(sec != last_read_sec) last_read_sec = sec;
       if((sec>(t2evts[0].sec+100))&&t2write != 0) {
         printf("T3: Error in timing, large jump; LS=%d\n",stat);

@@ -155,7 +155,7 @@ int buffer_add_t3(unsigned short *bf,int bfsize,short id) {
   msg_start[AMSG_OFFSET_TAG] = DU_EVENT;
   if(next_read == next_write)  return(0); // nothing needed
   memcpy(&msg_start[AMSG_OFFSET_BODY],&t3buf[next_read*t3buf[EVT_LENGTH]],t3buf[EVT_LENGTH]*sizeof(uint16_t));
-  printf("Copying %d words. Time %d\n",t3buf[next_read*t3buf[EVT_LENGTH]+EVT_LENGTH],*(uint32_t *)&t3buf[next_read*t3buf[EVT_LENGTH]+EVT_SECOND]);
+  //printf("Copying %d words\n",t3buf[EVT_LENGTH]);
   bf[0] = t3buf[EVT_LENGTH]+2;
   next_read++;
   if(next_read>=MAXT3) next_read = 0;

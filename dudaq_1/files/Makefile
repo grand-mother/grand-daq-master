@@ -12,5 +12,5 @@ clean:
 	rm -f dudaq
 
 $(APP): $(APP_OBJS)
-	$(CC) $(LDFLAGS) -O3 -DSCOPE_V4  -o $@ $(APP_OBJS) $(LDLIBS)
+	$(CC) $(LDFLAGS) -DSCOPE_V4  -o $@ $(APP_OBJS) $(LDLIBS)
 

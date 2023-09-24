@@ -1,7 +1,7 @@
 APP = dudaq
 
 # Add any other object files to this list below
-APP_OBJS = dudaq.o buffer.o scope.o ad_shm.o
+APP_OBJS = dudaq.o buffer.o scope.o ad_shm.o monitor.o
 
 all: build
 

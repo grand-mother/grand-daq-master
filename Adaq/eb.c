@@ -96,16 +96,22 @@ void eb_close()
 {
   char cmd[400];
   // first update file header
-  rewind(fpout);
-  fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpout);
-  fclose(fpout);
-  rewind(fpten);
-  fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpten);
-  fclose(fpten);
-  rewind(fpmb);
-  fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpmb);
-  fclose(fpmb);
-  fclose(fpmon);
+  if(fpout != NULL){
+    rewind(fpout);
+    fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpout);
+    fclose(fpout);
+  }
+  if(fpten != NULL){
+    rewind(fpten);
+    fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpten);
+    fclose(fpten);
+  }
+  if(fpmb != NULL){
+    rewind(fpmb);
+    fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpmb);
+    fclose(fpmb);
+  }
+  if(fpmon != NULL) fclose(fpmon);
   fpout = NULL;
   fpten = NULL;
   fpmb = NULL;
@@ -127,14 +133,14 @@ int eb_DUcompare(const void *a, const void *b)
   uint32_t t1nsec,t2nsec;
   t1 = (uint16_t *)(a);
   t2 = (uint16_t *)(b);
-  if(t1[EVT_ID] < t2[EVT_ID]) {
+  /**if(t1[EVT_ID] < t2[EVT_ID]) {
     if((t1[EVT_ID]+1000) < t2[EVT_ID]) return(-1);
     else return(1);
   }
   if(t1[EVT_ID] > t2[EVT_ID]) {
     if(t1[EVT_ID] > (t2[EVT_ID]+1000)) return(1);
     else return(-1);
-  }
+  }**/
   t1sec = *(uint32_t *)&t1[EVT_SECOND];
   t1nsec = *(uint32_t *)&t1[EVT_NANOSEC];
   t2sec = *(uint32_t *)&t2[EVT_SECOND];
@@ -231,8 +237,12 @@ void eb_getdata(){
       DUinfo = (uint16_t *)msg->body;
       //printf("Trying to copy event of length %d (max is %d)\n",DUinfo[EVT_LENGTH],EVSIZE);
       if(DUinfo[EVT_LENGTH] < EVSIZE){
-	if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,2*DUinfo[EVT_LENGTH]);
-	if(running ==1) i_DUbuffer +=1;
+        if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,2*DUinfo[EVT_LENGTH]);
+        if(running ==1) i_DUbuffer +=1;
+        if(i_DUbuffer >= NDU) {
+          printf("EB: Filling the buffer, loosing data\n");
+          i_DUbuffer = NDU-1;
+        }
       }
     } else if(msg->tag == DU_MONITOR){
       if(fpmon != NULL){
@@ -250,7 +260,10 @@ void eb_getdata(){
     *shm_eb.next_read = (*shm_eb.next_read) + 1;
     if( *shm_eb.next_read >= *shm_eb.nbuf) *shm_eb.next_read = 0;
   }
-  if(i_DUbuffer >= NDU) i_DUbuffer = NDU-1;
+  if(i_DUbuffer >= NDU) {
+    printf("EB: Filling the buffer, loosing data\n");
+    i_DUbuffer = NDU-1;
+  }
   if(i_DUbuffer>0 && inew == 1) {
     qsort(DUbuffer[0],i_DUbuffer,2*EVSIZE,eb_DUcompare);
   }
@@ -272,7 +285,8 @@ void eb_write_events(){
   FILE *fp;
   EVHDR evhdr;
   uint16_t *DUinfo,*DUn;
-  int i,ils,il_start;
+  uint32_t du_sec,du_nsec;
+  int i,ils,il_start,DTime;
   static int n_written=0;
   
   if(i_DUbuffer == 0) return; //no buffers in memory
@@ -280,7 +294,16 @@ void eb_write_events(){
   DUinfo = (uint16_t *)DUbuffer[i_DUbuffer-1];
   il_start = i_DUbuffer-1;
   DUn = (uint16_t *)DUbuffer[0];
-  if((*(uint32_t *)&DUn[EVT_SECOND]<=*(uint32_t *)&DUinfo[EVT_SECOND])  &&(i_DUbuffer < (0.8*NDU)))  return; //in case of a huge amount of data in 1 sec
+  if((*(uint32_t *)&DUn[EVT_SECOND]<*(uint32_t *)&DUinfo[EVT_SECOND])) {
+    printf("EB: Second sorting went wrong %u %u\n",*(uint32_t *)&DUn[EVT_SECOND],*(uint32_t *)&DUinfo[EVT_SECOND]);
+    i_DUbuffer = 0;
+    return;
+  }
+  if((*(uint32_t *)&DUn[EVT_SECOND]==*(uint32_t *)&DUinfo[EVT_SECOND])  &&(i_DUbuffer > (0.8*NDU))) {
+    printf("EB: filling 80 percent of the data buffer, aborting event writing\n");
+    i_DUbuffer = 0;
+    return;
+  }
   if(((*(uint32_t *)&DUn[EVT_SECOND]-*(uint32_t *)&DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU)) ) return;
   evhdr.t3_id = DUinfo[EVT_ID];
   evhdr.DU_count = 1;
@@ -295,15 +318,44 @@ void eb_write_events(){
   //printf("Event Type %d Version %d\n",evhdr.type,evhdr.version);
   for(i=(i_DUbuffer-2);i>=0;i--){
     DUn = (uint16_t *)DUbuffer[i];
-    if(DUn[EVT_ID] == evhdr.t3_id){
+    du_sec = *(uint32_t *)&DUn[EVT_SECOND];
+    du_nsec =*(uint32_t *)&DUn[EVT_NANOSEC];
+    if(du_sec == evhdr.seconds){
+      if(du_nsec >= evhdr.nanosec) DTime = du_nsec-evhdr.nanosec;
+      else {
+        DTime = evhdr.nanosec-du_nsec;
+        printf("EB: sorting error (ns)\n");
+      }
+    }else if (du_sec > evhdr.seconds){
+      DTime = du_sec-evhdr.seconds;
+      if(DTime > 1) DTime = 1E9;
+      else{
+        if(evhdr.nanosec>du_nsec)
+          DTime = 1E9-(evhdr.nanosec-du_nsec);
+        else
+          DTime = 1E9+(du_nsec-evhdr.nanosec);
+      }
+    } else{
+      printf("EB: sorting error (s)\n");
+      DTime = evhdr.seconds-du_sec;
+      if(DTime > 1) DTime = 1E9;
+      else{
+        if(du_nsec>evhdr.nanosec)
+          DTime = 1E9+(du_nsec-evhdr.nanosec);
+        else
+          DTime = 1E9-(evhdr.nanosec-du_nsec);
+      }
+    }
+    if(DUn[EVT_ID] == evhdr.t3_id && DTime < 5E6){
       evhdr.DU_count ++;
       evhdr.length += 2*DUn[EVT_LENGTH];
       evhdr.type |= DUn[EVT_T3FLAG];
     }else{
-      //printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,DUn->GPSseconds,DUinfo->GPSseconds);
+      printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,du_sec,evhdr.seconds);
       eb_fhdr.last_event_id = evhdr.event_id;
       eb_fhdr.last_event_time = evhdr.seconds;
       if(fpout == NULL) {
+        printf("EB: Opening %d\n",(int)fpout);
         eb_open(&evhdr);
         n_written = 0;
         for(isub=0;isub<3;isub++) write_sub[isub] = 0;
@@ -320,6 +372,7 @@ void eb_write_events(){
         }
         else fp = fpout;
       }
+      //printf("EB: Writing event %d\n",(int)fp);
       fwrite(&evhdr,1,44,fp);
       for(ils=il_start;ils>(il_start-evhdr.DU_count);ils--){
         DUn = (uint16_t *)DUbuffer[ils];
@@ -328,13 +381,19 @@ void eb_write_events(){
       }// that is it, start a new event
       n_written++;
       write_sub[isub]++;
-      if(n_written >=eb_max_evts) eb_close();
+      if(n_written >=eb_max_evts) {
+        printf("EB: closing  files %d\n",(int)fpout);
+        eb_close();
+        //printf("EB: after closing  files %d\n",(int) fpout);
+        //printf("EB: after closing  files %d\n",(int) fpout);
+      }
       eb_event++;
       DUinfo = (uint16_t *)DUbuffer[i];
-      DUn = (uint16_t *)DUbuffer[0];
+      DUn = (uint16_t *)DUbuffer[i-1];
       il_start = i;
       i_DUbuffer = i+1;
-      if(((*(uint32_t *)&DUn[EVT_SECOND]-*(uint32_t *)&DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU))) break;
+      break;
+/*      if(((*(uint32_t *)&DUn[EVT_SECOND]-*(uint32_t *)&DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU))) break;
       evhdr.t3_id = DUinfo[EVT_ID];
       evhdr.DU_count = 1;
       evhdr.length = 40+2*DUinfo[EVT_LENGTH];
@@ -344,7 +403,7 @@ void eb_write_events(){
       evhdr.seconds = *(uint32_t *)&DUinfo[EVT_SECOND];
       evhdr.nanosec = *(uint32_t *)&DUinfo[EVT_NANOSEC];
       evhdr.type = DUinfo[EVT_T3FLAG];
-      evhdr.version=EVENTVERSION;
+      evhdr.version=EVENTVERSION;*/
     }
   }
 }
