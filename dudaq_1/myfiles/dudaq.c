@@ -44,6 +44,11 @@ extern uint32_t shadowlist[Reg_End>>2];
 #define SOCKETS_BUFFER_SIZE  1048576
 #define SOCKETS_TIMEOUT      100
 
+#define STR_IMPL(x) #x
+#define STR(x) STR_IMPL(x)
+const char g_GIT_BRANCH[] = STR(VERSION);
+const char g_GIT_SHA1[] = STR(GIT_SHA);
+
 int du_port;       //!<port number on which to connect to the central daq
 
 int run=0;                //!< current run number
@@ -816,6 +821,9 @@ int main(int argc, char **argv)
     signal(SIGABRT,clean_stop);
     signal(SIGKILL,clean_stop);
     
+    printf("**** %s ****\n",g_GIT_BRANCH);
+    printf("**** %s ****\n",g_GIT_SHA1);
+
 #ifndef Fake
     du_get_station_id();
 #else
