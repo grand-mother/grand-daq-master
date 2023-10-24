@@ -17,3 +17,6 @@ SpecNancaydet.pdf
 SpecNancayfull.pdf
 *.pdf
 tools/noise.txt
+.DS_Store
+*~
+.project
