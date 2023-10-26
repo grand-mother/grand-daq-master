@@ -821,8 +821,11 @@ int main(int argc, char **argv)
     signal(SIGABRT,clean_stop);
     signal(SIGKILL,clean_stop);
     
-    printf("**** %s ****\n",g_GIT_BRANCH);
-    printf("**** %s ****\n",g_GIT_SHA1);
+    printf("\n====================================");
+    printf("\nExecutable dudaq, compiled %s %s", __DATE__, __TIME__);
+    printf("\n\nfrom git branch %s with sha1 %s",g_GIT_BRANCH, g_GIT_SHA1);
+    printf("\n====================================\n\n");
+
 
 #ifndef Fake
     du_get_station_id();
