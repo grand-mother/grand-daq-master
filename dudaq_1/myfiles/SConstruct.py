@@ -5,7 +5,6 @@
 #
 # Configuration:
 # --------------
--
 #  1) Scons installation xith python3
 #     python3 pip -m install scons
 # 
@@ -43,7 +42,7 @@ sha_git = subprocess.getoutput(cmd)
 #https://stackoverflow.com/questions/61164904/compiler-not-found-when-building-with-scons
 # => ENV = os.environ need to retrieve the path of aarch64-linux-gnu-gcc
 CC_val = 'aarch64-linux-gnu-gcc'
-CC_val = 'gcc'
+#CC_val = 'gcc'
 env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -DVERSION={branch} -DGIT_SHA={sha_git} ')
 
 
