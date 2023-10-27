@@ -47,11 +47,13 @@ WARNING: experimental approach, must validate
       with my installation it's here
       . /home/grand/install/xilinx/SDK/2018.3/settings64.sh
       now C compilator "aarch64-linux-gnu-gcc" must be available in PATH
+      
+   3) Write a SConstruct.py file an equivalent of Makefile for SCons
   
  
   Build executable dudaq:
   ----------------------
-  in terminal , in the same directory of this file, ie "SConstruct.py"
+  in terminal, in the same directory where "SConstruct.py" is present
      $ scons   
    
   
