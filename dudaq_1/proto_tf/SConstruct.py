@@ -29,7 +29,7 @@
 
 import os
 
-ARM64 = True
+ARM64 = False
 
 if ARM64:
 	CC_val = 'aarch64-linux-gnu-gcc'
@@ -37,7 +37,8 @@ if ARM64:
 else:
 	CC_val = 'gcc'
 	m_LIBPATH='/home/grand/install/tf_lite/tflite_build_amd64'
-	
+
+
 env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -I/home/grand/install/tf_lite/tensorflow_src')
 
 
@@ -45,4 +46,3 @@ env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-len
 env.Program('tf_inference', 'main.c',
 	LIBS = 'tensorflowlite_c',
 	LIBPATH = m_LIBPATH)
-
