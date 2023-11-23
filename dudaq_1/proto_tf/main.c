@@ -4,7 +4,7 @@
  Author      : colley
  Version     :
  Copyright   : Your copyright notice
- Description : trigger tensor proto
+ Description : trigger tensorflow proto
  ============================================================================
  */
 
@@ -13,6 +13,7 @@
 #include "tensorflow/lite/c/c_api.h"
 
 #define NB_SAMPLE 1024
+#define NB_EVENTS 20000
 
 float trace_1[] = { -0.004028, -0.001465, 0.000732, 0.000854, 0.000122,
 		0.002319, 0.005493, 0.001221, -0.002075, 0.000977, 0.004272, -0.000244,
@@ -539,12 +540,27 @@ int main(int argc, char *argv[]) {
 	float output_proba;
 	float input[3 * NB_SAMPLE];
 	int cpt;
+	int init;
+	int nb_thread;
+	int nb_events;
 
 	cpt = 0;
+	init = 1;
+	nb_thread = 1;
+	nb_events = NB_EVENTS;
+
+	if (argc > 1) {
+		nb_thread = atoi(argv[1]);
+		if (argc > 2) {
+			nb_events = atoi(argv[2]);
+		}
+	}
 
 	TfLiteModel* model = TfLiteModelCreateFromFile("trigger_grand.tflite");
 
 	TfLiteInterpreterOptions* options = TfLiteInterpreterOptionsCreate();
+	printf("\nNb thread : %d", nb_thread);
+	TfLiteInterpreterOptionsSetNumThreads(options, nb_thread);
 
 // Create the interpreter.
 	TfLiteInterpreter* interpreter = TfLiteInterpreterCreate(model, options);
@@ -553,13 +569,16 @@ int main(int argc, char *argv[]) {
 	TfLiteInterpreterAllocateTensors(interpreter);
 
 	while (1) {
-		get_input(input);
+		if (init == 1) {
+			get_input(input);
+			init = 0;
+		}
 		run_inference(interpreter, input, &output_proba);
-		printf("\n%f", output_proba);
-		output_proba = 3.14;
-		if (++cpt > 10)
+		if (++cpt >= nb_events)
 			break;
 	}
+	printf("\nNb events : %d", cpt);
+	printf("\nLast proba: %f", output_proba);
 
 // Dispose of the model and interpreter objects.
 	TfLiteInterpreterDelete(interpreter);

@@ -29,17 +29,23 @@
 
 import os
 
-ARM64 = False
+ARM64 = True
+arch_opt =""
 
 if ARM64:
 	CC_val = 'aarch64-linux-gnu-gcc'
 	m_LIBPATH='/home/grand/install/tf_lite/tflite_build'
+	# -mcpu=name  -march=name  -mfpu=name -mtune=name
+	#a53 = "-mcpu=cortex-a53 -march=armv8-a -mfpu=neon-vfpv4 -mtune=cortex-a53"
+	# can't use -mfpu option ...?
+	arch_opt = "-mcpu=cortex-a53 -march=armv8-a+simd -mtune=cortex-a53 "
 else:
 	CC_val = 'gcc'
 	m_LIBPATH='/home/grand/install/tf_lite/tflite_build_amd64'
+	arch_opt = "-march=native"
 
 
-env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -I/home/grand/install/tf_lite/tensorflow_src')
+env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'{arch_opt} -Wall -O3 -fmessage-length=0 -MMD -MP -I/home/grand/install/tf_lite/tensorflow_src')
 
 
 # Build application
