@@ -12,5 +12,7 @@
 
 FILE *fpmon[N_MON];
 
-void monitor_open();
-void monitor_read();
+void
+monitor_open ();
+void
+monitor_read ();

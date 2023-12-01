@@ -71,50 +71,56 @@ extern float *ch_cur;
  * \author C. Timmermans
 
  */
-int buffer_add_t2(unsigned short *bf, int bfsize, short id) {
+int
+buffer_add_t2 (unsigned short *bf, int bfsize, short id)
+{
 
-	unsigned int *s = (unsigned int*) (&(bf[3])); // pointer to where the seconds will be stored
-	unsigned int ss;
-	unsigned int ssp;
-	T2SSEC *ssec;                        // pointer to where nanosec. are stored
-	int n_t2 = 0;
-	int iten;
-	int bffil = 0;
-	int next_read = *(shm_ts.next_read);
-	int next_write = *(shm_ts.next_write);
+  unsigned int *s = (unsigned int*) (&(bf[3])); // pointer to where the seconds will be stored
+  unsigned int ss;
+  unsigned int ssp;
+  T2SSEC *ssec;                        // pointer to where nanosec. are stored
+  int n_t2 = 0;
+  int iten;
+  int bffil = 0;
+  int next_read = *(shm_ts.next_read);
+  int next_write = *(shm_ts.next_write);
 
-	if (next_read == next_write) {
-		bf[0] = 0;
-		return (0);                                 // no T2 to be sent
-	}
-	bf[1] = DU_T2;                                       // tag (message header)
-	bf[2] = id;
-	*s = (unsigned int) timestampbuf[next_read].ts_seconds;
-	bffil = 5;                                                    // the T2 body
+  if (next_read == next_write)
+    {
+      bf[0] = 0;
+      return (0);                                 // no T2 to be sent
+    }
+  bf[1] = DU_T2;                                       // tag (message header)
+  bf[2] = id;
+  *s = (unsigned int) timestampbuf[next_read].ts_seconds;
+  bffil = 5;                                                    // the T2 body
 
-	while (next_read != next_write && timestampbuf[next_read].ts_seconds == *s // until all timestamps are done (or we move into next second)
-	&& bffil < (bfsize - 2)) {              // maximally the whole socket-buffer
-		ss = (unsigned int) (timestampbuf[next_read].ts_nanoseconds >> 6); // shift nanosec 6 bits
-		ssec = (T2SSEC*) (&(bf[bffil]));
-		iten = 0;
-		if ((timestampbuf[next_read].trigmask & 0x20) != 0)
-			iten += 4; //10 sec
-		if ((timestampbuf[next_read].trigmask & 0xf) != 0)
-			iten += 2; //ant
-		T2FILL(ssec, ss,
-				((timestampbuf[next_read].ts_nanoseconds >> 2) & 0xf)
-						+ ((iten & 0xf) << 4)); // fill subsec bytes appropriately
-		bffil += 2;                                     // update buffer counter
-		n_t2++;
-		next_read++;                            // update circular event counter
-		if (next_read >= BUFSIZE)
-			next_read = 0;
-	}
-	if (n_t2 == 0)
-		bffil = 0;
-	*(shm_ts.next_read) = next_read;
-	bf[0] = bffil;                                     // set total message size
-	return (n_t2);
+  while (next_read != next_write && timestampbuf[next_read].ts_seconds == *s // until all timestamps are done (or we move into next second)
+  && bffil < (bfsize - 2))
+    {              // maximally the whole socket-buffer
+      ss = (unsigned int) (timestampbuf[next_read].ts_nanoseconds >> 6); // shift nanosec 6 bits
+      ssec = (T2SSEC*) (&(bf[bffil]));
+      iten = 0;
+      if ((timestampbuf[next_read].trigmask & 0x20) != 0)
+	iten += 4; //10 sec
+      if ((timestampbuf[next_read].trigmask & 0xf) != 0)
+	iten += 2; //ant
+      T2FILL(
+	  ssec,
+	  ss,
+	  ((timestampbuf[next_read].ts_nanoseconds >> 2) & 0xf)
+	      + ((iten & 0xf) << 4)); // fill subsec bytes appropriately
+      bffil += 2;                                     // update buffer counter
+      n_t2++;
+      next_read++;                            // update circular event counter
+      if (next_read >= BUFSIZE)
+	next_read = 0;
+    }
+  if (n_t2 == 0)
+    bffil = 0;
+  *(shm_ts.next_read) = next_read;
+  bf[0] = bffil;                                     // set total message size
+  return (n_t2);
 }
 
 /*!
@@ -130,31 +136,34 @@ int buffer_add_t2(unsigned short *bf, int bfsize, short id) {
  * - Add 1 to the number of T3 events sent
  * \author C. Timmermans
  */
-int buffer_add_t3(unsigned short *bf, int bfsize, short id) {
-	uint16_t *t3buf = (uint16_t*) shm_ev.Ubuf;
-	if (t3buf == NULL) {
-		bf[0] = 0;
-		return (0);
-	}
-	int next_read = *(shm_ev.next_read);
-	int next_write = *(shm_ev.next_write);
-	uint16_t *msg_start = bf;
+int
+buffer_add_t3 (unsigned short *bf, int bfsize, short id)
+{
+  uint16_t *t3buf = (uint16_t*) shm_ev.Ubuf;
+  if (t3buf == NULL)
+    {
+      bf[0] = 0;
+      return (0);
+    }
+  int next_read = *(shm_ev.next_read);
+  int next_write = *(shm_ev.next_write);
+  uint16_t *msg_start = bf;
 
-	bf[0] = 0;
-	msg_start[AMSG_OFFSET_TAG] = DU_EVENT;
-	if (next_read == next_write)
-		return (0); // nothing needed
-	if (t3buf[EVT_LENGTH] < bfsize)
-		return (0); //nothing can be done
-	memcpy(&msg_start[AMSG_OFFSET_BODY], &t3buf[next_read * t3buf[EVT_LENGTH]],
-			t3buf[EVT_LENGTH] * sizeof(uint16_t));
-	//printf("Copying %d words\n",t3buf[EVT_LENGTH]);
-	bf[0] = t3buf[EVT_LENGTH] + 2;
-	next_read++;
-	if (next_read >= MAXT3)
-		next_read = 0;
-	*(shm_ev.next_read) = next_read;
-	return (1);
+  bf[0] = 0;
+  msg_start[AMSG_OFFSET_TAG] = DU_EVENT;
+  if (next_read == next_write)
+    return (0); // nothing needed
+  if (t3buf[EVT_LENGTH] < bfsize)
+    return (0); //nothing can be done
+  memcpy (&msg_start[AMSG_OFFSET_BODY], &t3buf[next_read * t3buf[EVT_LENGTH]],
+	  t3buf[EVT_LENGTH] * sizeof(uint16_t));
+  //printf("Copying %d words\n",t3buf[EVT_LENGTH]);
+  bf[0] = t3buf[EVT_LENGTH] + 2;
+  next_read++;
+  if (next_read >= MAXT3)
+    next_read = 0;
+  *(shm_ev.next_read) = next_read;
+  return (1);
 }
 
 /*!
@@ -173,35 +182,36 @@ int buffer_add_t3(unsigned short *bf, int bfsize, short id) {
  *   - add voltage and current (Charge controller)
  * \author C. Timmermans
  */
-int buffer_add_monitor(unsigned short *bf, int bfsize, short id) {
+int
+buffer_add_monitor (unsigned short *bf, int bfsize, short id)
+{
 
-	int len;                              // total length of the message body
-	int i;
-	int n_send = 0;
-	static int gpssent = 0;
-	int bffil = 0;
-	float tmp;
+  int len;                              // total length of the message body
+  int i;
+  int n_send = 0;
+  static int gpssent = 0;
+  int bffil = 0;
+  float tmp;
 
-	bf[0] = 0;
-	if (gpssent != *(shm_gps.next_read)) {
-		gpssent = *(shm_gps.next_read);
-		bf[bffil] = 19;                                                // length
-		bf[bffil + 1] = DU_MONITOR;                                       // tag
-		bf[bffil + 2] = id; //((id&0xff) | ((DU_HWNL&0xf)<<8) | ((FIRMWARE_VERSION(firmware_version&0x1f))<<11)); // id of the scope+HWtype +HWvers
-		memcpy((void*) &bf[bffil + 3], (void*) &(firmware_version), 4);
-		memcpy((void*) &bf[bffil + 5], (void*) &(gpsbuf[gpssent].ts_seconds),
-				4);
-		bf[bffil + 7] =
-				*(unsigned short*) &(gpsbuf[gpssent].data[PPS_TRIG_RATE]);
-		//memcpy((void *)&bf[bffil+14],ch_volt,4);
-		//memcpy((void *)&bf[bffil+16],ch_cur,4);
-		bf[bffil + 18] = gpsbuf[gpssent].data[PPS_STATSEC];
-		//printf("CC: %g %g\n",*ch_volt,*ch_cur);
-		//printf("Send monitor: %d %d %d %d\n",gpsbuf[gpssent].ts_seconds,bf[bffil+5],bf[bffil+6],bf[bffil+7]);
-		bffil += 19;
-		n_send++;
-	}
-	return (n_send);
+  bf[0] = 0;
+  if (gpssent != *(shm_gps.next_read))
+    {
+      gpssent = *(shm_gps.next_read);
+      bf[bffil] = 19;                                                // length
+      bf[bffil + 1] = DU_MONITOR;                                       // tag
+      bf[bffil + 2] = id; //((id&0xff) | ((DU_HWNL&0xf)<<8) | ((FIRMWARE_VERSION(firmware_version&0x1f))<<11)); // id of the scope+HWtype +HWvers
+      memcpy ((void*) &bf[bffil + 3], (void*) &(firmware_version), 4);
+      memcpy ((void*) &bf[bffil + 5], (void*) &(gpsbuf[gpssent].ts_seconds), 4);
+      bf[bffil + 7] = *(unsigned short*) &(gpsbuf[gpssent].data[PPS_TRIG_RATE]);
+      //memcpy((void *)&bf[bffil+14],ch_volt,4);
+      //memcpy((void *)&bf[bffil+16],ch_cur,4);
+      bf[bffil + 18] = gpsbuf[gpssent].data[PPS_STATSEC];
+      //printf("CC: %g %g\n",*ch_volt,*ch_cur);
+      //printf("Send monitor: %d %d %d %d\n",gpsbuf[gpssent].ts_seconds,bf[bffil+5],bf[bffil+6],bf[bffil+7]);
+      bffil += 19;
+      n_send++;
+    }
+  return (n_send);
 }
 
 /*!
@@ -211,12 +221,15 @@ int buffer_add_monitor(unsigned short *bf, int bfsize, short id) {
  \retval 1
  \author C. Timmermans
  */
-int print_message(AMSG *msg) {
-	int i, ilen;
-	uint16_t *buf = (uint16_t*) msg;
-	ilen = msg->length;
-	for (i = 0; i < ilen; i++) {
-		printf("%d %x %d\n", i, buf[i], buf[i]);
-	}
-	return (1);
+int
+print_message (AMSG *msg)
+{
+  int i, ilen;
+  uint16_t *buf = (uint16_t*) msg;
+  ilen = msg->length;
+  for (i = 0; i < ilen; i++)
+    {
+      printf ("%d %x %d\n", i, buf[i], buf[i]);
+    }
+  return (1);
 }

@@ -17,14 +17,15 @@
 #define NORMAL 1
 #define DEFAULT_CONFIGFILE "conf/Adaq.conf"
 
-typedef struct {
-	int DUid; // station number
-	char DUip[20]; // IP address
-	int DUport;   // port to connect to
-	int DUsock;
-	time_t LSTconnect;
-	struct sockaddr_in DUaddress;
-	socklen_t DUalength;
+typedef struct
+{
+  int DUid; // station number
+  char DUip[20]; // IP address
+  int DUport;   // port to connect to
+  int DUsock;
+  time_t LSTconnect;
+  struct sockaddr_in DUaddress;
+  socklen_t DUalength;
 } DUInfo;
 
 #define NT2BUF (8*MAXDU) //8 per DU
