@@ -25,12 +25,14 @@
  print_message(AMSG *msg) prints the complete content of a message (hex and dec)!
 
  ************************************/
+
+#include <bits/stdint-intn.h>
+#include <bits/stdint-uintn.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include "dudaq.h"
-#include "amsg.h"
+
 #include "ad_shm.h"
+#include "amsg.h"
 #include "scope.h"
 
 extern shm_struct shm_ev; //!< shared memory containing all event info, including read/write pointers

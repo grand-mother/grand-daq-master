@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <bits/types/FILE.h>
 
 #define MONBUF 1
 #define N_MON 7

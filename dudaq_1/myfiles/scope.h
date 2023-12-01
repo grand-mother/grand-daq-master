@@ -12,7 +12,8 @@
  *>
  */
 
-#include <stdint.h>
+#include <bits/stdint-intn.h>
+#include <bits/stdint-uintn.h>
 
 /*----------------------------------------------------------------------*/
 #define SAMPLING_FREQ 500 //!< 500 MHz scope
@@ -215,7 +216,7 @@
 /*----------------------------------------------------------------------*/
 
 /*
-  buffer definitions for the scope readout process.
+ buffer definitions for the scope readout process.
  */
 
 #define BUFSIZE 3000            //!< store up to 3000 events in circular buffer
@@ -228,20 +229,17 @@
 #define SCOPE_EVENT 2          //!< return code for reading an event
 #define SCOPE_GPS   3          //!< return code for reading a PPS message
 
-typedef struct
-{
-  uint32_t ts_seconds;
-  uint32_t ts_nanoseconds;
-  uint16_t event_nr;
-  uint16_t trigmask;
-}TS_DATA; //timestamps
+typedef struct {
+	uint32_t ts_seconds;
+	uint32_t ts_nanoseconds;
+	uint16_t event_nr;
+	uint16_t trigmask;
+} TS_DATA; //timestamps
 
-typedef struct
-{
-  uint32_t ts_seconds;      //!< time marker in GPS sec
-  uint16_t data[WCNT_PPS];  //! all data read in PPS
+typedef struct {
+	uint32_t ts_seconds;      //!< time marker in GPS sec
+	uint16_t data[WCNT_PPS];  //! all data read in PPS
 } GPS_DATA;
-
 
 // the routines
 
@@ -252,7 +250,8 @@ void scope_close();
 void scope_reset();
 void scope_start_run();
 void scope_stop_run();
-void scope_set_parameters(uint32_t reg_addr, uint32_t value,uint32_t to_shadow);
+void scope_set_parameters(uint32_t reg_addr, uint32_t value,
+		uint32_t to_shadow);
 void scope_reboot();
 void scope_copy_shadow();
 void scope_init_shadow();
@@ -263,5 +262,6 @@ int scope_read_pps();
 int scope_read(int ioff);
 int scope_no_run_read();
 int scope_run_read();
-void scope_event_to_shm(uint16_t evnr,uint16_t trflag,uint16_t sec,uint32_t ssec);
+void scope_event_to_shm(uint16_t evnr, uint16_t trflag, uint16_t sec,
+		uint32_t ssec);
 //

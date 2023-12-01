@@ -432,7 +432,6 @@ int send_server_data() {
 	int32_t length, bsent;
 	DU_alength = sizeof(DU_address);
 
-
 	if (DU_comms < 0) {
 		if (DU_socket < 0) {
 			if (make_server_connection(du_port) < 0)

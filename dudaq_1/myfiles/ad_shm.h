@@ -6,11 +6,8 @@ Author: Charles Timmermans, Nikhef/Radboud University
 
 Altering the code without explicit consent of the author is forbidden
  ***/
-#include <stdint.h>
-#include <unistd.h>
-#include<sys/types.h>
-#include<sys/ipc.h>
-#include<sys/shm.h>
+
+#include <bits/stdint-uintn.h>
 
 typedef struct{
   int shmid; /**< shared memory identifier */

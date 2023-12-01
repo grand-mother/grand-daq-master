@@ -6,8 +6,13 @@ Author: Charles Timmermans, Nikhef/Radboud University
 
 Altering the code without explicit consent of the author is forbidden
  ***/
-#include <string.h>
+
 #include "ad_shm.h"
+
+#include <bits/stdint-uintn.h>
+#include <bits/types/struct_shmid_ds.h>
+#include <stddef.h>
+#include <string.h>
 
 /**
  int ad_shm_create(shm_struct *ptr,int nbuf,int size)
