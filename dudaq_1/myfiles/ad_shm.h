@@ -9,6 +9,13 @@
 
 #include <bits/stdint-uintn.h>
 
+
+/**
+ * \struct
+ * \brief Manage ring buffer of IPC share memory
+ *
+ */
+
 typedef struct
 {
   int shmid; /**< shared memory identifier */

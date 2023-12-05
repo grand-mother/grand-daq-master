@@ -9,22 +9,38 @@
 
 #include "ad_shm.h"
 
-#include <bits/stdint-uintn.h>
 #include <bits/types/struct_shmid_ds.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
 
 /**
- int ad_shm_create(shm_struct *ptr,int nbuf,int size)
- 
- create a shared memory of useable size "(size+1)*nbuf" shorts
- The pointer to the shm_struct (defined in ad_shm.h) must be provided
+ * \fn int ad_shm_create(shm_struct*, int, int)
+ * \brief
+ * int ad_shm_create(shm_struct *ptr,int nbuf,int size)
+ *
+ * create a shared memory of useable size "(size+1)*nbuf" shorts
+ * The pointer to the shm_struct (defined in ad_shm.h) must be provided
+ *
+ *
+ * \pre
+ * \post
+ * \param ptr
+ * \param nbuf number of element buffer in share memory
+ * \param size number of int16 in element buffer
+ * \return 1 OK, -1 NOK
  */
 int
 ad_shm_create (shm_struct *ptr, int nbuf, int size)
 {
   int sz_int = sizeof(int);
   size_t isize = (size + 1) * nbuf * sizeof(uint16_t) + 5 * sz_int;
+  //
+  // why size + 1 ?
+  // to prevent, critical section when update 'new write' before modulo MAX
+  // JM Colley
+  //
   key_t key = IPC_PRIVATE;
 
   ptr->shmid = 0;
@@ -38,9 +54,12 @@ ad_shm_create (shm_struct *ptr, int nbuf, int size)
   ptr->shmid = shmget (key, isize, IPC_CREAT | 0666);
   if (ptr->shmid < 0)
     return (-1);
+  // buf is a pointer of char (1 byte)
   ptr->buf = shmat (ptr->shmid, NULL, 0600);
   memset ((void*) ptr->buf, 0, isize);
+  // buf is header + Ubuf
   ptr->Ubuf = (uint16_t*) (&(ptr->buf[5 * sz_int]));
+  // fill header : 5 fields
   ptr->next_write = (int*) &(ptr->buf[0]);
   ptr->next_read = (int*) &(ptr->buf[sz_int]);
   ptr->next_readb = (int*) &(ptr->buf[2 * sz_int]);

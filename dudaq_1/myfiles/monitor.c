@@ -9,20 +9,13 @@ extern shm_struct shm_mon;
 void
 monitor_open ()
 {
-  fpmon[MON_PRESSURE] = fopen (
-      "/sys/bus/iio/devices/iio:device1/in_voltage0_raw", "r");
-  fpmon[MON_HUMIDITY] = fopen (
-      "/sys/bus/iio/devices/iio:device1/in_voltage1_raw", "r");
-  fpmon[MON_AccX] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage2_raw",
-			   "r");
-  fpmon[MON_AccY] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage3_raw",
-			   "r");
-  fpmon[MON_AccZ] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage4_raw",
-			   "r");
-  fpmon[MON_TEMP] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage5_raw",
-			   "r");
-  fpmon[MON_BATTERY] = fopen (
-      "/sys/bus/iio/devices/iio:device1/in_voltage6_raw", "r");
+  fpmon[MON_PRESSURE] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage0_raw", "r");
+  fpmon[MON_HUMIDITY] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage1_raw", "r");
+  fpmon[MON_AccX] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage2_raw", "r");
+  fpmon[MON_AccY] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage3_raw", "r");
+  fpmon[MON_AccZ] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage4_raw", "r");
+  fpmon[MON_TEMP] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage5_raw", "r");
+  fpmon[MON_BATTERY] = fopen ("/sys/bus/iio/devices/iio:device1/in_voltage6_raw", "r");
 
 }
 

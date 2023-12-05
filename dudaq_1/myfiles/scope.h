@@ -231,16 +231,16 @@
 
 typedef struct
 {
-  uint32_t ts_seconds;
-  uint32_t ts_nanoseconds;
-  uint16_t event_nr;
-  uint16_t trigmask;
-} TS_DATA; //timestamps
+    uint32_t ts_seconds;
+    uint32_t ts_nanoseconds;
+    uint16_t event_nr;
+    uint16_t trigmask;
+} TS_DATA;//timestamps
 
 typedef struct
 {
-  uint32_t ts_seconds;      //!< time marker in GPS sec
-  uint16_t data[WCNT_PPS];  //! all data read in PPS
+    uint32_t ts_seconds;//!< time marker in GPS sec
+    uint16_t data[WCNT_PPS];//! all data read in PPS
 } GPS_DATA;
 
 // the routines
@@ -282,6 +282,5 @@ scope_no_run_read ();
 int
 scope_run_read ();
 void
-scope_event_to_shm (uint16_t evnr, uint16_t trflag, uint16_t sec,
-		    uint32_t ssec);
+scope_event_to_shm (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
 //
