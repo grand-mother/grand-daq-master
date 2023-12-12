@@ -25,6 +25,7 @@ typedef struct
   int *nbuf; /**< number of data blocks in the circular buffer */
   int *size; /**< size (in shorts) of a data block */
   char *buf; /**< pointer to the buffer */
+  /* buf is header(5 int) + Ubuf */
   uint16_t *Ubuf; /**< our data is in uint16, so a uint16 pointer */
 } shm_struct;
 

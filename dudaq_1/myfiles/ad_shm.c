@@ -57,7 +57,7 @@ ad_shm_create (shm_struct *ptr, int nbuf, int size)
   // buf is a pointer of char (1 byte)
   ptr->buf = shmat (ptr->shmid, NULL, 0600);
   memset ((void*) ptr->buf, 0, isize);
-  // buf is header + Ubuf
+  // buf is header(5 int) + Ubuf
   ptr->Ubuf = (uint16_t*) (&(ptr->buf[5 * sz_int]));
   // fill header : 5 fields
   ptr->next_write = (int*) &(ptr->buf[0]);
