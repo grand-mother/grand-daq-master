@@ -9,11 +9,29 @@
 
 #include "ad_shm.h"
 
-#include <bits/types/struct_shmid_ds.h>
-#include <stddef.h>
-#include <string.h>
-#include <sys/ipc.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include<signal.h>
+#include<sys/wait.h>
+#include<sys/time.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <sys/select.h>
 #include <sys/shm.h>
+#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include<errno.h>
+#include"dudaq.h"
+#include "amsg.h"
+#include "scope.h"
+#include "ad_shm.h"
+#include "du_monitor.h"
 
 /**
  * \fn int ad_shm_create(shm_struct*, int, int)

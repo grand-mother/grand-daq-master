@@ -7,7 +7,12 @@
  Altering the code without explicit consent of the author is forbidden
  ***/
 
-#include <bits/stdint-uintn.h>
+#ifndef _AD_SHM_H_
+#define _AD_SHM_H_
+
+
+#include <stdint.h>
+
 
 
 /**
@@ -33,3 +38,6 @@ int
 ad_shm_create (shm_struct *ptr, int nbuf, int size);
 void
 ad_shm_delete (shm_struct *ptr);
+
+
+#endif

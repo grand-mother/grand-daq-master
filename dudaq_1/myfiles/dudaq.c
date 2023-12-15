@@ -4,31 +4,29 @@
 
 #include "dudaq.h"
 
-#include <asm-generic/errno.h>
-#include <asm-generic/errno-base.h>
-#include <asm-generic/socket.h>
-#include <bits/signum-arch.h>
-#include <bits/signum-generic.h>
-#include <bits/stdint-intn.h>
-#include <bits/stdint-uintn.h>
-#include <bits/types/FILE.h>
-#include <bits/types/struct_timeval.h>
-#include <errno.h>
-#include <netinet/in.h>
-#include <netinet/tcp.h>
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <sys/select.h>
+#include<signal.h>
+#include<sys/wait.h>
+#include<sys/time.h>
+#include <sys/types.h>
 #include <sys/socket.h>
-#include <sys/wait.h>
+#include <sys/select.h>
 #include <unistd.h>
-
-#include "ad_shm.h"
+#include <string.h>
+#include <fcntl.h>
+#include <sys/socket.h>
+#include <netinet/tcp.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <signal.h>
+#include<errno.h>
+#include"dudaq.h"
 #include "amsg.h"
-#include "du_monitor.h"
 #include "scope.h"
+#include "ad_shm.h"
+#include "du_monitor.h"
+
 
 int
 buffer_add_t2 (unsigned short *bf, int bfsize, short id);
@@ -107,6 +105,7 @@ void remove_shared_memory ()
  * kill child processes and perform a clean stop to clean up shared memory
  * \author C. Timmermans
  */
+
 void clean_stop (int signum)
 {
    remove_shared_memory ();
@@ -138,6 +137,7 @@ void block_signals (int iblock)
       sigprocmask (SIG_SETMASK, (sigset_t*) &mask, (sigset_t*) &prev_mask);
    }
 }
+
 
 /*!
  \fn int set_socketoptions(int sock)

@@ -14,16 +14,12 @@
  evgps: index of location of next GPS data read out
  ************************************/
 
-#include <bits/mman-linux.h>
-#include <bits/stdint-intn.h>
-#include <bits/stdint-uintn.h>
-#include <bits/types/struct_tm.h>
-#include <fcntl.h>
+
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 #include <unistd.h>
-#include <threads.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <time.h>
 
 #ifdef Fake
 #include <math.h>

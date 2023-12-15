@@ -283,4 +283,6 @@ int
 scope_run_read ();
 void
 scope_event_to_shm (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
+
+void scope_update_event (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
 //

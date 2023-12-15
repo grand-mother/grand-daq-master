@@ -6,8 +6,7 @@
 #ifndef DUDAQ_1_MYFILES_RING_BUFFER_H_
 #define DUDAQ_1_MYFILES_RING_BUFFER_H_
 
-#include <bits/stdint-uintn.h>
-#include  <threads.h>
+#include  <pthread.h>
 
 typedef struct
 {
@@ -32,7 +31,7 @@ typedef struct
       float *a_prob; // array of probability for each buffer
 
       /* mutex */
-      mtx_t mutex;
+      pthread_mutex_t mutex;
 } RingBufferEval_struct;
 
 RingBufferEval_struct*

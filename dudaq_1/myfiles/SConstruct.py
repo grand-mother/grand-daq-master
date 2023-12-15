@@ -43,7 +43,7 @@ sha_git = subprocess.getoutput(cmd)
 # => ENV = os.environ need to retrieve the path of aarch64-linux-gnu-gcc
 CC_val = 'aarch64-linux-gnu-gcc'
 #CC_val = 'gcc'
-env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -DVERSION={branch} -DGIT_SHA={sha_git} ')
+env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -DVERSION={branch} -lpthread -I/home/grand/install/tf_lite/tensorflow_src -DGIT_SHA={sha_git} ')
 
 
 # Build application

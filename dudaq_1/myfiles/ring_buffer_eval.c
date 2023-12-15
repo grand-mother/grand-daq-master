@@ -1,7 +1,7 @@
 #include "ring_buffer_eval.h"
 
 #include <stdlib.h>
-#include <bits/stdint-uintn.h>
+
 
 int RBE_error = 0;
 
@@ -161,6 +161,7 @@ inline void RBE_update_trigger (RingBufferEval_struct *p_rbe)
  * \param p_int
  * \return
  */
+
 
 inline void RBE_inc_modulo (uint16_t *p_int, uint16_t max_int)
 {
