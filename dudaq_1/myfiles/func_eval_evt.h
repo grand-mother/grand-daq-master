@@ -12,7 +12,7 @@ typedef struct
 
 FuncEval_struct *FEEV_create(RingBufferEval_struct *p_rbe, void *p_eval);
 
-void FEEV_run (void *p_args);
+void *FEEV_run (void *p_args);
 
 void FEEV_stop (void);
 

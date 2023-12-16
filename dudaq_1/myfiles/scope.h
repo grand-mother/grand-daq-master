@@ -271,6 +271,9 @@ void
 scope_initialize ();
 void
 scope_create_memory ();
+void
+scope_create_thread_T2 (void);
+
 int
 scope_read_event (int32_t ioff);
 int
@@ -284,5 +287,11 @@ scope_run_read ();
 void
 scope_event_to_shm (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
 
-void scope_update_event (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
-//
+void
+scope_update_event (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
+
+void
+scope_event_to_evaluation (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec);
+
+void
+scope_evaluation_to_trigger (void);

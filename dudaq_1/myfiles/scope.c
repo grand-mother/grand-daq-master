@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <fcntl.h>
 #include <time.h>
+#include <pthread.h>
 
 #ifdef Fake
 #include <math.h>
@@ -33,7 +34,10 @@
 #include "ad_shm.h"
 #include "du_monitor.h"
 #include "scope.h"
-#include"ring_buffer_eval.h"
+#include "func_eval_evt.h"
+#include "tflite_inference.h"
+#include "ring_buffer_eval.h"
+
 
 #ifdef Fake
 #define MAXRAND 0x7FFFFFFF
@@ -93,11 +97,11 @@ RingBufferEval_struct *Gp_rbuf2trig = NULL;
  * thread evaluation with Tensorflow Lite of 3D trace for trigger T2
  * 2 threads one by CPU CORTEX A53
  */
-thrd_t G_thread1_t2;
+pthread_t G_thread1_t2;
 TFLT_struct *Gp_tflt1 = NULL;
 FuncEval_struct *Gp_feev1 = NULL;
 
-thrd_t G_thread2_t2;
+pthread_t G_thread2_t2;
 TFLT_struct *Gp_tflt2 = NULL;
 FuncEval_struct *Gp_feev2 = NULL;
 
@@ -222,8 +226,6 @@ void scope_copy_shadow ()
 
 void scope_init_shadow ()
 {
-   int32_t list;
-
    shadow_filled = 0;
    memset (shadowlist, 0, sizeof(shadowlist));
 }
@@ -275,7 +277,7 @@ void scope_create_memory ()
  * \brief with TensorFlow Lite trigger
  *
  */
-void scope_create_thread_T2 ()
+void scope_create_thread_T2 (void)
 {
    int ret;
 
@@ -292,13 +294,13 @@ void scope_create_thread_T2 ()
    Gp_feev2 = FEEV_create (Gp_rbuf2trig, (void*) Gp_tflt2);
 
    /* Create 2 thread */
-   ret = thrd_create (&G_thread1_t2, FEEV_run, Gp_feev1);
-   if (ret != thrd_success)
+   ret = pthread_create (&G_thread1_t2, NULL,FEEV_run, Gp_feev1);
+   if (ret != 0)
    {
       printf ("[scope_create_thread_T2] Failed create thread 1, ret=%d ", ret);
    }
-   ret = thrd_create (&G_thread2_t2, FEEV_run, Gp_feev2);
-   if (ret != thrd_success)
+   ret = pthread_create (&G_thread2_t2, NULL,FEEV_run, Gp_feev2);
+   if (ret != 0)
    {
       printf ("[scope_create_thread_T2] Failed create thread 2, ret=%d ", ret);
    }
@@ -450,7 +452,6 @@ int scope_read_event (int32_t ioff)
 {
    static uint16_t evtnr = 0;
    int offset = ptr_evt * evtlen;
-   int32_t rread, nread, ntry;
    uint32_t Is_Data, tbuf, *ebuf;
    struct tm tt;
    int length, i;
@@ -585,9 +586,6 @@ int32_t scope_read_pps ()
 
 int scope_read (int ioff)
 {
-   unsigned short int totlen;
-   int rread, nread, ntry;
-   int ir;
    uint32_t Is_Data;
 
 #ifdef Fake
@@ -681,12 +679,12 @@ void scope_event_to_shm (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t 
  */
 void scope_update_event (uint16_t evnr, uint16_t trflag, uint16_t sec, uint32_t ssec)
 {
-   mutext_lock (Gp_rbuf1trig->mutex);
-   mutext_lock (Gp_rbuf2trig->mutex);
+   pthread_mutex_lock (&Gp_rbuf1trig->mutex);
+   pthread_mutex_lock (&Gp_rbuf2trig->mutex);
    scope_evaluation_to_trigger ();
    scope_event_to_evaluation (evnr, trflag, sec, ssec);
-   mutext_unlock (Gp_rbuf1trig->mutex);
-   mutext_unlock (Gp_rbuf2trig->mutex);
+   pthread_mutex_unlock (&Gp_rbuf1trig->mutex);
+   pthread_mutex_unlock (&Gp_rbuf2trig->mutex);
 }
 
 /**
@@ -745,7 +743,7 @@ void scope_event_to_evaluation (uint16_t evnr, uint16_t trflag, uint16_t sec, ui
 	    {
 	       evtbuf[offset + EVT_ID] = evnr;
 	       evtbuf[offset + EVT_T3FLAG] = trflag;
-	       RBE_write(Gp_buftrig, &S_t3buf[next_write * evtlen]);
+	       RBE_write(Gp_buftrig,(void*)(S_t3buf + next_write*evtlen));
 	       break;
 	    }
 	 }
@@ -773,7 +771,7 @@ void scope_evaluation_to_trigger (void)
 	 uint32_t idx_eval_buffer = Gp_rbuf1trig->inext_trig;
 	 /* index (in byte ) where start buffer to evaluate */
 	 uint32_t idx_eval_byte = ((uint32_t) idx_eval_buffer) * Gp_rbuf1trig->size_buffer;
-	 memcpy (&(S_t3buf[next_write * evtlen]),
+	 memcpy (S_t3buf + next_write*evtlen,
 		 &(Gp_rbuf1trig->a_buffers[idx_eval_byte]),
 		 Gp_rbuf1trig->size_buffer);
 	 next_write++;

@@ -41,10 +41,27 @@ sha_git = subprocess.getoutput(cmd)
 # Define environnement and flag compilation
 #https://stackoverflow.com/questions/61164904/compiler-not-found-when-building-with-scons
 # => ENV = os.environ need to retrieve the path of aarch64-linux-gnu-gcc
-CC_val = 'aarch64-linux-gnu-gcc'
-#CC_val = 'gcc'
-env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -DVERSION={branch} -lpthread -I/home/grand/install/tf_lite/tensorflow_src -DGIT_SHA={sha_git} ')
+
+ARM64 = False
+
+if ARM64:
+	CC_val = 'aarch64-linux-gnu-gcc'
+	m_LIBPATH='/home/grand/install/tf_lite/tflite_build'
+	# -mcpu=name  -march=name  -mfpu=name -mtune=name
+	#a53 = "-mcpu=cortex-a53 -march=armv8-a -mfpu=neon-vfpv4 -mtune=cortex-a53"
+	# can't use -mfpu option ...?
+	arch_opt = "-mcpu=cortex-a53 -march=armv8-a+simd -mtune=cortex-a53 "
+else:
+	CC_val = 'gcc'
+	m_LIBPATH='/home/grand/install/tf_lite/tflite_build_amd64'
+	arch_opt = "-march=native"
+
+env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-length=0 -MMD -MP -DVERSION={branch} -I/home/grand/install/tf_lite/tensorflow_src -DGIT_SHA={sha_git} ')
 
 
-# Build application
-env.Program('dudaq_jmc', ['ad_shm.c','buffer.c','dudaq.c','monitor.c','scope.c'])
+# Build application.c
+env.Program('dudaq_jmc', ['ad_shm.c','buffer.c','dudaq.c','monitor.c','scope.c','ring_buffer_eval.c','tflite_inference.c','func_eval_evt.c'],
+	LIBS = ['tensorflowlite_c','pthread'],
+	LIBPATH = m_LIBPATH)
+
+

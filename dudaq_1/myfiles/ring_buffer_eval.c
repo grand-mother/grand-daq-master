@@ -1,7 +1,7 @@
 #include "ring_buffer_eval.h"
 
 #include <stdlib.h>
-
+#include <stdio.h>
 
 int RBE_error = 0;
 
@@ -55,8 +55,8 @@ RBE_create (uint16_t size_buffer, uint16_t nb_array)
       return NULL;
    }
    p_rbe->a_prob = p_prob;
-   ret_mtx = mtx_init (&(p_rbe->mutex), mtx_plain);
-   if (ret_mtx != thrd_success)
+   ret_mtx = pthread_mutex_init (&p_rbe->mutex, NULL);
+   if (ret_mtx != 0)
    {
       RBE_error = 4;
       return NULL;
@@ -78,7 +78,7 @@ void RBE_delete (RingBufferEval_struct **pp_rbe)
 {
    free ((*pp_rbe)->a_buffers);
    free ((*pp_rbe)->a_prob);
-   mtx_destroy (&((*pp_rbe)->mutex));
+   pthread_mutex_destroy (&((*pp_rbe)->mutex));
    free (*pp_rbe);
    *pp_rbe = NULL;
 }
@@ -91,7 +91,7 @@ void RBE_delete (RingBufferEval_struct **pp_rbe)
  *
  * \param p_rbe
  */
-inline void RBE_write (RingBufferEval_struct *p_rbe, void *p_buf)
+void RBE_write (RingBufferEval_struct *p_rbe, void *p_buf)
 {
    uint32_t idx_eval_buffer = p_rbe->inext_eval;
    /* index (in byte ) where start buffer to evaluate */
@@ -110,13 +110,13 @@ inline void RBE_write (RingBufferEval_struct *p_rbe, void *p_buf)
  *
  * \param p_rbe
  */
-inline void RBE_update_write (RingBufferEval_struct *p_rbe)
+void RBE_update_write (RingBufferEval_struct *p_rbe)
 {
-   mutext_lock (&p_rbe->mutex);
+   pthread_mutex_lock (&p_rbe->mutex);
    p_rbe->nb_write -= 1;
    p_rbe->nb_eval += 1;
    RBE_inc_modulo (&p_rbe->inext_write, p_rbe->idx_max);
-   mutext_unlock (&p_rbe->mutex);
+   pthread_mutex_unlock (&p_rbe->mutex);
 }
 
 /**
@@ -127,13 +127,13 @@ inline void RBE_update_write (RingBufferEval_struct *p_rbe)
  *
  * \param p_rbe
  */
-inline void RBE_update_eval (RingBufferEval_struct *p_rbe)
+void RBE_update_eval (RingBufferEval_struct *p_rbe)
 {
-   mutext_lock (&p_rbe->mutex);
+	pthread_mutex_lock (&p_rbe->mutex);
    p_rbe->nb_eval -= 1;
    p_rbe->nb_trig += 1;
    RBE_inc_modulo (&p_rbe->inext_eval, p_rbe->idx_max);
-   mutext_unlock (&p_rbe->mutex);
+   pthread_mutex_unlock (&p_rbe->mutex);
 }
 
 /**
@@ -144,13 +144,13 @@ inline void RBE_update_eval (RingBufferEval_struct *p_rbe)
  *
  * \param p_rbe
  */
-inline void RBE_update_trigger (RingBufferEval_struct *p_rbe)
+void RBE_update_trigger (RingBufferEval_struct *p_rbe)
 {
-   mutext_lock (&p_rbe->mutex);
+   pthread_mutex_lock (&p_rbe->mutex);
    p_rbe->nb_trig -= 1;
    p_rbe->nb_write += 1;
    RBE_inc_modulo (&p_rbe->inext_trig, p_rbe->idx_max);
-   mutext_unlock (&p_rbe->mutex);
+   pthread_mutex_unlock (&p_rbe->mutex);
 }
 
 /**
@@ -163,7 +163,7 @@ inline void RBE_update_trigger (RingBufferEval_struct *p_rbe)
  */
 
 
-inline void RBE_inc_modulo (uint16_t *p_int, uint16_t max_int)
+void RBE_inc_modulo (uint16_t *p_int, uint16_t max_int)
 {
    if (*p_int == max_int)
    {

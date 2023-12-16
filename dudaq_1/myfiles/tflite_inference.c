@@ -69,7 +69,8 @@ void TFLT_delete (TFLT_struct **pp_tflt)
  */
 void TFLT_preprocessing (TFLT_struct *p_tflt, uint8_t *a_tr_adu)
 {
-   uint16_t idx;
+
+
 
    {
       int l_s;

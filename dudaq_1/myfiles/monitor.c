@@ -24,7 +24,7 @@ monitor_read ()
 {
   char bla[20000];
   int i, size;
-  short *mon_val = shm_mon.Ubuf;
+  short *mon_val = (short *)shm_mon.Ubuf;
 
   for (i = 0; i < N_MON; i++)
     {
@@ -40,7 +40,7 @@ monitor_read ()
       rewind (fpmon[i]);
       fread (bla, 1, size, fpmon[i]);
       bla[size] = 0;
-      sscanf (bla, "%d", &mon_val[i]);
+      sscanf (bla, "%hd", &mon_val[i]);
       //printf("%d\t", mon_val[i]);
     }
   //printf("\n");

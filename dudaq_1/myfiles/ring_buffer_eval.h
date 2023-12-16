@@ -7,6 +7,8 @@
 #define DUDAQ_1_MYFILES_RING_BUFFER_H_
 
 #include  <pthread.h>
+#include <stdint.h>
+#include <string.h>
 
 typedef struct
 {
@@ -40,16 +42,19 @@ RBE_create (uint16_t size_buffer, uint16_t nb_array);
 void
 RBE_delete (RingBufferEval_struct **pp_rbe);
 
-inline void
+void
+RBE_write (RingBufferEval_struct *p_rbe, void *p_buf);
+
+void
 RBE_update_write (RingBufferEval_struct *p_rbe);
 
-inline void
+void
 RBE_update_eval (RingBufferEval_struct *p_rbe);
 
-inline void
+void
 RBE_update_trigger (RingBufferEval_struct *p_rbe);
 
-inline void
+void
 RBE_inc_modulo (uint16_t *p_int, uint16_t max_int);
 
 void

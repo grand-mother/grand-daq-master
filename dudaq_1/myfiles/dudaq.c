@@ -278,15 +278,14 @@ int make_server_connection (int port)
 int check_server_data ()
 {
    uint16_t *msg_start;
-   uint16_t msg_tag, msg_len;
+   uint16_t msg_tag ,msg_len=0;
    uint16_t ackalive[6] =
       { 5, 3, ALIVE_ACK, station_id, GRND1, GRND2 };
-   int32_t port, i, il, isize;
-   uint16_t isec;
-   uint32_t ssec;
+   int32_t i=0;
+
+
 
    int32_t bytesRead, recvRet;
-   int32_t length;
    unsigned char *bf = (unsigned char*) DU_input;
    struct timeval timeout;
 
@@ -830,7 +829,7 @@ void du_get_station_id ()
  */
 void du_socket_main (int argc, char **argv)
 {
-   int i = 0, du_port = DU_PORT;
+   int du_port = DU_PORT;
    struct timeval tprev, tnow, tcontact;
    struct timezone tzone;
    float tdif, tdifc;

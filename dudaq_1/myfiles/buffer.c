@@ -76,7 +76,7 @@ int buffer_add_t2 (unsigned short *bf, int bfsize, short id)
 
    unsigned int *s = (unsigned int*) (&(bf[3])); // pointer to where the seconds will be stored
    unsigned int ss;
-   unsigned int ssp;
+
    T2SSEC *ssec; // pointer to where nanosec. are stored
    int n_t2 = 0;
    int iten;
@@ -104,7 +104,7 @@ int buffer_add_t2 (unsigned short *bf, int bfsize, short id)
 	 iten += 4; //10 sec
       if ((timestampbuf[next_read].trigmask & 0xf) != 0)
 	 iten += 2; //ant
-      T2FILL(ssec, ss, ((timestampbuf[next_read].ts_nanoseconds >> 2) & 0xf) + ((iten & 0xf) << 4)); // fill subsec bytes appropriately
+      T2FILL(ssec, ss, (((timestampbuf[next_read].ts_nanoseconds >> 2) & 0xf) + ((iten & 0xf) << 4))); // fill subsec bytes appropriately
       bffil += 2; // update buffer counter
       n_t2++;
       next_read++; // update circular event counter
@@ -184,13 +184,9 @@ int buffer_add_t3 (unsigned short *bf, int bfsize, short id)
  */
 int buffer_add_monitor (unsigned short *bf, int bfsize, short id)
 {
-
-   int len; // total length of the message body
-   int i;
    int n_send = 0;
    static int gpssent = 0;
    int bffil = 0;
-   float tmp;
 
    bf[0] = 0;
    if (gpssent != *(shm_gps.next_read))

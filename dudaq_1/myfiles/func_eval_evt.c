@@ -7,6 +7,10 @@
 
 #include "func_eval_evt.h"
 #include "ring_buffer_eval.h"
+#include <stdlib.h>
+#include <assert.h>
+#include <unistd.h>
+#include <stdio.h>
 
 int G_cpt = 0;
 int G_running = 1; // if 0 stop all thread
@@ -50,7 +54,7 @@ void FEEV_delete (FuncEval_struct **pp_feev)
  *
  * \param p_data
  */
-int FEEV_run (void *p_args)
+void *FEEV_run (void *p_args)
 {
    FuncEval_struct *p_fe = (FuncEval_struct*) p_args;
    RingBufferEval_struct *p_rbe = (RingBufferEval_struct*) p_fe->p_rbe;
@@ -59,31 +63,33 @@ int FEEV_run (void *p_args)
    uint16_t nb_eval;
    uint16_t idx_eval_buffer;
    uint32_t idx_eval_byte;
-   struct timespec tempo =
-      { .tv_nsec = 500000000 };
+
 
    while (G_running)
    {
       /* evaluation of all events without tempo between*/
-      mutex_lock (&p_rbe->mutex);
+      pthread_mutex_lock (&p_rbe->mutex);
       nb_eval = p_rbe->nb_eval;
-      mutex_unlock (&p_rbe->mutex);
+      pthread_mutex_unlock (&p_rbe->mutex);
       if (nb_eval > 0)
       {
 	 idx_eval_buffer = p_rbe->inext_eval;
 	 /* index (in byte ) where start buffer to evaluate */
 	 idx_eval_byte = ((uint32_t) idx_eval_buffer) * p_rbe->size_buffer;
 	 /* eval and update ring buffer */
-	 FEEV_eval (p_eval, &(p_rbe->a_buffers[idx_eval_byte]), &(p_rbe->a_prob[idx_eval_buffer]));
-	 RFE_update_eval (p_rbe);
+	 FEEV_eval (p_eval,
+			 	p_rbe->a_buffers + idx_eval_byte,
+				p_rbe->a_prob + idx_eval_buffer);
+	 RBE_update_eval (p_rbe);
       }
       else
       {
 	 /* all evaluation are done => sleep 0.1 ms */
-	 thrd_sleep (&tempo, NULL);
+	 usleep (100);
+	 printf("Wake up !!!");
       }
    }
-   return 0;
+   pthread_exit(NULL);
 }
 
 /**
