@@ -56,7 +56,7 @@ ad_shm_create (shm_struct *ptr, int nbuf, int size)
   size_t isize = (size + 1) * nbuf * sizeof(uint16_t) + 5 * sz_int;
   //
   // why size + 1 ?
-  // to prevent, critical section when update 'new write' before modulo MAX
+  // may by ... to prevent, critical section when update 'new write' before modulo MAX
   // JM Colley
   //
   key_t key = IPC_PRIVATE;

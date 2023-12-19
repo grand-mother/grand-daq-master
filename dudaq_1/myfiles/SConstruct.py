@@ -42,6 +42,7 @@ sha_git = subprocess.getoutput(cmd)
 #https://stackoverflow.com/questions/61164904/compiler-not-found-when-building-with-scons
 # => ENV = os.environ need to retrieve the path of aarch64-linux-gnu-gcc
 
+ARM64 = True
 ARM64 = False
 
 if ARM64:
