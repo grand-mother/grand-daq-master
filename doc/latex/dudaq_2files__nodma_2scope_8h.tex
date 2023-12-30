@@ -1,0 +1,900 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/files\+\_\+nodma/scope.h File Reference}
+\hypertarget{dudaq_2files__nodma_2scope_8h}{}\label{dudaq_2files__nodma_2scope_8h}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_nodma/scope.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_nodma/scope.h}}
+
+
+Header file for GP300 scope.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_t_s___d_a_t_a}{TS\+\_\+\+DATA}}
+\item 
+struct \mbox{\hyperlink{struct_g_p_s___d_a_t_a}{GPS\+\_\+\+DATA}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0e9e19885becad75b533b44b3e506ea1}\label{dudaq_2files__nodma_2scope_8h_a0e9e19885becad75b533b44b3e506ea1} 
+\#define {\bfseries SAMPLING\+\_\+\+FREQ}~500
+\begin{DoxyCompactList}\small\item\em 500 MHz scope \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a00978ca9e8220475258dcbbbb7d29129}\label{dudaq_2files__nodma_2scope_8h_a00978ca9e8220475258dcbbbb7d29129} 
+\#define {\bfseries ADC\+\_\+\+RESOLUTION}~14
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a734f24a5ae02a73dc2cb73467a26af35}\label{dudaq_2files__nodma_2scope_8h_a734f24a5ae02a73dc2cb73467a26af35} 
+\#define {\bfseries DATA\+\_\+\+MAX\+\_\+\+SAMP}~8192
+\begin{DoxyCompactList}\small\item\em Maximal trace length (samples) \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aabc28ccab6c53b56e624234fd8c3ce36}\label{dudaq_2files__nodma_2scope_8h_aabc28ccab6c53b56e624234fd8c3ce36} 
+\#define {\bfseries MAX\+\_\+\+READOUT}~(256 + \mbox{\hyperlink{_d_u_2scope_8h_a734f24a5ae02a73dc2cb73467a26af35}{DATA\+\_\+\+MAX\+\_\+\+SAMP}}\texorpdfstring{$\ast$}{*}4)
+\begin{DoxyCompactList}\small\item\em Maximal raw event size. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a83ea91d92093daf433cee23e42c05d53}\label{dudaq_2files__nodma_2scope_8h_a83ea91d92093daf433cee23e42c05d53} 
+\#define {\bfseries TDAQ\+\_\+\+BASE}~0x80000000
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a9e41641ab58462fccbb27c3b193a1e16}\label{dudaq_2files__nodma_2scope_8h_a9e41641ab58462fccbb27c3b193a1e16} 
+\#define {\bfseries Reg\+\_\+\+Dig\+\_\+\+Control}~0x000
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a8eb26447555fc7c7ccb4809f815ba28e}\label{dudaq_2files__nodma_2scope_8h_a8eb26447555fc7c7ccb4809f815ba28e} 
+\#define {\bfseries Reg\+\_\+\+Trig\+\_\+\+Enable}~0x002
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a519832a5e871cedf37b3d9c6ce4079d6}\label{dudaq_2files__nodma_2scope_8h_a519832a5e871cedf37b3d9c6ce4079d6} 
+\#define {\bfseries Reg\+\_\+\+Test\+Pulse\+\_\+\+Ch\+Read}~0x004
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a28d4dbd86f982e8c29f5655055e4c59e}\label{dudaq_2files__nodma_2scope_8h_a28d4dbd86f982e8c29f5655055e4c59e} 
+\#define {\bfseries Reg\+\_\+\+Time\+\_\+\+Common}~0x006
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a8cc8bdbac61b5c35ffd1b4623b0059a9}\label{dudaq_2files__nodma_2scope_8h_a8cc8bdbac61b5c35ffd1b4623b0059a9} 
+\#define {\bfseries Reg\+\_\+\+Inp\+\_\+\+Select}~0x008
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a069853ea216cf2f09df90c7bf0e619af}\label{dudaq_2files__nodma_2scope_8h_a069853ea216cf2f09df90c7bf0e619af} 
+\#define {\bfseries Reg\+\_\+\+Battery\+\_\+\+Off}~0x00A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a9f29c4ac0dad178cfe78ec93b867c23b}\label{dudaq_2files__nodma_2scope_8h_a9f29c4ac0dad178cfe78ec93b867c23b} 
+\#define {\bfseries Reg\+\_\+\+Battery\+\_\+\+On}~0x00C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a48c0d513480723e4a7eca9caa8a8b540}\label{dudaq_2files__nodma_2scope_8h_a48c0d513480723e4a7eca9caa8a8b540} 
+\#define {\bfseries Reg\+\_\+\+Spare\+\_\+C}~0x00E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a19af923604c71c42e27bdd572f203a21}\label{dudaq_2files__nodma_2scope_8h_a19af923604c71c42e27bdd572f203a21} 
+\#define {\bfseries Reg\+\_\+\+Time1\+\_\+\+Pre}~0x010
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a1fe2b5ef4819336ad3e566f8d2eb4352}\label{dudaq_2files__nodma_2scope_8h_a1fe2b5ef4819336ad3e566f8d2eb4352} 
+\#define {\bfseries Reg\+\_\+\+Time1\+\_\+\+Post}~0x012
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae47ac36a1a1aa2006d62c75fadd14d00}\label{dudaq_2files__nodma_2scope_8h_ae47ac36a1a1aa2006d62c75fadd14d00} 
+\#define {\bfseries Reg\+\_\+\+Time2\+\_\+\+Pre}~0x014
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a791ce6e0bbd8f0d2ade48cfb7ac9fbbd}\label{dudaq_2files__nodma_2scope_8h_a791ce6e0bbd8f0d2ade48cfb7ac9fbbd} 
+\#define {\bfseries Reg\+\_\+\+Time2\+\_\+\+Post}~0x016
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3cd195af8abd01424f53cb15d35638e4}\label{dudaq_2files__nodma_2scope_8h_a3cd195af8abd01424f53cb15d35638e4} 
+\#define {\bfseries Reg\+\_\+\+Time3\+\_\+\+Pre}~0x018
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7c9255e43497bf009d2aa482b1f7c72f}\label{dudaq_2files__nodma_2scope_8h_a7c9255e43497bf009d2aa482b1f7c72f} 
+\#define {\bfseries Reg\+\_\+\+Time3\+\_\+\+Post}~0x01A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa177ac45fd4ecf6ff6942eefebb4445a}\label{dudaq_2files__nodma_2scope_8h_aa177ac45fd4ecf6ff6942eefebb4445a} 
+\#define {\bfseries Reg\+\_\+\+Time4\+\_\+\+Pre}~0x01C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ab2554c922738828a4d742d298a8e2612}\label{dudaq_2files__nodma_2scope_8h_ab2554c922738828a4d742d298a8e2612} 
+\#define {\bfseries Reg\+\_\+\+Time4\+\_\+\+Post}~0x01E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_adc088a016219bc578b4461110007d8e1}\label{dudaq_2files__nodma_2scope_8h_adc088a016219bc578b4461110007d8e1} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+Gain}~0x020
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7b5673ec5a2226bcf3c4494bfba6ca46}\label{dudaq_2files__nodma_2scope_8h_a7b5673ec5a2226bcf3c4494bfba6ca46} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+Int\+Off}~0x022
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aac9c41147a97a689d31ad6350a946d8c}\label{dudaq_2files__nodma_2scope_8h_aac9c41147a97a689d31ad6350a946d8c} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+Base\+Ma}~0x024
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a04f658b545a837ba7dcffdc3663841d5}\label{dudaq_2files__nodma_2scope_8h_a04f658b545a837ba7dcffdc3663841d5} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+Base\+Mi}~0x026
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a562e8384e30d472a5df4cd8842a3aea2}\label{dudaq_2files__nodma_2scope_8h_a562e8384e30d472a5df4cd8842a3aea2} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+SpareA}~0x028
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a4ba55f0cc03ba4117654a13259ecabe4}\label{dudaq_2files__nodma_2scope_8h_a4ba55f0cc03ba4117654a13259ecabe4} 
+\#define {\bfseries Reg\+\_\+\+ADC1\+\_\+\+SpareB}~0x02A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad8c8fb057db30fc4a7f3140458eb4d61}\label{dudaq_2files__nodma_2scope_8h_ad8c8fb057db30fc4a7f3140458eb4d61} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+Gain}~0x02C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a33435e2d74486f04059ecd5a1d3b8204}\label{dudaq_2files__nodma_2scope_8h_a33435e2d74486f04059ecd5a1d3b8204} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+Int\+Off}~0x02E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a801d9e530d75c5e8580b7cb2a69167ab}\label{dudaq_2files__nodma_2scope_8h_a801d9e530d75c5e8580b7cb2a69167ab} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+Base\+Max}~0x030
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a162d6b0aa66e9e60ff66b213318aab3e}\label{dudaq_2files__nodma_2scope_8h_a162d6b0aa66e9e60ff66b213318aab3e} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+Base\+Min}~0x032
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a9e891a6130f4b51acf791f68d3ccf7d1}\label{dudaq_2files__nodma_2scope_8h_a9e891a6130f4b51acf791f68d3ccf7d1} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+SpareA}~0x034
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae45d58856ff21185bebcdfab7fb4dbd6}\label{dudaq_2files__nodma_2scope_8h_ae45d58856ff21185bebcdfab7fb4dbd6} 
+\#define {\bfseries Reg\+\_\+\+ADC2\+\_\+\+SpareB}~0x036
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2aaecaccfba200a642bf836ae967ba59}\label{dudaq_2files__nodma_2scope_8h_a2aaecaccfba200a642bf836ae967ba59} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+Gain}~0x038
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a212d5f96832feb46ec9f620fa837acd9}\label{dudaq_2files__nodma_2scope_8h_a212d5f96832feb46ec9f620fa837acd9} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+Int\+Off}~0x03A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa0c629f7234c6620f7dd65a46b5228a7}\label{dudaq_2files__nodma_2scope_8h_aa0c629f7234c6620f7dd65a46b5228a7} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+Base\+Max}~0x03C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2c333f5b312eb22d41f4e9285f0fa53f}\label{dudaq_2files__nodma_2scope_8h_a2c333f5b312eb22d41f4e9285f0fa53f} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+Base\+Min}~0x03E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae4d05cf65d15826054ca53a4bb3e0e1e}\label{dudaq_2files__nodma_2scope_8h_ae4d05cf65d15826054ca53a4bb3e0e1e} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+SpareA}~0x040
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a76cd5e916a55a61909233ff6e61cb218}\label{dudaq_2files__nodma_2scope_8h_a76cd5e916a55a61909233ff6e61cb218} 
+\#define {\bfseries Reg\+\_\+\+ADC3\+\_\+\+SpareB}~0x042
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a031445c6cc2fc2fb872633e3d6ec740b}\label{dudaq_2files__nodma_2scope_8h_a031445c6cc2fc2fb872633e3d6ec740b} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+Gain}~0x044
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af209c009f84dac8a44f64bad5d941d32}\label{dudaq_2files__nodma_2scope_8h_af209c009f84dac8a44f64bad5d941d32} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+Int\+Off}~0x046
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_abc852614484a870f42d153076aeb1a09}\label{dudaq_2files__nodma_2scope_8h_abc852614484a870f42d153076aeb1a09} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+Base\+Max}~0x048
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af231664dbe3d4f9ba08cc4d789fa3b51}\label{dudaq_2files__nodma_2scope_8h_af231664dbe3d4f9ba08cc4d789fa3b51} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+Base\+Min}~0x04A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a1f785ad23c6cb7d73a9c8fe78d7b8872}\label{dudaq_2files__nodma_2scope_8h_a1f785ad23c6cb7d73a9c8fe78d7b8872} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+SpareA}~0x04C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad73864346084b296ee34877867cefe63}\label{dudaq_2files__nodma_2scope_8h_ad73864346084b296ee34877867cefe63} 
+\#define {\bfseries Reg\+\_\+\+ADC4\+\_\+\+SpareB}~0x04E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7f52ec8039506a730dbd1950bd215d85}\label{dudaq_2files__nodma_2scope_8h_a7f52ec8039506a730dbd1950bd215d85} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+ThresA}~0x050
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a44f18a74b5f831f9bc5a68bcc53ba440}\label{dudaq_2files__nodma_2scope_8h_a44f18a74b5f831f9bc5a68bcc53ba440} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+ThresB}~0x052
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3054b793e2e574cd716beb426cf0653f}\label{dudaq_2files__nodma_2scope_8h_a3054b793e2e574cd716beb426cf0653f} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+Times}~0x054
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad993b2d6a4dccd6d817479ae4fdfb6a4}\label{dudaq_2files__nodma_2scope_8h_ad993b2d6a4dccd6d817479ae4fdfb6a4} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+Tmax}~0x056
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_abd9c78e4dafb742e34aa7bd310128c3e}\label{dudaq_2files__nodma_2scope_8h_abd9c78e4dafb742e34aa7bd310128c3e} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+Nmin}~0x058
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7eab133b42407710931898fc86a5909f}\label{dudaq_2files__nodma_2scope_8h_a7eab133b42407710931898fc86a5909f} 
+\#define {\bfseries Reg\+\_\+\+Trig1\+\_\+\+Qmin}~0x05A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2b5a6c4067c4b52322c3da2966dd1496}\label{dudaq_2files__nodma_2scope_8h_a2b5a6c4067c4b52322c3da2966dd1496} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+ThresA}~0x05C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a680736fb0f1cdfdbc34f8f1737e15915}\label{dudaq_2files__nodma_2scope_8h_a680736fb0f1cdfdbc34f8f1737e15915} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+ThresB}~0x05E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a01175eccf47254558d82356a19f6e343}\label{dudaq_2files__nodma_2scope_8h_a01175eccf47254558d82356a19f6e343} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+Times}~0x060
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2820aa500e071e7b7b2d67e78574c6d3}\label{dudaq_2files__nodma_2scope_8h_a2820aa500e071e7b7b2d67e78574c6d3} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+Tmax}~0x062
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad59d04426b224143fe09c3d56f176c1d}\label{dudaq_2files__nodma_2scope_8h_ad59d04426b224143fe09c3d56f176c1d} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+Nmin}~0x064
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_abb2b44a415aaed25566e7284f6ff38dc}\label{dudaq_2files__nodma_2scope_8h_abb2b44a415aaed25566e7284f6ff38dc} 
+\#define {\bfseries Reg\+\_\+\+Trig2\+\_\+\+Qmin}~0x066
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a16ef5286953c2ffaad51628ffa03d018}\label{dudaq_2files__nodma_2scope_8h_a16ef5286953c2ffaad51628ffa03d018} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+ThresA}~0x068
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7c2478e536baf1be5d58cdd48d9afa01}\label{dudaq_2files__nodma_2scope_8h_a7c2478e536baf1be5d58cdd48d9afa01} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+ThresB}~0x06A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a30b39959fa7fa59c2d9c767de51182c2}\label{dudaq_2files__nodma_2scope_8h_a30b39959fa7fa59c2d9c767de51182c2} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+Times}~0x06C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad0394e9ceabb94d98417d2112705faf9}\label{dudaq_2files__nodma_2scope_8h_ad0394e9ceabb94d98417d2112705faf9} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+Tmax}~0x06E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aee2ca664313870beb976f412b05de269}\label{dudaq_2files__nodma_2scope_8h_aee2ca664313870beb976f412b05de269} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+Nmin}~0x070
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a568342361419fecc3c641caadb8f8708}\label{dudaq_2files__nodma_2scope_8h_a568342361419fecc3c641caadb8f8708} 
+\#define {\bfseries Reg\+\_\+\+Trig3\+\_\+\+Qmin}~0x072
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ac06adf65373bbf056dc93724ffe963d0}\label{dudaq_2files__nodma_2scope_8h_ac06adf65373bbf056dc93724ffe963d0} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+ThresA}~0x074
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a27b8a7c24216e567d1c8a5beea4b4c1b}\label{dudaq_2files__nodma_2scope_8h_a27b8a7c24216e567d1c8a5beea4b4c1b} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+ThresB}~0x076
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a976047cb6e783d9dcb4cd28a4053e3de}\label{dudaq_2files__nodma_2scope_8h_a976047cb6e783d9dcb4cd28a4053e3de} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+Times}~0x078
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af8d8643d86c770404e266f01e46cf3de}\label{dudaq_2files__nodma_2scope_8h_af8d8643d86c770404e266f01e46cf3de} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+Tmax}~0x07A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af9dd8da099b5df8f43b6e00ad1ac59c5}\label{dudaq_2files__nodma_2scope_8h_af9dd8da099b5df8f43b6e00ad1ac59c5} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+Nmin}~0x07C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a66a6eb577e4fb652cfa7a1f1ec421668}\label{dudaq_2files__nodma_2scope_8h_a66a6eb577e4fb652cfa7a1f1ec421668} 
+\#define {\bfseries Reg\+\_\+\+Trig4\+\_\+\+Qmin}~0x07E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2d8ad119d105be02f46368b305051688}\label{dudaq_2files__nodma_2scope_8h_a2d8ad119d105be02f46368b305051688} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+A1}~0x080
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a41d9ae08884a02e46aed05a2c9876035}\label{dudaq_2files__nodma_2scope_8h_a41d9ae08884a02e46aed05a2c9876035} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+A2}~0x082
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7cf0a29da151bc5d7fcf69b107a91597}\label{dudaq_2files__nodma_2scope_8h_a7cf0a29da151bc5d7fcf69b107a91597} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B1}~0x084
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a486bad890d3bbf2d0d78ce4c723c05a9}\label{dudaq_2files__nodma_2scope_8h_a486bad890d3bbf2d0d78ce4c723c05a9} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B2}~0x086
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a6c651e892d49c6a975119f289cd0384e}\label{dudaq_2files__nodma_2scope_8h_a6c651e892d49c6a975119f289cd0384e} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B3}~0x088
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad2fbf814ee86bfeac17d0ea2847008fa}\label{dudaq_2files__nodma_2scope_8h_ad2fbf814ee86bfeac17d0ea2847008fa} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B4}~0x08A
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a5ff4b797fbf0e6f4eb55c0834d76e970}\label{dudaq_2files__nodma_2scope_8h_a5ff4b797fbf0e6f4eb55c0834d76e970} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B5}~0x08C
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a4a82a365eef1a771cd6715878aef6843}\label{dudaq_2files__nodma_2scope_8h_a4a82a365eef1a771cd6715878aef6843} 
+\#define {\bfseries Reg\+\_\+\+Flt\+A1\+\_\+\+B6}~0x08E
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa5afe7bf492ad83ef346e34b63b218b1}\label{dudaq_2files__nodma_2scope_8h_aa5afe7bf492ad83ef346e34b63b218b1} 
+\#define {\bfseries Reg\+\_\+\+FWStatus}~0x1\+C0
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a62604600600a3770cc72d1c967f48d9b}\label{dudaq_2files__nodma_2scope_8h_a62604600600a3770cc72d1c967f48d9b} 
+\#define {\bfseries Reg\+\_\+\+Gen\+Status}~0x1\+D0
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a531570b5f4ba5fe3545f0cb738c4e0b1}\label{dudaq_2files__nodma_2scope_8h_a531570b5f4ba5fe3545f0cb738c4e0b1} 
+\#define {\bfseries Reg\+\_\+\+Gen\+Control}~0x1\+D4
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ab893f6b4187645e2fcb970cec9c58871}\label{dudaq_2files__nodma_2scope_8h_ab893f6b4187645e2fcb970cec9c58871} 
+\#define {\bfseries Reg\+\_\+\+Data}~0x1\+D8
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0a58763a972f2cfe9ed23cf837aafbd1}\label{dudaq_2files__nodma_2scope_8h_a0a58763a972f2cfe9ed23cf837aafbd1} 
+\#define {\bfseries Reg\+\_\+\+Test\+Trace}~0x1\+DC
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae6df482809c8927be9e0c18095ee9315}\label{dudaq_2files__nodma_2scope_8h_ae6df482809c8927be9e0c18095ee9315} 
+\#define {\bfseries Reg\+\_\+\+Rate}~0x1\+E0
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a58a851db877c49c1441e0545608b8021}\label{dudaq_2files__nodma_2scope_8h_a58a851db877c49c1441e0545608b8021} 
+\#define {\bfseries Reg\+\_\+\+End}~0x1\+FC
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ab75150c1ea4b958cc5c36de46849ef3b}\label{dudaq_2files__nodma_2scope_8h_ab75150c1ea4b958cc5c36de46849ef3b} 
+\#define {\bfseries CTRL\+\_\+\+SEND\+\_\+\+EN}~(1 $<$$<$ 0)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aac26b47ff59f097e4eee6897d2c39716}\label{dudaq_2files__nodma_2scope_8h_aac26b47ff59f097e4eee6897d2c39716} 
+\#define {\bfseries CTRL\+\_\+\+PPS\+\_\+\+EN}~(1 $<$$<$ 1)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ac33527565578c39b8fbd1d29cb5eddaf}\label{dudaq_2files__nodma_2scope_8h_ac33527565578c39b8fbd1d29cb5eddaf} 
+\#define {\bfseries CTRL\+\_\+\+FLTR\+\_\+\+EN}~(1 $<$$<$ 3)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ace1d1c561b6cdf8f47d232786ca184d3}\label{dudaq_2files__nodma_2scope_8h_ace1d1c561b6cdf8f47d232786ca184d3} 
+\#define {\bfseries CTRL\+\_\+\+FAKE\+\_\+\+ADC}~(1 $<$$<$ 6)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2d2004879c2091e7661910ba882bf63a}\label{dudaq_2files__nodma_2scope_8h_a2d2004879c2091e7661910ba882bf63a} 
+\#define {\bfseries CTRL\+\_\+\+FILTER1}~(1 $<$$<$  8)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a5e33a1c50977342696a827001a7894c1}\label{dudaq_2files__nodma_2scope_8h_a5e33a1c50977342696a827001a7894c1} 
+\#define {\bfseries CTRL\+\_\+\+FILTER2}~(1 $<$$<$  9)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_acfdda86eb976bfc6516e4c053e8db882}\label{dudaq_2files__nodma_2scope_8h_acfdda86eb976bfc6516e4c053e8db882} 
+\#define {\bfseries CTRL\+\_\+\+FILTER3}~(1 $<$$<$ 10)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa16aebe792d655c057bfb2822d4dac20}\label{dudaq_2files__nodma_2scope_8h_aa16aebe792d655c057bfb2822d4dac20} 
+\#define {\bfseries CTRL\+\_\+\+FILTER4}~(1 $<$$<$ 11)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad279620fc21445ef8ba7fe3e67361912}\label{dudaq_2files__nodma_2scope_8h_ad279620fc21445ef8ba7fe3e67361912} 
+\#define {\bfseries CTRL\+\_\+\+AUTOBOOT}~(1 $<$$<$ 15)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a50fad80e1f54d9e2b7c0dea757dd6d51}\label{dudaq_2files__nodma_2scope_8h_a50fad80e1f54d9e2b7c0dea757dd6d51} 
+\#define {\bfseries GENSTAT\+\_\+\+PPSFIFO}~(1$<$$<$24)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a322867b9e48a8d637fce53a1e56df13d}\label{dudaq_2files__nodma_2scope_8h_a322867b9e48a8d637fce53a1e56df13d} 
+\#define {\bfseries GENSTAT\+\_\+\+EVTFIFO}~(1$<$$<$25)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a41ea13cae4b34c1adba502ca1d1463b4}\label{dudaq_2files__nodma_2scope_8h_a41ea13cae4b34c1adba502ca1d1463b4} 
+\#define {\bfseries GENSTAT\+\_\+\+DMAFIFO}~(1$<$$<$26)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ada585cccc736dc3e5c2ae6f319a38cf2}\label{dudaq_2files__nodma_2scope_8h_ada585cccc736dc3e5c2ae6f319a38cf2} 
+\#define {\bfseries GENCTRL\+\_\+\+EVTREAD}~(1$<$$<$25)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad9c84a11b688f5d11d5e22f8b4528b79}\label{dudaq_2files__nodma_2scope_8h_ad9c84a11b688f5d11d5e22f8b4528b79} 
+\#define {\bfseries TRIGGER\+\_\+\+T3\+\_\+\+MINBIAS}~0x1000
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a992d61143e117670f90543133bf91d82}\label{dudaq_2files__nodma_2scope_8h_a992d61143e117670f90543133bf91d82} 
+\#define {\bfseries TRIGGER\+\_\+\+T3\+\_\+\+RANDOM}~0x8000
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a4689b699eaa26d656c36523c197f2652}\label{dudaq_2files__nodma_2scope_8h_a4689b699eaa26d656c36523c197f2652} 
+\#define {\bfseries MAGIC\+\_\+\+PPS}~0x\+FACE
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3fee00f4558d88c57e57b2475e7b07ad}\label{dudaq_2files__nodma_2scope_8h_a3fee00f4558d88c57e57b2475e7b07ad} 
+\#define {\bfseries WCNT\+\_\+\+PPS}~32
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a54ef3064b3075b9b3cf6e7946112665b}\label{dudaq_2files__nodma_2scope_8h_a54ef3064b3075b9b3cf6e7946112665b} 
+\#define {\bfseries PPS\+\_\+\+MAGIC}~1
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a690e68747e650026a0ceb18ffd8f5543}\label{dudaq_2files__nodma_2scope_8h_a690e68747e650026a0ceb18ffd8f5543} 
+\#define {\bfseries PPS\+\_\+\+TRIG\+\_\+\+PAT}~2
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2e7a6be647a0361373c9b585cb08de9b}\label{dudaq_2files__nodma_2scope_8h_a2e7a6be647a0361373c9b585cb08de9b} 
+\#define {\bfseries PPS\+\_\+\+TRIG\+\_\+\+RATE}~3
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a572f879fb126f0f0baa332d4133a30df}\label{dudaq_2files__nodma_2scope_8h_a572f879fb126f0f0baa332d4133a30df} 
+\#define {\bfseries PPS\+\_\+\+CTD}~4
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2c12d8f7fe166b4835d040865c0c09fd}\label{dudaq_2files__nodma_2scope_8h_a2c12d8f7fe166b4835d040865c0c09fd} 
+\#define {\bfseries PPS\+\_\+\+CTP}~6
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ab3b93c2dc5617dc0c9b569ddbd697aa0}\label{dudaq_2files__nodma_2scope_8h_ab3b93c2dc5617dc0c9b569ddbd697aa0} 
+\#define {\bfseries PPS\+\_\+\+OFFSET}~8
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0d9a6b20ff1da74f0046ae929db847b4}\label{dudaq_2files__nodma_2scope_8h_a0d9a6b20ff1da74f0046ae929db847b4} 
+\#define {\bfseries PPS\+\_\+\+LEAP}~10
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a8e025501471780916235e228cdab24bf}\label{dudaq_2files__nodma_2scope_8h_a8e025501471780916235e228cdab24bf} 
+\#define {\bfseries PPS\+\_\+\+STATFLAG}~11
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a1b93f0b791f0f2b538926b4023e0ae8d}\label{dudaq_2files__nodma_2scope_8h_a1b93f0b791f0f2b538926b4023e0ae8d} 
+\#define {\bfseries PPS\+\_\+\+CRITICAL}~12
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa21746c3739d5e1d1c295315a060b0b5}\label{dudaq_2files__nodma_2scope_8h_aa21746c3739d5e1d1c295315a060b0b5} 
+\#define {\bfseries PPS\+\_\+\+WARNING}~13
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a40a6fac50903bf582e10b30e38b6bce6}\label{dudaq_2files__nodma_2scope_8h_a40a6fac50903bf582e10b30e38b6bce6} 
+\#define {\bfseries PPS\+\_\+\+YEAR}~14
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a42df49cbb5ecf3c94a9d46ee0b86c685}\label{dudaq_2files__nodma_2scope_8h_a42df49cbb5ecf3c94a9d46ee0b86c685} 
+\#define {\bfseries PPS\+\_\+\+DAYMONTH}~15
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae24304feed95468b6dc1474bd04610bf}\label{dudaq_2files__nodma_2scope_8h_ae24304feed95468b6dc1474bd04610bf} 
+\#define {\bfseries PPS\+\_\+\+MINHOUR}~16
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ac2a1c3702219751036184f64fb6d95a9}\label{dudaq_2files__nodma_2scope_8h_ac2a1c3702219751036184f64fb6d95a9} 
+\#define {\bfseries PPS\+\_\+\+STATSEC}~17
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae5f24d88a36beec6279dbb513896b9c3}\label{dudaq_2files__nodma_2scope_8h_ae5f24d88a36beec6279dbb513896b9c3} 
+\#define {\bfseries PPS\+\_\+\+LONGITUDE}~18
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0c3d3c402dce4f32d037ad22d900f1c5}\label{dudaq_2files__nodma_2scope_8h_a0c3d3c402dce4f32d037ad22d900f1c5} 
+\#define {\bfseries PPS\+\_\+\+LATITUDE}~22
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa7edb59473aa9561020a395081d3c6de}\label{dudaq_2files__nodma_2scope_8h_aa7edb59473aa9561020a395081d3c6de} 
+\#define {\bfseries PPS\+\_\+\+ALTITUDE}~26
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2717e74857fc568d782e826c28b5e6f5}\label{dudaq_2files__nodma_2scope_8h_a2717e74857fc568d782e826c28b5e6f5} 
+\#define {\bfseries PPS\+\_\+\+TEMPERATURE}~30
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af8f94ab54c52e003298b39e763d5a8f2}\label{dudaq_2files__nodma_2scope_8h_af8f94ab54c52e003298b39e763d5a8f2} 
+\#define {\bfseries MAGIC\+\_\+\+EVT}~0x\+ADC0
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_affab946af07554496f9d933e76ef5f1e}\label{dudaq_2files__nodma_2scope_8h_affab946af07554496f9d933e76ef5f1e} 
+\#define {\bfseries HEADER\+\_\+\+EVT}~256
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7f9fe16525c76209fb1ec8d2cedf278c}\label{dudaq_2files__nodma_2scope_8h_a7f9fe16525c76209fb1ec8d2cedf278c} 
+\#define {\bfseries FORMAT\+\_\+\+EVT}~1
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a008451af89b034a47c9c020ebd82c87b}\label{dudaq_2files__nodma_2scope_8h_a008451af89b034a47c9c020ebd82c87b} 
+\#define {\bfseries EVT\+\_\+\+LENGTH}~0
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a632cfe49d61efbb43d2ba6bde9c88ac6}\label{dudaq_2files__nodma_2scope_8h_a632cfe49d61efbb43d2ba6bde9c88ac6} 
+\#define {\bfseries EVT\+\_\+\+ID}~1
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aae69961515c5e8577c452c9e142a98fb}\label{dudaq_2files__nodma_2scope_8h_aae69961515c5e8577c452c9e142a98fb} 
+\#define {\bfseries EVT\+\_\+\+HARDWARE}~2
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a143346f759b208fdd4ca1ff37cd6263a}\label{dudaq_2files__nodma_2scope_8h_a143346f759b208fdd4ca1ff37cd6263a} 
+\#define {\bfseries EVT\+\_\+\+HDRLEN}~3
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a1e433f2136b18fb23aa9392b2c0cb888}\label{dudaq_2files__nodma_2scope_8h_a1e433f2136b18fb23aa9392b2c0cb888} 
+\#define {\bfseries EVT\+\_\+\+SECOND}~4
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2360a8730383a590226427094351e69c}\label{dudaq_2files__nodma_2scope_8h_a2360a8730383a590226427094351e69c} 
+\#define {\bfseries EVT\+\_\+\+NANOSEC}~6
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_acd7a28ca0e6940c41b3ee1a13547740e}\label{dudaq_2files__nodma_2scope_8h_acd7a28ca0e6940c41b3ee1a13547740e} 
+\#define {\bfseries EVT\+\_\+\+TRIGGERPOS}~8
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_abfbbcde1bb346b6f5bb8a13bbedc2f76}\label{dudaq_2files__nodma_2scope_8h_abfbbcde1bb346b6f5bb8a13bbedc2f76} 
+\#define {\bfseries EVT\+\_\+\+T3\+FLAG}~9
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a607f6d836dd28d6bf0ad4508bed58827}\label{dudaq_2files__nodma_2scope_8h_a607f6d836dd28d6bf0ad4508bed58827} 
+\#define {\bfseries EVT\+\_\+\+ATM\+\_\+\+TEMP}~17
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_acb308ed56dc0f0c4afc81362908fc97d}\label{dudaq_2files__nodma_2scope_8h_acb308ed56dc0f0c4afc81362908fc97d} 
+\#define {\bfseries EVT\+\_\+\+ATM\+\_\+\+PRES}~18
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a79656fcb46b0705e2fb72b97966eb319}\label{dudaq_2files__nodma_2scope_8h_a79656fcb46b0705e2fb72b97966eb319} 
+\#define {\bfseries EVT\+\_\+\+ATM\+\_\+\+HUM}~19
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3063dcb1462a92573fdae1141572e811}\label{dudaq_2files__nodma_2scope_8h_a3063dcb1462a92573fdae1141572e811} 
+\#define {\bfseries EVT\+\_\+\+ACCEL\+\_\+X}~20
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a319a0e750b34c9051db43dec3e60cae7}\label{dudaq_2files__nodma_2scope_8h_a319a0e750b34c9051db43dec3e60cae7} 
+\#define {\bfseries EVT\+\_\+\+ACCEL\+\_\+Y}~21
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a7edc668c487512248e9daa342d4d65c5}\label{dudaq_2files__nodma_2scope_8h_a7edc668c487512248e9daa342d4d65c5} 
+\#define {\bfseries EVT\+\_\+\+ACCEL\+\_\+Z}~22
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ab71230b229b88475f4806b3dff393184}\label{dudaq_2files__nodma_2scope_8h_ab71230b229b88475f4806b3dff393184} 
+\#define {\bfseries EVT\+\_\+\+BATTERY}~23
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a259b68da926d9e5ade8e0336b34ca788}\label{dudaq_2files__nodma_2scope_8h_a259b68da926d9e5ade8e0336b34ca788} 
+\#define {\bfseries EVT\+\_\+\+VERSION}~24
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a4ecd8a776742a0421c73f8f3e3f6ddb4}\label{dudaq_2files__nodma_2scope_8h_a4ecd8a776742a0421c73f8f3e3f6ddb4} 
+\#define {\bfseries EVT\+\_\+\+MSPS}~25
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0eaaea20c1ee8554bac3b24405808e2f}\label{dudaq_2files__nodma_2scope_8h_a0eaaea20c1ee8554bac3b24405808e2f} 
+\#define {\bfseries EVT\+\_\+\+ADC\+\_\+\+RES}~26
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a8134e89ea729c5a91049266a03963658}\label{dudaq_2files__nodma_2scope_8h_a8134e89ea729c5a91049266a03963658} 
+\#define {\bfseries EVT\+\_\+\+INP\+\_\+\+SELECT}~27
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af49e9e86a34780f735f529adda447b79}\label{dudaq_2files__nodma_2scope_8h_af49e9e86a34780f735f529adda447b79} 
+\#define {\bfseries EVT\+\_\+\+CH\+\_\+\+ENABLE}~28
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2554d99f3dfb12c34be3a3cd3b6e9241}\label{dudaq_2files__nodma_2scope_8h_a2554d99f3dfb12c34be3a3cd3b6e9241} 
+\#define {\bfseries EVT\+\_\+\+TOT\+\_\+\+SAMPLES}~29
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae0d9482ef9061e6ad57ca951c502588d}\label{dudaq_2files__nodma_2scope_8h_ae0d9482ef9061e6ad57ca951c502588d} 
+\#define {\bfseries EVT\+\_\+\+CH1\+\_\+\+SAMPLES}~30
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a887d20724deb97f8f5a3486665c8a236}\label{dudaq_2files__nodma_2scope_8h_a887d20724deb97f8f5a3486665c8a236} 
+\#define {\bfseries EVT\+\_\+\+CH2\+\_\+\+SAMPLES}~31
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad496660eacc7e26ae2b110ea87fc0b77}\label{dudaq_2files__nodma_2scope_8h_ad496660eacc7e26ae2b110ea87fc0b77} 
+\#define {\bfseries EVT\+\_\+\+CH3\+\_\+\+SAMPLES}~32
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2e5cac64ccffea32e7cce520794ea04f}\label{dudaq_2files__nodma_2scope_8h_a2e5cac64ccffea32e7cce520794ea04f} 
+\#define {\bfseries EVT\+\_\+\+CH4\+\_\+\+SAMPLES}~33
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3d80775cedf4d88ab368f7c3a644267a}\label{dudaq_2files__nodma_2scope_8h_a3d80775cedf4d88ab368f7c3a644267a} 
+\#define {\bfseries EVT\+\_\+\+TRIG\+\_\+\+PAT}~34
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae310340fd212bcb9479284de604a26a6}\label{dudaq_2files__nodma_2scope_8h_ae310340fd212bcb9479284de604a26a6} 
+\#define {\bfseries EVT\+\_\+\+TRIG\+\_\+\+RATE}~35
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ac871912ba09ee5a0d2708522e98682a4}\label{dudaq_2files__nodma_2scope_8h_ac871912ba09ee5a0d2708522e98682a4} 
+\#define {\bfseries EVT\+\_\+\+CTD}~36
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a96f15514ffded5f902bdf5c0a6b39bb3}\label{dudaq_2files__nodma_2scope_8h_a96f15514ffded5f902bdf5c0a6b39bb3} 
+\#define {\bfseries EVT\+\_\+\+CTP}~38
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a6fd7ca2555ad835658529df169f52622}\label{dudaq_2files__nodma_2scope_8h_a6fd7ca2555ad835658529df169f52622} 
+\#define {\bfseries EVT\+\_\+\+PPS\+\_\+\+OFFSET}~40
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_adf5c0afab165be824b1add8f0223ad00}\label{dudaq_2files__nodma_2scope_8h_adf5c0afab165be824b1add8f0223ad00} 
+\#define {\bfseries EVT\+\_\+\+LEAP}~42
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a5660f3cae7bd62c9b0aac5b5567e3549}\label{dudaq_2files__nodma_2scope_8h_a5660f3cae7bd62c9b0aac5b5567e3549} 
+\#define {\bfseries EVT\+\_\+\+GPS\+\_\+\+STATFLAG}~43
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a792f7f03b009b2b71ef8bfe3f1d527a3}\label{dudaq_2files__nodma_2scope_8h_a792f7f03b009b2b71ef8bfe3f1d527a3} 
+\#define {\bfseries EVT\+\_\+\+GPS\+\_\+\+CRITICAL}~44
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a305c7173fa284f5d7166e65e96ccbfd8}\label{dudaq_2files__nodma_2scope_8h_a305c7173fa284f5d7166e65e96ccbfd8} 
+\#define {\bfseries EVT\+\_\+\+GPS\+\_\+\+WARNING}~45
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a8f4797a9b19ca77ba23e073c34a3ea24}\label{dudaq_2files__nodma_2scope_8h_a8f4797a9b19ca77ba23e073c34a3ea24} 
+\#define {\bfseries EVT\+\_\+\+YEAR}~46
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa753d6703fbe52549ad0d0c4b219d81e}\label{dudaq_2files__nodma_2scope_8h_aa753d6703fbe52549ad0d0c4b219d81e} 
+\#define {\bfseries EVT\+\_\+\+DAYMONTH}~47
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a361853066ff0cb146ffee5aa94014fed}\label{dudaq_2files__nodma_2scope_8h_a361853066ff0cb146ffee5aa94014fed} 
+\#define {\bfseries EVT\+\_\+\+MINHOUR}~48
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3d2382530711ebd6aacdd480b9f9f3db}\label{dudaq_2files__nodma_2scope_8h_a3d2382530711ebd6aacdd480b9f9f3db} 
+\#define {\bfseries EVT\+\_\+\+STATSEC}~49
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a04c5a1840cc24a746a5fcfd776156be4}\label{dudaq_2files__nodma_2scope_8h_a04c5a1840cc24a746a5fcfd776156be4} 
+\#define {\bfseries EVT\+\_\+\+LONGITUDE}~50
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_afbf5cd3d5b193d8c032fc47a77973b88}\label{dudaq_2files__nodma_2scope_8h_afbf5cd3d5b193d8c032fc47a77973b88} 
+\#define {\bfseries EVT\+\_\+\+LATITUDE}~54
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a49620c75087a3b961646ff3b53aaf838}\label{dudaq_2files__nodma_2scope_8h_a49620c75087a3b961646ff3b53aaf838} 
+\#define {\bfseries EVT\+\_\+\+ALTITUDE}~58
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a5831aedc3ec33a43c639f1d4a15ae84f}\label{dudaq_2files__nodma_2scope_8h_a5831aedc3ec33a43c639f1d4a15ae84f} 
+\#define {\bfseries EVT\+\_\+\+GPS\+\_\+\+TEMP}~62
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2525a07b6f0d079be6619dc5bc5b0169}\label{dudaq_2files__nodma_2scope_8h_a2525a07b6f0d079be6619dc5bc5b0169} 
+\#define {\bfseries EVT\+\_\+\+CTRL}~64
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_af890eb25fd6d68be38d919e2cc5c416a}\label{dudaq_2files__nodma_2scope_8h_af890eb25fd6d68be38d919e2cc5c416a} 
+\#define {\bfseries EVT\+\_\+\+WINDOWS}~72
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aba5c7272ffa5bba406cd1be0e32586f7}\label{dudaq_2files__nodma_2scope_8h_aba5c7272ffa5bba406cd1be0e32586f7} 
+\#define {\bfseries EVT\+\_\+\+CHANNEL}~80
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a4f138549f4f24cfc6dc21897265bc501}\label{dudaq_2files__nodma_2scope_8h_a4f138549f4f24cfc6dc21897265bc501} 
+\#define {\bfseries EVT\+\_\+\+TRIGGER}~104
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a49b66b99d4df357e73933dd5d11d38fa}\label{dudaq_2files__nodma_2scope_8h_a49b66b99d4df357e73933dd5d11d38fa} 
+\#define {\bfseries EVT\+\_\+\+FILTER1}~128
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aa95d06e481ed64a66d493fd138a6c168}\label{dudaq_2files__nodma_2scope_8h_aa95d06e481ed64a66d493fd138a6c168} 
+\#define {\bfseries EVT\+\_\+\+FILTER2}~160
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a65675f4153869086f7fb120215959309}\label{dudaq_2files__nodma_2scope_8h_a65675f4153869086f7fb120215959309} 
+\#define {\bfseries EVT\+\_\+\+FILTER3}~192
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aaaa67791a050ef1602085b2e0d15bcf6}\label{dudaq_2files__nodma_2scope_8h_aaaa67791a050ef1602085b2e0d15bcf6} 
+\#define {\bfseries EVT\+\_\+\+FILTER4}~224
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_aeca034f67218340ecb2261a22c2f3dcd}\label{dudaq_2files__nodma_2scope_8h_aeca034f67218340ecb2261a22c2f3dcd} 
+\#define {\bfseries BUFSIZE}~3000
+\begin{DoxyCompactList}\small\item\em store up to 3000 events in circular buffer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a675acc4cc1e06dfad7cfa50c7e069f82}\label{dudaq_2files__nodma_2scope_8h_a675acc4cc1e06dfad7cfa50c7e069f82} 
+\#define {\bfseries GPSSIZE}~35
+\begin{DoxyCompactList}\small\item\em buffer upto 35 GPS seconds info in circular buffer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a52cc46c3561fc6bbe5af1bff78ff6303}\label{dudaq_2files__nodma_2scope_8h_a52cc46c3561fc6bbe5af1bff78ff6303} 
+\#define {\bfseries MAXT3}~50
+\begin{DoxyCompactList}\small\item\em 20 T3 events in circular cuffer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_afb3ac206d6bebda125d7eedc7c96da3f}\label{dudaq_2files__nodma_2scope_8h_afb3ac206d6bebda125d7eedc7c96da3f} 
+\#define {\bfseries SCOPE\+\_\+\+EVENT}~2
+\begin{DoxyCompactList}\small\item\em return code for reading an event \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a9b25b87dbe4b1d1c70a417be9bfbae30}\label{dudaq_2files__nodma_2scope_8h_a9b25b87dbe4b1d1c70a417be9bfbae30} 
+\#define {\bfseries SCOPE\+\_\+\+GPS}~3
+\begin{DoxyCompactList}\small\item\em return code for reading a PPS message \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a228b4562d5b4fdd5a558f29c6669ddf2}{scope\+\_\+raw\+\_\+write}} (uint32\+\_\+t reg\+\_\+addr, uint32\+\_\+t value)
+\begin{DoxyCompactList}\small\item\em writes a buffer to the digitizer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ad3f7a810c3fc238a40437f650aad700d}\label{dudaq_2files__nodma_2scope_8h_ad3f7a810c3fc238a40437f650aad700d} 
+uint32\+\_\+t {\bfseries scope\+\_\+raw\+\_\+read} (uint32\+\_\+t reg\+\_\+addr)
+\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a1c895b654148a7385f85dc09b332b24b}{scope\+\_\+flush}} ()
+\begin{DoxyCompactList}\small\item\em empty routine \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a9247308a7c4c77218798d40126e1b2be}{scope\+\_\+open}} ()
+\begin{DoxyCompactList}\small\item\em opens connection to digitizer \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a02756ee62fea9a11b9f89c44e12a0a65}{scope\+\_\+close}} ()
+\begin{DoxyCompactList}\small\item\em closes scope communication \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a506afe9b825fb1fed5acde2bc76e8d68}{scope\+\_\+reset}} ()
+\begin{DoxyCompactList}\small\item\em performs a soft reset on the scope \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_ae6ea501f53ade3c79f11f9b3935e8aa9}{scope\+\_\+start\+\_\+run}} ()
+\begin{DoxyCompactList}\small\item\em starts the run \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_ab6ad70489062a18bc3f394452758e035}{scope\+\_\+stop\+\_\+run}} ()
+\begin{DoxyCompactList}\small\item\em disables output \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a3a603e895e867e66d6d647770e1952a5}{scope\+\_\+set\+\_\+parameters}} (uint32\+\_\+t reg\+\_\+addr, uint32\+\_\+t value, uint32\+\_\+t to\+\_\+shadow)
+\begin{DoxyCompactList}\small\item\em writes a parameter list to the scope (and the shadowlist) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a59a93c7f3678aa0c67ed09095a66eac9}{scope\+\_\+reboot}} ()
+\begin{DoxyCompactList}\small\item\em resets the fpga \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a122e3e973152efd5f53c81623ecf274d}{scope\+\_\+copy\+\_\+shadow}} ()
+\begin{DoxyCompactList}\small\item\em copy every parameter from the shadowlist into the fpga \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a333fc3568af7db9af3b96e520a554d62}{scope\+\_\+init\+\_\+shadow}} ()
+\begin{DoxyCompactList}\small\item\em initializes the shadow list \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a34f554820dbaa982450d7584532e11f2}{scope\+\_\+initialize}} ()
+\begin{DoxyCompactList}\small\item\em initializes shadow memory, resets the digitizer and stops the run \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a31504a32abdee69b40abeb2db1a8e272}\label{dudaq_2files__nodma_2scope_8h_a31504a32abdee69b40abeb2db1a8e272} 
+void {\bfseries scope\+\_\+create\+\_\+memory} ()
+\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a2453dfed8e67d3ac98336be9eb83bcce}{scope\+\_\+read\+\_\+event}} (int32\+\_\+t ioff)
+\begin{DoxyCompactList}\small\item\em read an event from the fpga \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a1a73de65cf7a0d593a14b370e1bd2afd}{scope\+\_\+read\+\_\+pps}} ()
+\begin{DoxyCompactList}\small\item\em read pps, convert timestamp to GPS time, update circular GPS buffer \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a292fcdfa610afd0cfe60482be5be96e8}{scope\+\_\+read}} (int ioff)
+\begin{DoxyCompactList}\small\item\em reads data from a scope in the appropriate buffer. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_af00f0aa0824921216fd93fc510607ce4}{scope\+\_\+no\+\_\+run\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em reads data from scope, meant to use if there is no run \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__nodma_2scope_8h_a989d5bdd1c94c8749904417e8e982014}{scope\+\_\+run\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em reads data from scope during a run. If there has not been data for more than 11 sec, reset the scope and restart the run. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a0e96bf11f12682eac7283e3310a4614c}\label{dudaq_2files__nodma_2scope_8h_a0e96bf11f12682eac7283e3310a4614c} 
+void {\bfseries scope\+\_\+event\+\_\+to\+\_\+shm} (uint16\+\_\+t evnr, uint16\+\_\+t trflag, uint16\+\_\+t sec, uint32\+\_\+t ssec)
+\item 
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a6994584b6e0c307284cecdee7caa85ce}\label{dudaq_2files__nodma_2scope_8h_a6994584b6e0c307284cecdee7caa85ce} 
+int {\bfseries scope\+\_\+calc\+\_\+t3nsec} (uint16\+\_\+t \texorpdfstring{$\ast$}{*}pps)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+Header file for GP300 scope. 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a02756ee62fea9a11b9f89c44e12a0a65}\label{dudaq_2files__nodma_2scope_8h_a02756ee62fea9a11b9f89c44e12a0a65} 
+\index{scope.h@{scope.h}!scope\_close@{scope\_close}}
+\index{scope\_close@{scope\_close}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_close()}{scope\_close()}}
+{\footnotesize\ttfamily void scope\+\_\+close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+closes scope communication 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a02756ee62fea9a11b9f89c44e12a0a65}{scope\+\_\+close()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a122e3e973152efd5f53c81623ecf274d}\label{dudaq_2files__nodma_2scope_8h_a122e3e973152efd5f53c81623ecf274d} 
+\index{scope.h@{scope.h}!scope\_copy\_shadow@{scope\_copy\_shadow}}
+\index{scope\_copy\_shadow@{scope\_copy\_shadow}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_copy\_shadow()}{scope\_copy\_shadow()}}
+{\footnotesize\ttfamily void scope\+\_\+copy\+\_\+shadow (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+copy every parameter from the shadowlist into the fpga 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a122e3e973152efd5f53c81623ecf274d}{scope\+\_\+copy\+\_\+shadow()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a1c895b654148a7385f85dc09b332b24b}\label{dudaq_2files__nodma_2scope_8h_a1c895b654148a7385f85dc09b332b24b} 
+\index{scope.h@{scope.h}!scope\_flush@{scope\_flush}}
+\index{scope\_flush@{scope\_flush}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_flush()}{scope\_flush()}}
+{\footnotesize\ttfamily void scope\+\_\+flush (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+empty routine 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a1c895b654148a7385f85dc09b332b24b}{scope\+\_\+flush()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a333fc3568af7db9af3b96e520a554d62}\label{dudaq_2files__nodma_2scope_8h_a333fc3568af7db9af3b96e520a554d62} 
+\index{scope.h@{scope.h}!scope\_init\_shadow@{scope\_init\_shadow}}
+\index{scope\_init\_shadow@{scope\_init\_shadow}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_init\_shadow()}{scope\_init\_shadow()}}
+{\footnotesize\ttfamily void scope\+\_\+init\+\_\+shadow (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+initializes the shadow list 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a333fc3568af7db9af3b96e520a554d62}{scope\+\_\+init\+\_\+shadow()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a34f554820dbaa982450d7584532e11f2}\label{dudaq_2files__nodma_2scope_8h_a34f554820dbaa982450d7584532e11f2} 
+\index{scope.h@{scope.h}!scope\_initialize@{scope\_initialize}}
+\index{scope\_initialize@{scope\_initialize}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_initialize()}{scope\_initialize()}}
+{\footnotesize\ttfamily void scope\+\_\+initialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+initializes shadow memory, resets the digitizer and stops the run 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a34f554820dbaa982450d7584532e11f2}{scope\+\_\+initialize()} \Hypertarget{dudaq_2files__nodma_2scope_8h_af00f0aa0824921216fd93fc510607ce4}\label{dudaq_2files__nodma_2scope_8h_af00f0aa0824921216fd93fc510607ce4} 
+\index{scope.h@{scope.h}!scope\_no\_run\_read@{scope\_no\_run\_read}}
+\index{scope\_no\_run\_read@{scope\_no\_run\_read}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_no\_run\_read()}{scope\_no\_run\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+no\+\_\+run\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+reads data from scope, meant to use if there is no run 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_af00f0aa0824921216fd93fc510607ce4}{scope\+\_\+no\+\_\+run\+\_\+read()} 
+\begin{DoxyRetVals}{Return values}
+{\em scope\+\_\+read(0)} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a9247308a7c4c77218798d40126e1b2be}\label{dudaq_2files__nodma_2scope_8h_a9247308a7c4c77218798d40126e1b2be} 
+\index{scope.h@{scope.h}!scope\_open@{scope\_open}}
+\index{scope\_open@{scope\_open}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_open()}{scope\_open()}}
+{\footnotesize\ttfamily int scope\+\_\+open (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+opens connection to digitizer 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a9247308a7c4c77218798d40126e1b2be}{scope\+\_\+open()} 
+\begin{DoxyRetVals}{Return values}
+{\em -\/1} & failure \\
+\hline
+{\em 1} & succes \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a228b4562d5b4fdd5a558f29c6669ddf2}\label{dudaq_2files__nodma_2scope_8h_a228b4562d5b4fdd5a558f29c6669ddf2} 
+\index{scope.h@{scope.h}!scope\_raw\_write@{scope\_raw\_write}}
+\index{scope\_raw\_write@{scope\_raw\_write}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_raw\_write()}{scope\_raw\_write()}}
+{\footnotesize\ttfamily void scope\+\_\+raw\+\_\+write (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{reg\+\_\+addr,  }\item[{uint32\+\_\+t}]{value }\end{DoxyParamCaption})}
+
+
+
+writes a buffer to the digitizer 
+
+\textbackslash{}func void scope\+\_\+raw\+\_\+write(unsigned int \texorpdfstring{$\ast$}{*}buf, int len) 
+\begin{DoxyParams}{Parameters}
+{\em buf} & pointer to the data to send \\
+\hline
+{\em len} & number of bytes to send \\
+\hline
+\end{DoxyParams}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a292fcdfa610afd0cfe60482be5be96e8}\label{dudaq_2files__nodma_2scope_8h_a292fcdfa610afd0cfe60482be5be96e8} 
+\index{scope.h@{scope.h}!scope\_read@{scope\_read}}
+\index{scope\_read@{scope\_read}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_read()}{scope\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+read (\begin{DoxyParamCaption}\item[{int}]{ioff }\end{DoxyParamCaption})}
+
+
+
+reads data from a scope in the appropriate buffer. 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a292fcdfa610afd0cfe60482be5be96e8}{scope\+\_\+read(int ioff)} 
+\begin{DoxyParams}{Parameters}
+{\em ioff} & after reading the pointers to the buffers (event/monitor) are increased by ioff \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & No Data \\
+\hline
+{\em -\/1} & First word not a header \\
+\hline
+{\em -\/2} & Only start-\/of-\/message read \\
+\hline
+{\em -\/3} & Bad data identifier \\
+\hline
+{\em -\/4} & Error reading scope parameters \\
+\hline
+{\em -\/5} & Cannot read event header \\
+\hline
+{\em -\/6} & Error reading ADC values \\
+\hline
+{\em -\/7} & Error reading GPS parameters \\
+\hline
+{\em SCOPE\+\_\+\+PARAM} & successfully read scope parameters \\
+\hline
+{\em SCOPE\+\_\+\+EVENT} & successfully read scope event \\
+\hline
+{\em SCOPE\+\_\+\+GPS} & succesfully read GPS PPS info \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a2453dfed8e67d3ac98336be9eb83bcce}\label{dudaq_2files__nodma_2scope_8h_a2453dfed8e67d3ac98336be9eb83bcce} 
+\index{scope.h@{scope.h}!scope\_read\_event@{scope\_read\_event}}
+\index{scope\_read\_event@{scope\_read\_event}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_read\_event()}{scope\_read\_event()}}
+{\footnotesize\ttfamily int scope\+\_\+read\+\_\+event (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{ioff }\end{DoxyParamCaption})}
+
+
+
+read an event from the fpga 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a2453dfed8e67d3ac98336be9eb83bcce}{scope\+\_\+read\+\_\+event(int32\+\_\+t ioff)} 
+\begin{DoxyParams}{Parameters}
+{\em ioff} & 1 to update the event buffer. When 0 no update is made \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em -\/10} & too much data in the event \\
+\hline
+{\em -\/11} & not all data is read \\
+\hline
+{\em SCOPE\+\_\+\+EVENT} & succesfully read event \\
+\hline
+\end{DoxyRetVals}
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG\Hypertarget{dudaq_2files__nodma_2scope_8h_a1a73de65cf7a0d593a14b370e1bd2afd}\label{dudaq_2files__nodma_2scope_8h_a1a73de65cf7a0d593a14b370e1bd2afd} 
+\index{scope.h@{scope.h}!scope\_read\_pps@{scope\_read\_pps}}
+\index{scope\_read\_pps@{scope\_read\_pps}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_read\_pps()}{scope\_read\_pps()}}
+{\footnotesize\ttfamily int scope\+\_\+read\+\_\+pps (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+read pps, convert timestamp to GPS time, update circular GPS buffer 
+
+\textbackslash{}func int32\+\_\+t \doxylink{_d_u_2scope_8c_aa5d90138a67de94bc83b772c39cba2a4}{scope\+\_\+read\+\_\+pps()} 
+\begin{DoxyRetVals}{Return values}
+{\em -\/7} & error in reading the PPS \\
+\hline
+{\em SCOPE\+\_\+\+GPS} & OK \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a59a93c7f3678aa0c67ed09095a66eac9}\label{dudaq_2files__nodma_2scope_8h_a59a93c7f3678aa0c67ed09095a66eac9} 
+\index{scope.h@{scope.h}!scope\_reboot@{scope\_reboot}}
+\index{scope\_reboot@{scope\_reboot}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_reboot()}{scope\_reboot()}}
+{\footnotesize\ttfamily void scope\+\_\+reboot (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+resets the fpga 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a59a93c7f3678aa0c67ed09095a66eac9}{scope\+\_\+reboot()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a506afe9b825fb1fed5acde2bc76e8d68}\label{dudaq_2files__nodma_2scope_8h_a506afe9b825fb1fed5acde2bc76e8d68} 
+\index{scope.h@{scope.h}!scope\_reset@{scope\_reset}}
+\index{scope\_reset@{scope\_reset}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_reset()}{scope\_reset()}}
+{\footnotesize\ttfamily void scope\+\_\+reset (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+performs a soft reset on the scope 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a506afe9b825fb1fed5acde2bc76e8d68}{scope\+\_\+reset()} \Hypertarget{dudaq_2files__nodma_2scope_8h_a989d5bdd1c94c8749904417e8e982014}\label{dudaq_2files__nodma_2scope_8h_a989d5bdd1c94c8749904417e8e982014} 
+\index{scope.h@{scope.h}!scope\_run\_read@{scope\_run\_read}}
+\index{scope\_run\_read@{scope\_run\_read}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_run\_read()}{scope\_run\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+run\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+reads data from scope during a run. If there has not been data for more than 11 sec, reset the scope and restart the run. 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a989d5bdd1c94c8749904417e8e982014}{scope\+\_\+run\+\_\+read()} 
+\begin{DoxyRetVals}{Return values}
+{\em scope\+\_\+read(1)} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_a3a603e895e867e66d6d647770e1952a5}\label{dudaq_2files__nodma_2scope_8h_a3a603e895e867e66d6d647770e1952a5} 
+\index{scope.h@{scope.h}!scope\_set\_parameters@{scope\_set\_parameters}}
+\index{scope\_set\_parameters@{scope\_set\_parameters}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_set\_parameters()}{scope\_set\_parameters()}}
+{\footnotesize\ttfamily void scope\+\_\+set\+\_\+parameters (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{reg\+\_\+addr,  }\item[{uint32\+\_\+t}]{value,  }\item[{uint32\+\_\+t}]{to\+\_\+shadow }\end{DoxyParamCaption})}
+
+
+
+writes a parameter list to the scope (and the shadowlist) 
+
+\textbackslash{}func scope\+\_\+set\+\_\+parameters(unsigned short int \texorpdfstring{$\ast$}{*}data,int to\+\_\+shadow) 
+\begin{DoxyParams}{Parameters}
+{\em data} & contains the parameter and its value \\
+\hline
+{\em to\+\_\+shadow} & If 1 writes to the shadowlist, otherwise do not. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{dudaq_2files__nodma_2scope_8h_ae6ea501f53ade3c79f11f9b3935e8aa9}\label{dudaq_2files__nodma_2scope_8h_ae6ea501f53ade3c79f11f9b3935e8aa9} 
+\index{scope.h@{scope.h}!scope\_start\_run@{scope\_start\_run}}
+\index{scope\_start\_run@{scope\_start\_run}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_start\_run()}{scope\_start\_run()}}
+{\footnotesize\ttfamily void scope\+\_\+start\+\_\+run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+starts the run 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9}{scope\+\_\+start\+\_\+run()} \Hypertarget{dudaq_2files__nodma_2scope_8h_ab6ad70489062a18bc3f394452758e035}\label{dudaq_2files__nodma_2scope_8h_ab6ad70489062a18bc3f394452758e035} 
+\index{scope.h@{scope.h}!scope\_stop\_run@{scope\_stop\_run}}
+\index{scope\_stop\_run@{scope\_stop\_run}!scope.h@{scope.h}}
+\doxysubsubsection{\texorpdfstring{scope\_stop\_run()}{scope\_stop\_run()}}
+{\footnotesize\ttfamily void scope\+\_\+stop\+\_\+run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+disables output 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_ab6ad70489062a18bc3f394452758e035}{scope\+\_\+stop\+\_\+run()} 

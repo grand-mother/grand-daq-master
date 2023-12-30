@@ -15,8 +15,6 @@ SRC_URI = "file://dudaq.c \
 	   file://buffer.c \
 	   file://scope.c \
 	   file://scope.h \
-	   file://monitor.c \
-	   file://du_monitor.h \
 	   file://Makefile \
 		  "
 

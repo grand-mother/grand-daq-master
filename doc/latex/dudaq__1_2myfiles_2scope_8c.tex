@@ -1,0 +1,447 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq\+\_\+1/myfiles/scope.c File Reference}
+\hypertarget{dudaq__1_2myfiles_2scope_8c}{}\label{dudaq__1_2myfiles_2scope_8c}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq\_1/myfiles/scope.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq\_1/myfiles/scope.c}}
+
+
+routines interfacing to the fpga  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include "{}ad\+\_\+shm.\+h"{}}\newline
+{\ttfamily \#include "{}du\+\_\+monitor.\+h"{}}\newline
+{\ttfamily \#include "{}scope.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a663b31e647c5188218c8e9007f7a81e9}\label{dudaq__1_2myfiles_2scope_8c_a663b31e647c5188218c8e9007f7a81e9} 
+\#define {\bfseries DEVFILE}~"{}/dev/mem"{}
+\begin{DoxyCompactList}\small\item\em Device for talking to the FPGA. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_adb08aff46bb7262714b2a36aba398c9d}\label{dudaq__1_2myfiles_2scope_8c_adb08aff46bb7262714b2a36aba398c9d} 
+\#define {\bfseries DEV}~int32\+\_\+t
+\begin{DoxyCompactList}\small\item\em the type of the device id is really just a 32 bit integer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a2b46b61dc91acb0628b7655b24a7b092}\label{dudaq__1_2myfiles_2scope_8c_a2b46b61dc91acb0628b7655b24a7b092} 
+\#define {\bfseries MAXTRY}~50
+\begin{DoxyCompactList}\small\item\em maximal number of loops to complete reading from the FPGA \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}\label{dudaq__1_2myfiles_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397} 
+\#define {\bfseries UPDATESEC}~100
+\begin{DoxyCompactList}\small\item\em time interval between succesive rate checks. Only used in dynamic monitoring of rate. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a58d7bf37cefb16301db29f09cd9ba5ac}\label{dudaq__1_2myfiles_2scope_8c_a58d7bf37cefb16301db29f09cd9ba5ac} 
+\#define {\bfseries MINRRATE}~(100\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em minimal radio rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_aa2127c4f2fa09bfb43cca0d46788150c}\label{dudaq__1_2myfiles_2scope_8c_aa2127c4f2fa09bfb43cca0d46788150c} 
+\#define {\bfseries MEANRRATE}~(200\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em mean radio rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a3482f4ee69e40fec04ece6fffcc5b090}\label{dudaq__1_2myfiles_2scope_8c_a3482f4ee69e40fec04ece6fffcc5b090} 
+\#define {\bfseries MAXRRATE}~(600\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em maximal radio rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a1eb17bf5310b3f257e08bfa2fbf31ca4}\label{dudaq__1_2myfiles_2scope_8c_a1eb17bf5310b3f257e08bfa2fbf31ca4} 
+\#define {\bfseries MINSRATE}~(40\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em minimal scintillator rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_ac84d900eeb7aef35419abb3a20f50b08}\label{dudaq__1_2myfiles_2scope_8c_ac84d900eeb7aef35419abb3a20f50b08} 
+\#define {\bfseries MEANSRATE}~(50\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em mean scintillator rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a8e85928baf2c23b059c9ad4fed40f9ac}\label{dudaq__1_2myfiles_2scope_8c_a8e85928baf2c23b059c9ad4fed40f9ac} 
+\#define {\bfseries MAXSRATE}~(80\texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8c_a8118356ae0fa80571aca6b00b5ba4397}{UPDATESEC}})
+\begin{DoxyCompactList}\small\item\em max scintillator rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_acf0fea40652c5fec4b4140281b098223}\label{dudaq__1_2myfiles_2scope_8c_acf0fea40652c5fec4b4140281b098223} 
+\#define {\bfseries HVMAX}~0xc0
+\begin{DoxyCompactList}\small\item\em maximum HV for PMT\textquotesingle{}s. Only used in dynamic monitoring of rate \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a73332915dbe128e83139b30b75d0c753}\label{dudaq__1_2myfiles_2scope_8c_a73332915dbe128e83139b30b75d0c753} 
+\#define {\bfseries scope\+\_\+raw\+\_\+read}(reg\+\_\+addr)~\texorpdfstring{$\ast$}{*}((unsigned int \texorpdfstring{$\ast$}{*})(axi\+\_\+ptr+page\+\_\+offset+reg\+\_\+addr))
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a228b4562d5b4fdd5a558f29c6669ddf2}{scope\+\_\+raw\+\_\+write}} (uint32\+\_\+t reg\+\_\+addr, uint32\+\_\+t value)
+\begin{DoxyCompactList}\small\item\em writes a buffer to the digitizer \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a1c895b654148a7385f85dc09b332b24b}{scope\+\_\+flush}} ()
+\begin{DoxyCompactList}\small\item\em empty routine \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a9247308a7c4c77218798d40126e1b2be}{scope\+\_\+open}} ()
+\begin{DoxyCompactList}\small\item\em opens connection to digitizer \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a02756ee62fea9a11b9f89c44e12a0a65}{scope\+\_\+close}} ()
+\begin{DoxyCompactList}\small\item\em closes scope communication \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a506afe9b825fb1fed5acde2bc76e8d68}{scope\+\_\+reset}} ()
+\begin{DoxyCompactList}\small\item\em performs a soft reset on the scope \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9}{scope\+\_\+start\+\_\+run}} ()
+\begin{DoxyCompactList}\small\item\em starts the run \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_ab6ad70489062a18bc3f394452758e035}{scope\+\_\+stop\+\_\+run}} ()
+\begin{DoxyCompactList}\small\item\em disables output \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a3a603e895e867e66d6d647770e1952a5}{scope\+\_\+set\+\_\+parameters}} (uint32\+\_\+t reg\+\_\+addr, uint32\+\_\+t value, uint32\+\_\+t to\+\_\+shadow)
+\begin{DoxyCompactList}\small\item\em writes a parameter list to the scope (and the shadowlist) \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a59a93c7f3678aa0c67ed09095a66eac9}{scope\+\_\+reboot}} ()
+\begin{DoxyCompactList}\small\item\em resets the fpga \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a122e3e973152efd5f53c81623ecf274d}{scope\+\_\+copy\+\_\+shadow}} ()
+\begin{DoxyCompactList}\small\item\em copy every parameter from the shadowlist into the fpga \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a333fc3568af7db9af3b96e520a554d62}{scope\+\_\+init\+\_\+shadow}} ()
+\begin{DoxyCompactList}\small\item\em initializes the shadow list \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a34f554820dbaa982450d7584532e11f2}{scope\+\_\+initialize}} ()
+\begin{DoxyCompactList}\small\item\em initializes shadow memory, resets the digitizer and stops the run \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a31504a32abdee69b40abeb2db1a8e272}\label{dudaq__1_2myfiles_2scope_8c_a31504a32abdee69b40abeb2db1a8e272} 
+void {\bfseries scope\+\_\+create\+\_\+memory} ()
+\item 
+int \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a2453dfed8e67d3ac98336be9eb83bcce}{scope\+\_\+read\+\_\+event}} (int32\+\_\+t ioff)
+\begin{DoxyCompactList}\small\item\em read an event from the fpga \end{DoxyCompactList}\item 
+int32\+\_\+t \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_aa5d90138a67de94bc83b772c39cba2a4}{scope\+\_\+read\+\_\+pps}} ()
+\begin{DoxyCompactList}\small\item\em read pps, convert timestamp to GPS time, update circular GPS buffer \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a292fcdfa610afd0cfe60482be5be96e8}{scope\+\_\+read}} (int ioff)
+\begin{DoxyCompactList}\small\item\em reads data from a scope in the appropriate buffer. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_af00f0aa0824921216fd93fc510607ce4}{scope\+\_\+no\+\_\+run\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em reads data from scope, meant to use if there is no run \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq__1_2myfiles_2scope_8c_a989d5bdd1c94c8749904417e8e982014}{scope\+\_\+run\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em reads data from scope during a run. If there has not been data for more than 11 sec, reset the scope and restart the run. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a0e96bf11f12682eac7283e3310a4614c}\label{dudaq__1_2myfiles_2scope_8c_a0e96bf11f12682eac7283e3310a4614c} 
+void {\bfseries scope\+\_\+event\+\_\+to\+\_\+shm} (uint16\+\_\+t evnr, uint16\+\_\+t trflag, uint16\+\_\+t sec, uint32\+\_\+t ssec)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_ad60a268ca94c07a576557ff4180389df}\label{dudaq__1_2myfiles_2scope_8c_ad60a268ca94c07a576557ff4180389df} 
+\mbox{\hyperlink{_d_u_2scope_8c_adb08aff46bb7262714b2a36aba398c9d}{DEV}} {\bfseries dev} = 0
+\begin{DoxyCompactList}\small\item\em Device id. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_ad1a4dd288242c6ca6e150b449517b010}\label{dudaq__1_2myfiles_2scope_8c_ad1a4dd288242c6ca6e150b449517b010} 
+void \texorpdfstring{$\ast$}{*} {\bfseries axi\+\_\+ptr}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a0179c8ebaa94683c32ca7328a5040d33}\label{dudaq__1_2myfiles_2scope_8c_a0179c8ebaa94683c32ca7328a5040d33} 
+uint32\+\_\+t {\bfseries page\+\_\+offset}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a967e91bd9e44a1bf4c1f7d2623b8b9d1}\label{dudaq__1_2myfiles_2scope_8c_a967e91bd9e44a1bf4c1f7d2623b8b9d1} 
+int {\bfseries station\+\_\+id}
+\begin{DoxyCompactList}\small\item\em id of the LS, obtained from the ip address \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b}\label{dudaq__1_2myfiles_2scope_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+ev}
+\begin{DoxyCompactList}\small\item\em shared memory containing all event info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a09571a10d0b58a51a104bf701a337df6}\label{dudaq__1_2myfiles_2scope_8c_a09571a10d0b58a51a104bf701a337df6} 
+uint16\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries t3buf}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a243df20e2497f32e6fe4835b594b2d52}\label{dudaq__1_2myfiles_2scope_8c_a243df20e2497f32e6fe4835b594b2d52} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+gps}
+\begin{DoxyCompactList}\small\item\em shared memory containing all GPS info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a9a8f7033ed411c72a64fa5cf17ea3484}\label{dudaq__1_2myfiles_2scope_8c_a9a8f7033ed411c72a64fa5cf17ea3484} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+ts}
+\begin{DoxyCompactList}\small\item\em shared memory containing all timestamp info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a5070fcf7f11341198c1ae2f680449253}\label{dudaq__1_2myfiles_2scope_8c_a5070fcf7f11341198c1ae2f680449253} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+mon}
+\begin{DoxyCompactList}\small\item\em shared memory containing monitoring info \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_acac741c0dd6b0e151ab4669236de50a6}\label{dudaq__1_2myfiles_2scope_8c_acac741c0dd6b0e151ab4669236de50a6} 
+\mbox{\hyperlink{struct_g_p_s___d_a_t_a}{GPS\+\_\+\+DATA}} \texorpdfstring{$\ast$}{*} {\bfseries gpsbuf}
+\begin{DoxyCompactList}\small\item\em buffer to hold GPS information \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_aab4f38b17989bb328781b37d2861a30a}\label{dudaq__1_2myfiles_2scope_8c_aab4f38b17989bb328781b37d2861a30a} 
+\mbox{\hyperlink{struct_t_s___d_a_t_a}{TS\+\_\+\+DATA}} \texorpdfstring{$\ast$}{*} {\bfseries timestampbuf}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_aa3d4f8275397fc3492e8b1fe9ab8b232}\label{dudaq__1_2myfiles_2scope_8c_aa3d4f8275397fc3492e8b1fe9ab8b232} 
+uint16\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries evtbuf} =NULL
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a9146af478fa38a31adbb4b419da9232b}\label{dudaq__1_2myfiles_2scope_8c_a9146af478fa38a31adbb4b419da9232b} 
+int {\bfseries ptr\+\_\+evt} =0
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a1bccab21ccefe661c892fa2a7e4fe2c4}\label{dudaq__1_2myfiles_2scope_8c_a1bccab21ccefe661c892fa2a7e4fe2c4} 
+uint16\+\_\+t {\bfseries ppsbuf} \mbox{[}WCNT\+\_\+\+PPS \texorpdfstring{$\ast$}{*}\mbox{\hyperlink{_d_u_2scope_8h_a675acc4cc1e06dfad7cfa50c7e069f82}{GPSSIZE}}\mbox{]}
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_afbcd43e1d4d0126f43167de76e9f578f}\label{dudaq__1_2myfiles_2scope_8c_afbcd43e1d4d0126f43167de76e9f578f} 
+int {\bfseries n\+\_\+evt} = 0
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a991f8889cfdcd9c7db60dbf94781604a}\label{dudaq__1_2myfiles_2scope_8c_a991f8889cfdcd9c7db60dbf94781604a} 
+int32\+\_\+t {\bfseries evgps} =0
+\begin{DoxyCompactList}\small\item\em pointer to next GPS info \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a713e77167380835215a35c4d3658f065}\label{dudaq__1_2myfiles_2scope_8c_a713e77167380835215a35c4d3658f065} 
+int32\+\_\+t {\bfseries prevgps} = 0
+\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a7935548448144453a965ca585433be6a}\label{dudaq__1_2myfiles_2scope_8c_a7935548448144453a965ca585433be6a} 
+int32\+\_\+t {\bfseries firmware\+\_\+version}
+\begin{DoxyCompactList}\small\item\em version of the firmware of the scope \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_af27e8120c09237dacfb06b9756a036cf}\label{dudaq__1_2myfiles_2scope_8c_af27e8120c09237dacfb06b9756a036cf} 
+int {\bfseries leap\+\_\+sec} = 0
+\begin{DoxyCompactList}\small\item\em Number of leap seconds in UTC; read from GPS unit. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_af6ef4f8841300f61f28ec47ae95516e8}\label{dudaq__1_2myfiles_2scope_8c_af6ef4f8841300f61f28ec47ae95516e8} 
+uint32\+\_\+t {\bfseries shadowlist} \mbox{[}Reg\+\_\+\+End $>$ $>$2\mbox{]}
+\begin{DoxyCompactList}\small\item\em all parameters to set in FPGA \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a1c2e618073b9eaa010993c9f4bed9bb0}\label{dudaq__1_2myfiles_2scope_8c_a1c2e618073b9eaa010993c9f4bed9bb0} 
+uint32\+\_\+t {\bfseries shadowlistR} \mbox{[}Reg\+\_\+\+End $>$ $>$2\mbox{]}
+\begin{DoxyCompactList}\small\item\em all parameters read from FPGA \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a3732e9ebc709fe8d581397a7a3f76e69}\label{dudaq__1_2myfiles_2scope_8c_a3732e9ebc709fe8d581397a7a3f76e69} 
+int32\+\_\+t {\bfseries shadow\+\_\+filled} = 0
+\begin{DoxyCompactList}\small\item\em the shadow list is not filled \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_ab40d8a5e429b7a50204ec136dac7a69f}\label{dudaq__1_2myfiles_2scope_8c_ab40d8a5e429b7a50204ec136dac7a69f} 
+int16\+\_\+t {\bfseries setsystime} =0
+\begin{DoxyCompactList}\small\item\em check if system time is set \end{DoxyCompactList}\item 
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a53c135777e016abbcb703adf7fa339dd}\label{dudaq__1_2myfiles_2scope_8c_a53c135777e016abbcb703adf7fa339dd} 
+uint16\+\_\+t {\bfseries evtlen}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+routines interfacing to the fpga 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a02756ee62fea9a11b9f89c44e12a0a65}\label{dudaq__1_2myfiles_2scope_8c_a02756ee62fea9a11b9f89c44e12a0a65} 
+\index{scope.c@{scope.c}!scope\_close@{scope\_close}}
+\index{scope\_close@{scope\_close}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_close()}{scope\_close()}}
+{\footnotesize\ttfamily void scope\+\_\+close (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+closes scope communication 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a02756ee62fea9a11b9f89c44e12a0a65}{scope\+\_\+close()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a122e3e973152efd5f53c81623ecf274d}\label{dudaq__1_2myfiles_2scope_8c_a122e3e973152efd5f53c81623ecf274d} 
+\index{scope.c@{scope.c}!scope\_copy\_shadow@{scope\_copy\_shadow}}
+\index{scope\_copy\_shadow@{scope\_copy\_shadow}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_copy\_shadow()}{scope\_copy\_shadow()}}
+{\footnotesize\ttfamily void scope\+\_\+copy\+\_\+shadow (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+copy every parameter from the shadowlist into the fpga 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a122e3e973152efd5f53c81623ecf274d}{scope\+\_\+copy\+\_\+shadow()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a1c895b654148a7385f85dc09b332b24b}\label{dudaq__1_2myfiles_2scope_8c_a1c895b654148a7385f85dc09b332b24b} 
+\index{scope.c@{scope.c}!scope\_flush@{scope\_flush}}
+\index{scope\_flush@{scope\_flush}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_flush()}{scope\_flush()}}
+{\footnotesize\ttfamily void scope\+\_\+flush (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+empty routine 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a1c895b654148a7385f85dc09b332b24b}{scope\+\_\+flush()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a333fc3568af7db9af3b96e520a554d62}\label{dudaq__1_2myfiles_2scope_8c_a333fc3568af7db9af3b96e520a554d62} 
+\index{scope.c@{scope.c}!scope\_init\_shadow@{scope\_init\_shadow}}
+\index{scope\_init\_shadow@{scope\_init\_shadow}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_init\_shadow()}{scope\_init\_shadow()}}
+{\footnotesize\ttfamily void scope\+\_\+init\+\_\+shadow (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+initializes the shadow list 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a333fc3568af7db9af3b96e520a554d62}{scope\+\_\+init\+\_\+shadow()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a34f554820dbaa982450d7584532e11f2}\label{dudaq__1_2myfiles_2scope_8c_a34f554820dbaa982450d7584532e11f2} 
+\index{scope.c@{scope.c}!scope\_initialize@{scope\_initialize}}
+\index{scope\_initialize@{scope\_initialize}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_initialize()}{scope\_initialize()}}
+{\footnotesize\ttfamily void scope\+\_\+initialize (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+initializes shadow memory, resets the digitizer and stops the run 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a34f554820dbaa982450d7584532e11f2}{scope\+\_\+initialize()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_af00f0aa0824921216fd93fc510607ce4}\label{dudaq__1_2myfiles_2scope_8c_af00f0aa0824921216fd93fc510607ce4} 
+\index{scope.c@{scope.c}!scope\_no\_run\_read@{scope\_no\_run\_read}}
+\index{scope\_no\_run\_read@{scope\_no\_run\_read}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_no\_run\_read()}{scope\_no\_run\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+no\+\_\+run\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+reads data from scope, meant to use if there is no run 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_af00f0aa0824921216fd93fc510607ce4}{scope\+\_\+no\+\_\+run\+\_\+read()} 
+\begin{DoxyRetVals}{Return values}
+{\em scope\+\_\+read(0)} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a9247308a7c4c77218798d40126e1b2be}\label{dudaq__1_2myfiles_2scope_8c_a9247308a7c4c77218798d40126e1b2be} 
+\index{scope.c@{scope.c}!scope\_open@{scope\_open}}
+\index{scope\_open@{scope\_open}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_open()}{scope\_open()}}
+{\footnotesize\ttfamily int scope\+\_\+open (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+opens connection to digitizer 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a9247308a7c4c77218798d40126e1b2be}{scope\+\_\+open()} 
+\begin{DoxyRetVals}{Return values}
+{\em -\/1} & failure \\
+\hline
+{\em 1} & succes \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a228b4562d5b4fdd5a558f29c6669ddf2}\label{dudaq__1_2myfiles_2scope_8c_a228b4562d5b4fdd5a558f29c6669ddf2} 
+\index{scope.c@{scope.c}!scope\_raw\_write@{scope\_raw\_write}}
+\index{scope\_raw\_write@{scope\_raw\_write}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_raw\_write()}{scope\_raw\_write()}}
+{\footnotesize\ttfamily void scope\+\_\+raw\+\_\+write (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{reg\+\_\+addr,  }\item[{uint32\+\_\+t}]{value }\end{DoxyParamCaption})}
+
+
+
+writes a buffer to the digitizer 
+
+\textbackslash{}func void scope\+\_\+raw\+\_\+write(unsigned int \texorpdfstring{$\ast$}{*}buf, int len) 
+\begin{DoxyParams}{Parameters}
+{\em buf} & pointer to the data to send \\
+\hline
+{\em len} & number of bytes to send \\
+\hline
+\end{DoxyParams}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a292fcdfa610afd0cfe60482be5be96e8}\label{dudaq__1_2myfiles_2scope_8c_a292fcdfa610afd0cfe60482be5be96e8} 
+\index{scope.c@{scope.c}!scope\_read@{scope\_read}}
+\index{scope\_read@{scope\_read}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_read()}{scope\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+read (\begin{DoxyParamCaption}\item[{int}]{ioff }\end{DoxyParamCaption})}
+
+
+
+reads data from a scope in the appropriate buffer. 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a292fcdfa610afd0cfe60482be5be96e8}{scope\+\_\+read(int ioff)} 
+\begin{DoxyParams}{Parameters}
+{\em ioff} & after reading the pointers to the buffers (event/monitor) are increased by ioff \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em 0} & No Data \\
+\hline
+{\em -\/1} & First word not a header \\
+\hline
+{\em -\/2} & Only start-\/of-\/message read \\
+\hline
+{\em -\/3} & Bad data identifier \\
+\hline
+{\em -\/4} & Error reading scope parameters \\
+\hline
+{\em -\/5} & Cannot read event header \\
+\hline
+{\em -\/6} & Error reading ADC values \\
+\hline
+{\em -\/7} & Error reading GPS parameters \\
+\hline
+{\em SCOPE\+\_\+\+PARAM} & successfully read scope parameters \\
+\hline
+{\em SCOPE\+\_\+\+EVENT} & successfully read scope event \\
+\hline
+{\em SCOPE\+\_\+\+GPS} & succesfully read GPS PPS info \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a2453dfed8e67d3ac98336be9eb83bcce}\label{dudaq__1_2myfiles_2scope_8c_a2453dfed8e67d3ac98336be9eb83bcce} 
+\index{scope.c@{scope.c}!scope\_read\_event@{scope\_read\_event}}
+\index{scope\_read\_event@{scope\_read\_event}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_read\_event()}{scope\_read\_event()}}
+{\footnotesize\ttfamily int scope\+\_\+read\+\_\+event (\begin{DoxyParamCaption}\item[{int32\+\_\+t}]{ioff }\end{DoxyParamCaption})}
+
+
+
+read an event from the fpga 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a2453dfed8e67d3ac98336be9eb83bcce}{scope\+\_\+read\+\_\+event(int32\+\_\+t ioff)} 
+\begin{DoxyParams}{Parameters}
+{\em ioff} & 1 to update the event buffer. When 0 no update is made \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em -\/10} & too much data in the event \\
+\hline
+{\em -\/11} & not all data is read \\
+\hline
+{\em SCOPE\+\_\+\+EVENT} & succesfully read event \\
+\hline
+\end{DoxyRetVals}
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG
+
+temp fix for ARG\Hypertarget{dudaq__1_2myfiles_2scope_8c_aa5d90138a67de94bc83b772c39cba2a4}\label{dudaq__1_2myfiles_2scope_8c_aa5d90138a67de94bc83b772c39cba2a4} 
+\index{scope.c@{scope.c}!scope\_read\_pps@{scope\_read\_pps}}
+\index{scope\_read\_pps@{scope\_read\_pps}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_read\_pps()}{scope\_read\_pps()}}
+{\footnotesize\ttfamily int32\+\_\+t scope\+\_\+read\+\_\+pps (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+read pps, convert timestamp to GPS time, update circular GPS buffer 
+
+\textbackslash{}func int32\+\_\+t \doxylink{_d_u_2scope_8c_aa5d90138a67de94bc83b772c39cba2a4}{scope\+\_\+read\+\_\+pps()} 
+\begin{DoxyRetVals}{Return values}
+{\em -\/7} & error in reading the PPS \\
+\hline
+{\em SCOPE\+\_\+\+GPS} & OK \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a59a93c7f3678aa0c67ed09095a66eac9}\label{dudaq__1_2myfiles_2scope_8c_a59a93c7f3678aa0c67ed09095a66eac9} 
+\index{scope.c@{scope.c}!scope\_reboot@{scope\_reboot}}
+\index{scope\_reboot@{scope\_reboot}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_reboot()}{scope\_reboot()}}
+{\footnotesize\ttfamily void scope\+\_\+reboot (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+resets the fpga 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a59a93c7f3678aa0c67ed09095a66eac9}{scope\+\_\+reboot()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a506afe9b825fb1fed5acde2bc76e8d68}\label{dudaq__1_2myfiles_2scope_8c_a506afe9b825fb1fed5acde2bc76e8d68} 
+\index{scope.c@{scope.c}!scope\_reset@{scope\_reset}}
+\index{scope\_reset@{scope\_reset}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_reset()}{scope\_reset()}}
+{\footnotesize\ttfamily void scope\+\_\+reset (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+performs a soft reset on the scope 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_a506afe9b825fb1fed5acde2bc76e8d68}{scope\+\_\+reset()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_a989d5bdd1c94c8749904417e8e982014}\label{dudaq__1_2myfiles_2scope_8c_a989d5bdd1c94c8749904417e8e982014} 
+\index{scope.c@{scope.c}!scope\_run\_read@{scope\_run\_read}}
+\index{scope\_run\_read@{scope\_run\_read}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_run\_read()}{scope\_run\_read()}}
+{\footnotesize\ttfamily int scope\+\_\+run\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+reads data from scope during a run. If there has not been data for more than 11 sec, reset the scope and restart the run. 
+
+\textbackslash{}func int \doxylink{_d_u_2scope_8c_a989d5bdd1c94c8749904417e8e982014}{scope\+\_\+run\+\_\+read()} 
+\begin{DoxyRetVals}{Return values}
+{\em scope\+\_\+read(1)} & \\
+\hline
+\end{DoxyRetVals}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_a3a603e895e867e66d6d647770e1952a5}\label{dudaq__1_2myfiles_2scope_8c_a3a603e895e867e66d6d647770e1952a5} 
+\index{scope.c@{scope.c}!scope\_set\_parameters@{scope\_set\_parameters}}
+\index{scope\_set\_parameters@{scope\_set\_parameters}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_set\_parameters()}{scope\_set\_parameters()}}
+{\footnotesize\ttfamily void scope\+\_\+set\+\_\+parameters (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{reg\+\_\+addr,  }\item[{uint32\+\_\+t}]{value,  }\item[{uint32\+\_\+t}]{to\+\_\+shadow }\end{DoxyParamCaption})}
+
+
+
+writes a parameter list to the scope (and the shadowlist) 
+
+\textbackslash{}func scope\+\_\+set\+\_\+parameters(unsigned short int \texorpdfstring{$\ast$}{*}data,int to\+\_\+shadow) 
+\begin{DoxyParams}{Parameters}
+{\em data} & contains the parameter and its value \\
+\hline
+{\em to\+\_\+shadow} & If 1 writes to the shadowlist, otherwise do not. \\
+\hline
+\end{DoxyParams}
+\Hypertarget{dudaq__1_2myfiles_2scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9}\label{dudaq__1_2myfiles_2scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9} 
+\index{scope.c@{scope.c}!scope\_start\_run@{scope\_start\_run}}
+\index{scope\_start\_run@{scope\_start\_run}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_start\_run()}{scope\_start\_run()}}
+{\footnotesize\ttfamily void scope\+\_\+start\+\_\+run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+starts the run 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9}{scope\+\_\+start\+\_\+run()} \Hypertarget{dudaq__1_2myfiles_2scope_8c_ab6ad70489062a18bc3f394452758e035}\label{dudaq__1_2myfiles_2scope_8c_ab6ad70489062a18bc3f394452758e035} 
+\index{scope.c@{scope.c}!scope\_stop\_run@{scope\_stop\_run}}
+\index{scope\_stop\_run@{scope\_stop\_run}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_stop\_run()}{scope\_stop\_run()}}
+{\footnotesize\ttfamily void scope\+\_\+stop\+\_\+run (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+disables output 
+
+\textbackslash{}func void \doxylink{_d_u_2scope_8c_ab6ad70489062a18bc3f394452758e035}{scope\+\_\+stop\+\_\+run()} 

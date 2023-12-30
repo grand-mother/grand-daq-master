@@ -1,0 +1,33 @@
+\doxysection{ad\+\_\+shm.\+h}
+\hypertarget{_adaq_2ad__shm_8h_source}{}\label{_adaq_2ad__shm_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/ad\_shm.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/ad\_shm.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/***\ \(\backslash\)file\ ad\_shm.h}}
+\DoxyCodeLine{00002\ \textcolor{comment}{DAQ\ shared\ memory\ definitions}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Version:2.0\ updated\ for\ integers,\ not\ shorts}}
+\DoxyCodeLine{00004\ \textcolor{comment}{Date:\ 17/12/2020}}
+\DoxyCodeLine{00005\ \textcolor{comment}{Author:\ Charles\ Timmermans,\ Nikhef/Radboud\ University}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{Altering\ the\ code\ without\ explicit\ consent\ of\ the\ author\ is\ forbidden}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ ***/}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include<sys/types.h>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include<sys/ipc.h>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include<sys/shm.h>}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00016\ \ \ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{structshm__struct_ac8807d215d2ee6d9779d76aeb1147430}{shmid}};\ }
+\DoxyCodeLine{00017\ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structshm__struct_a3177427ee45736b3f06eb9a52ed4da9a}{next\_read}};\ \ }
+\DoxyCodeLine{00018\ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structshm__struct_a48934a9ae134bdf40aa31f258912a913}{next\_readb}};\ }
+\DoxyCodeLine{00019\ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structshm__struct_aeebfe8bce3c9ffab5f8fad0547c3accf}{next\_write}};\ }
+\DoxyCodeLine{00020\ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structshm__struct_a0c7213bce6e9fa87ee12cfa8e0d8c5ea}{nbuf}};\ }
+\DoxyCodeLine{00021\ \ \ \textcolor{keywordtype}{int}\ *\mbox{\hyperlink{structshm__struct_a4056c972b361d04c6de1ec06355b8280}{size}};\ }
+\DoxyCodeLine{00022\ \ \ \textcolor{keywordtype}{char}\ *\mbox{\hyperlink{structshm__struct_ac14417684334d01b4e1e807a19d92816}{buf}};\ }
+\DoxyCodeLine{00023\ \ \ uint32\_t\ *\mbox{\hyperlink{structshm__struct_ad6198df46333e196855658d479bb2985}{Ubuf}};\ }
+\DoxyCodeLine{00024\ \}\mbox{\hyperlink{structshm__struct}{shm\_struct}};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keywordtype}{int}\ ad\_shm\_create(\mbox{\hyperlink{structshm__struct}{shm\_struct}}\ *ptr,\textcolor{keywordtype}{int}\ nbuf,\textcolor{keywordtype}{int}\ size);}
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{void}\ ad\_shm\_delete(\mbox{\hyperlink{structshm__struct}{shm\_struct}}\ *ptr);}
+
+\end{DoxyCode}

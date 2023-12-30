@@ -1,0 +1,47 @@
+\doxysection{eb.\+h}
+\hypertarget{_adaq_2eb_8h_source}{}\label{_adaq_2eb_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/eb.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/eb.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/***}}
+\DoxyCodeLine{00002\ \textcolor{comment}{Event\ Builder\ definitions}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Version:1.0}}
+\DoxyCodeLine{00004\ \textcolor{comment}{Date:\ 18/2/2020}}
+\DoxyCodeLine{00005\ \textcolor{comment}{Author:\ Charles\ Timmermans,\ Nikhef/Radboud\ University}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{Altering\ the\ code\ without\ explicit\ consent\ of\ the\ author\ is\ forbidden}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ ***/}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <unistd.h>}}
+\DoxyCodeLine{00010\ }
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ EVENTVERSION\ 3}}
+\DoxyCodeLine{00012\ }
+\DoxyCodeLine{00013\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00014\ \ \ uint32\_t\ length;}
+\DoxyCodeLine{00015\ \ \ uint32\_t\ run\_id;}
+\DoxyCodeLine{00016\ \ \ uint32\_t\ run\_mode;}
+\DoxyCodeLine{00017\ \ \ uint32\_t\ file\_id;}
+\DoxyCodeLine{00018\ \ \ uint32\_t\ first\_event\_id;}
+\DoxyCodeLine{00019\ \ \ uint32\_t\ first\_event\_time;}
+\DoxyCodeLine{00020\ \ \ uint32\_t\ last\_event\_id;}
+\DoxyCodeLine{00021\ \ \ uint32\_t\ last\_event\_time;}
+\DoxyCodeLine{00022\ \ \ uint32\_t\ add1;}
+\DoxyCodeLine{00023\ \ \ uint32\_t\ add2;}
+\DoxyCodeLine{00024\ \}\mbox{\hyperlink{struct_f_i_l_e_h_d_r}{FILEHDR}};}
+\DoxyCodeLine{00025\ }
+\DoxyCodeLine{00026\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00027\ \ \ uint32\_t\ length;}
+\DoxyCodeLine{00028\ \ \ uint32\_t\ run\_id;}
+\DoxyCodeLine{00029\ \ \ uint32\_t\ event\_id;}
+\DoxyCodeLine{00030\ \ \ uint32\_t\ t3\_id;}
+\DoxyCodeLine{00031\ \ \ uint32\_t\ first\_DU;}
+\DoxyCodeLine{00032\ \ \ uint32\_t\ seconds;}
+\DoxyCodeLine{00033\ \ \ uint32\_t\ nanosec;}
+\DoxyCodeLine{00034\ \ \ uint16\_t\ type;}
+\DoxyCodeLine{00035\ \ \ uint16\_t\ version;}
+\DoxyCodeLine{00036\ \ \ uint32\_t\ free;}
+\DoxyCodeLine{00037\ \ \ uint32\_t\ event\_free;}
+\DoxyCodeLine{00038\ \ \ uint32\_t\ DU\_count;}
+\DoxyCodeLine{00039\ \ \ uint16\_t\ DUdata[];}
+\DoxyCodeLine{00040\ \}\mbox{\hyperlink{struct_e_v_h_d_r}{EVHDR}};}
+\DoxyCodeLine{00041\ }
+
+\end{DoxyCode}

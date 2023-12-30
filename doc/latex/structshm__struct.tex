@@ -1,0 +1,78 @@
+\doxysection{shm\+\_\+struct Struct Reference}
+\hypertarget{structshm__struct}{}\label{structshm__struct}\index{shm\_struct@{shm\_struct}}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{structshm__struct_ac8807d215d2ee6d9779d76aeb1147430}{shmid}}
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_a3177427ee45736b3f06eb9a52ed4da9a}{next\+\_\+read}}
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_a48934a9ae134bdf40aa31f258912a913}{next\+\_\+readb}}
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_aeebfe8bce3c9ffab5f8fad0547c3accf}{next\+\_\+write}}
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_a0c7213bce6e9fa87ee12cfa8e0d8c5ea}{nbuf}}
+\item 
+int \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_a4056c972b361d04c6de1ec06355b8280}{size}}
+\item 
+char \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_ac14417684334d01b4e1e807a19d92816}{buf}}
+\item 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} \mbox{\hyperlink{structshm__struct_ad6198df46333e196855658d479bb2985}{Ubuf}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Field Documentation}
+\Hypertarget{structshm__struct_ac14417684334d01b4e1e807a19d92816}\label{structshm__struct_ac14417684334d01b4e1e807a19d92816} 
+\index{shm\_struct@{shm\_struct}!buf@{buf}}
+\index{buf@{buf}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{buf}{buf}}
+{\footnotesize\ttfamily char \texorpdfstring{$\ast$}{*} buf}
+
+pointer to the buffer \Hypertarget{structshm__struct_a0c7213bce6e9fa87ee12cfa8e0d8c5ea}\label{structshm__struct_a0c7213bce6e9fa87ee12cfa8e0d8c5ea} 
+\index{shm\_struct@{shm\_struct}!nbuf@{nbuf}}
+\index{nbuf@{nbuf}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{nbuf}{nbuf}}
+{\footnotesize\ttfamily int \texorpdfstring{$\ast$}{*} nbuf}
+
+number of data blocks in the circular buffer \Hypertarget{structshm__struct_a3177427ee45736b3f06eb9a52ed4da9a}\label{structshm__struct_a3177427ee45736b3f06eb9a52ed4da9a} 
+\index{shm\_struct@{shm\_struct}!next\_read@{next\_read}}
+\index{next\_read@{next\_read}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{next\_read}{next\_read}}
+{\footnotesize\ttfamily int \texorpdfstring{$\ast$}{*} next\+\_\+read}
+
+pointer to the next block to read out in Ubuf \Hypertarget{structshm__struct_a48934a9ae134bdf40aa31f258912a913}\label{structshm__struct_a48934a9ae134bdf40aa31f258912a913} 
+\index{shm\_struct@{shm\_struct}!next\_readb@{next\_readb}}
+\index{next\_readb@{next\_readb}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{next\_readb}{next\_readb}}
+{\footnotesize\ttfamily int \texorpdfstring{$\ast$}{*} next\+\_\+readb}
+
+pointer to the next block to read out in Ubuf by a second process \Hypertarget{structshm__struct_aeebfe8bce3c9ffab5f8fad0547c3accf}\label{structshm__struct_aeebfe8bce3c9ffab5f8fad0547c3accf} 
+\index{shm\_struct@{shm\_struct}!next\_write@{next\_write}}
+\index{next\_write@{next\_write}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{next\_write}{next\_write}}
+{\footnotesize\ttfamily int \texorpdfstring{$\ast$}{*} next\+\_\+write}
+
+Pointer to the next position where to write a block of data \Hypertarget{structshm__struct_ac8807d215d2ee6d9779d76aeb1147430}\label{structshm__struct_ac8807d215d2ee6d9779d76aeb1147430} 
+\index{shm\_struct@{shm\_struct}!shmid@{shmid}}
+\index{shmid@{shmid}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{shmid}{shmid}}
+{\footnotesize\ttfamily int shmid}
+
+shared memory identifier \Hypertarget{structshm__struct_a4056c972b361d04c6de1ec06355b8280}\label{structshm__struct_a4056c972b361d04c6de1ec06355b8280} 
+\index{shm\_struct@{shm\_struct}!size@{size}}
+\index{size@{size}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{size}{size}}
+{\footnotesize\ttfamily int \texorpdfstring{$\ast$}{*} size}
+
+size (in ints) of a data block \Hypertarget{structshm__struct_ad6198df46333e196855658d479bb2985}\label{structshm__struct_ad6198df46333e196855658d479bb2985} 
+\index{shm\_struct@{shm\_struct}!Ubuf@{Ubuf}}
+\index{Ubuf@{Ubuf}!shm\_struct@{shm\_struct}}
+\doxysubsubsection{\texorpdfstring{Ubuf}{Ubuf}}
+{\footnotesize\ttfamily uint32\+\_\+t \texorpdfstring{$\ast$}{*} Ubuf}
+
+our data is in uint32, so a uint32 pointer 
+
+The documentation for this struct was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/\+Adaq/ad\+\_\+shm.\+h\item 
+/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/files/ad\+\_\+shm.\+h\end{DoxyCompactItemize}

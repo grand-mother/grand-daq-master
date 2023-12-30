@@ -1,0 +1,93 @@
+\doxysection{Traces.\+h}
+\hypertarget{_traces_8h_source}{}\label{_traces_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/tools/Traces.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/tools/Traces.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/*\ First\ define\ the\ header\ words\ */}}
+\DoxyCodeLine{00002\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_LENGTH\ \ \ \ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00003\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_RUNNR\ \ \ \ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_RUN\_MODE\ \ \ \ \ \ \ \ 2}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_SERIAL\ \ \ \ \ \ \ \ \ \ 3}}
+\DoxyCodeLine{00006\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_FIRST\_EVENT\ \ \ \ \ 4}}
+\DoxyCodeLine{00007\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_FIRST\_EVENT\_SEC\ 5}}
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_LAST\_EVENT\ \ \ \ \ \ 6}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_LAST\_EVENT\_SEC\ \ 7}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ FILE\_HDR\_ADDITIONAL\ \ \ \ \ \ 8\ }\textcolor{comment}{//start\ of\ additional\ info\ to\ be\ defined}}
+\DoxyCodeLine{00011\ }
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_LENGTH\ \ \ \ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_RUNNR\ \ \ \ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_EVENTNR\ \ \ \ \ \ \ \ \ 2}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_T3EVENTNR\ \ \ \ \ \ \ 3}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_FIRST\_DU\ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_EVENT\_SEC\ \ \ \ \ \ \ 5}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_EVENT\_NSEC\ \ \ \ \ \ 6}}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_EVENT\_TYPE\ \ \ \ \ \ 7}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_EVENT\_VERS\ \ \ \ \ \ 8}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_NDU\ \ \ \ \ \ \ \ \ \ \ \ \ 9\ }\textcolor{comment}{//start\ of\ additional\ info\ to\ be\ defined}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ EVENT\_HDR\_AD1\ \ \ \ \ \ \ \ \ \ \ \ 10\ }\textcolor{comment}{//\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ info\ to\ be\ defined}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ EVENT\_DU\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 11}}
+\DoxyCodeLine{00024\ }
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ EVT\_HDR\_LENGTH\ \ \ \ 146}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ EVT\_LENGTH\ \ \ \ \ \ \ \ 0\ }\textcolor{comment}{//\ nr\ of\ int32\ words}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ EVT\_VERSION\ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ EVT\_STATION\_ID\ \ \ \ 2}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ EVT\_HARDWARE\_ID\ \ \ 3}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ EVT\_EVT\_ID\ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ EVT\_CTP\ \ \ \ \ \ \ \ \ \ \ 5}}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ EVT\_CTD\ \ \ \ \ \ \ \ \ \ \ 6}}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ EVT\_ADCINFO\ \ \ \ \ \ \ 7}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ EVT\_SECOND\ \ \ \ \ \ \ \ 8}}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ EVT\_NANOSEC\ \ \ \ \ \ \ 9}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ EVT\_TRIGGER\_POS\ \ \ 10}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ EVT\_TRIGGER\_STAT\ \ 11}}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ EVT\_STATISTICS\ \ \ \ 12}}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ EVT\_PPS\_ID\ \ \ \ \ \ \ \ 13}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ EVT\_SPARE1\ \ \ \ \ \ \ \ 14}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ EVT\_SPARE2\ \ \ \ \ \ \ \ 15}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ EVT\_SPARE3\ \ \ \ \ \ \ \ 16}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ EVT\_ATM\_TP\ \ \ \ \ \ \ \ 17}}
+\DoxyCodeLine{00044\ \textcolor{preprocessor}{\#define\ EVT\_HM\_AX\ \ \ \ \ \ \ \ \ 18}}
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ EVT\_AY\_AZ\ \ \ \ \ \ \ \ \ 19}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ EVT\_BATTERY\ \ \ \ \ \ \ 20}}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ EVT\_WEEKTIME\ \ \ \ \ \ 21}}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ EVT\_WEEKOFFSET\ \ \ \ 22}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ EVT\_SECMINHOUR\ \ \ \ 23}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ EVT\_DAYMONTH\ \ \ \ \ \ 24}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ EVT\_YEAR\ \ \ \ \ \ \ \ \ \ 25}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ EVT\_GPSMODE\ \ \ \ \ \ \ 26}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ EVT\_GPSSTATUS\ \ \ \ \ 27}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ EVT\_OFFSET\ \ \ \ \ \ \ \ 28}}
+\DoxyCodeLine{00055\ \textcolor{preprocessor}{\#define\ EVT\_TEMPERATURE\ \ \ 29}}
+\DoxyCodeLine{00056\ \textcolor{preprocessor}{\#define\ EVT\_LATITUDE\ \ \ \ \ \ 31}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ EVT\_LONGITUDE\ \ \ \ \ 33}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ EVT\_ALTITUDE\ \ \ \ \ \ 35}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ EVT\_TRACELENGTH\ \ \ 36}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ EVT\_INP\_SELECT\ \ \ \ 37}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_SELECT\ \ \ 38}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C1\ \ \ \ \ \ 39}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C2\ \ \ \ \ \ 40}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C3\ \ \ \ \ \ 41}}
+\DoxyCodeLine{00065\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C1\ \ \ \ \ \ \ 43}}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C2\ \ \ \ \ \ \ 45}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C3\ \ \ \ \ \ \ 47}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ EVT\_GAIN\_AB\ \ \ \ \ \ \ 51}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ EVT\_GAIN\_CD\ \ \ \ \ \ \ 52}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ EVT\_BASELINE\_12\ \ \ 53}}
+\DoxyCodeLine{00071\ \textcolor{preprocessor}{\#define\ EVT\_BASELINE\_3\ \ \ \ 54}}
+\DoxyCodeLine{00072\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F1\ \ \ 63}}
+\DoxyCodeLine{00073\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F2\ \ \ 68}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F3\ \ \ 73}}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F4\ \ \ 78}}
+\DoxyCodeLine{00076\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F1\ \ \ 83}}
+\DoxyCodeLine{00077\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F2\ \ \ 88}}
+\DoxyCodeLine{00078\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F3\ \ \ 93}}
+\DoxyCodeLine{00079\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F4\ \ \ 98}}
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F1\ \ \ 103}}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F2\ \ \ 108}}
+\DoxyCodeLine{00082\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F3\ \ \ 113}}
+\DoxyCodeLine{00083\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F4\ \ \ 118}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#define\ EVT\_TOT\_SAMPLEP\ \ \ 143}}
+\DoxyCodeLine{00085\ \textcolor{preprocessor}{\#define\ EVT\_CH12\_SAMPLEP\ \ 144}}
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ EVT\_CH3\_SAMPLEP\ \ \ 145}}
+\DoxyCodeLine{00087\ \textcolor{preprocessor}{\#define\ EVT\_START\_ADC\ \ \ \ \ 146}}
+
+\end{DoxyCode}

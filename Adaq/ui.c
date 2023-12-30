@@ -13,19 +13,19 @@ Altering the code without explicit consent of the author is forbidden
 #include "amsg.h"
 #include "Adaq.h"
 
-uint16_t cmdlist[CMDSIZE];
+uint32_t cmdlist[CMDSIZE];
 
 /**
- void cmd_run(uint16_t mode)
+ void cmd_run(uint32_t mode)
  
  continuous loop waiting for a buffer to free up
  put the command into the command shared memory
  run command should be read bu the du-interface and event-builder
  update the pointer to the next empty buffer (circular!)
  */
-void cmd_run(uint16_t mode)
+void cmd_run(uint32_t mode)
 {
-  cmdlist[0] = 3;
+  cmdlist[0] = 4;
   cmdlist[1] = mode;
   cmdlist[2]=0; // all local stations
   while(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] != 0) {//possible problem!
@@ -33,27 +33,27 @@ void cmd_run(uint16_t mode)
     usleep(1000); // wait for buffer to be free
   }
   //printf("UI: Writing to SHM\n");
-  memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)cmdlist,2*cmdlist[0]);
+  memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)cmdlist,INTSIZE*cmdlist[0]);
   shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 1; // to be read by du(1)+eb(2)!
   *shm_cmd.next_write = *shm_cmd.next_write + 1;
   if(*shm_cmd.next_write >= *shm_cmd.nbuf) *shm_cmd.next_write = 0;
-  memcpy((void *)&(shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_write)+1]),(void *)cmdlist,2*cmdlist[0]);
+  memcpy((void *)&(shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_write)+1]),(void *)cmdlist,INTSIZE*cmdlist[0]);
   shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_write)] = 2; // to be read by du(1)+eb(2)!
   *shm_ebcmd.next_write = *shm_ebcmd.next_write + 1;
   if(*shm_ebcmd.next_write >= *shm_ebcmd.nbuf) *shm_ebcmd.next_write = 0;
 }
 
 /**
-void send_cmd(uint16_t mode,uint16_t istat)
+void send_cmd(uint32_t mode,uint32_t istat)
  
 continuous loop waiting for a buffer to free up
 put the command into the command shared memory
 run command should be read bu the du-interface
 update the pointer to the next empty buffer (circular!)
 */
-void send_cmd(uint16_t mode,uint16_t istat)
+void send_cmd(uint32_t mode,uint32_t istat)
 {
-  cmdlist[0] = 3;
+  cmdlist[0] = 4;
   cmdlist[1] = mode;
   cmdlist[2]=istat; 
   while(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] != 0) {//possible problem
@@ -61,7 +61,7 @@ void send_cmd(uint16_t mode,uint16_t istat)
     usleep(1000); // wait for buffer to be free
   }
   printf("UI: Writing to SHM\n");
-  memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)cmdlist,2*cmdlist[0]);
+  memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)cmdlist,INTSIZE*cmdlist[0]);
   shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 1; // to be read by du(1)
   *shm_cmd.next_write = *shm_cmd.next_write + 1;
   if(*shm_cmd.next_write >= *shm_cmd.nbuf) *shm_cmd.next_write = 0;

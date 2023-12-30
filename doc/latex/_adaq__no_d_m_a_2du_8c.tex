@@ -1,0 +1,199 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/\+Adaq\+\_\+no\+DMA/du.c File Reference}
+\hypertarget{_adaq__no_d_m_a_2du_8c}{}\label{_adaq__no_d_m_a_2du_8c}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq\_noDMA/du.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq\_noDMA/du.c}}
+
+
+routines interfacing to the socket  
+
+
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include "{}Adaq.\+h"{}}\newline
+{\ttfamily \#include "{}amsg.\+h"{}}\newline
+{\ttfamily \#include "{}scope.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a3aa7c7f68a54e1f12eb7436b08a7e42c}\label{_adaq__no_d_m_a_2du_8c_a3aa7c7f68a54e1f12eb7436b08a7e42c} 
+\#define {\bfseries MAXLOG}~8
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a30ab6e4dcb2c9baef30028ece9b495d4}\label{_adaq__no_d_m_a_2du_8c_a30ab6e4dcb2c9baef30028ece9b495d4} 
+\#define {\bfseries SAMP\+\_\+\+FREQ}~500.\+0
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_ae6df482809c8927be9e0c18095ee9315}\label{_adaq__no_d_m_a_2du_8c_ae6df482809c8927be9e0c18095ee9315} 
+\#define {\bfseries Reg\+\_\+\+Rate}~0x1\+E0
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_af53954b47ec98995f3b586ec783b1e77}\label{_adaq__no_d_m_a_2du_8c_af53954b47ec98995f3b586ec783b1e77} 
+\#define {\bfseries SOCKETS\+\_\+\+BUFFER\+\_\+\+SIZE}~1048576
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a6beb7365a8d84d42492b4798e807cfd1}\label{_adaq__no_d_m_a_2du_8c_a6beb7365a8d84d42492b4798e807cfd1} 
+\#define {\bfseries SOCKETS\+\_\+\+TIMEOUT}~100
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a4f4517f4a3c5821c7c99e1026ebbb7cc}\label{_adaq__no_d_m_a_2du_8c_a4f4517f4a3c5821c7c99e1026ebbb7cc} 
+\#define {\bfseries XTRA\+\_\+\+PIPE}~4
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_ac8c448b6f31833f9546f99b3cc37ab6b}\label{_adaq__no_d_m_a_2du_8c_ac8c448b6f31833f9546f99b3cc37ab6b} 
+int {\bfseries get\+Notch\+Filter\+Coeffs} (double nu\+\_\+s, double r, int xtra\+Pipe, int \texorpdfstring{$\ast$}{*}a, int \texorpdfstring{$\ast$}{*}b, int \texorpdfstring{$\ast$}{*}a\+Len, int \texorpdfstring{$\ast$}{*}b\+Len)
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a391c8e83fb3d54225c548b21564c6711}\label{_adaq__no_d_m_a_2du_8c_a391c8e83fb3d54225c548b21564c6711} 
+void {\bfseries du\+\_\+send} ()
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a9b735b25f9d26680026c19e71b8348dd}\label{_adaq__no_d_m_a_2du_8c_a9b735b25f9d26680026c19e71b8348dd} 
+uint16\+\_\+t {\bfseries du\+\_\+read\+\_\+initfile} ()
+\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_ab5dfa04029a2e3265b34b3af978961c5}{du\+\_\+interpret}} (uint16\+\_\+t \texorpdfstring{$\ast$}{*}buffer)
+\begin{DoxyCompactList}\small\item\em interprets the data in the buffer \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a0a3c3390c14ffc01395c0a184d834315}{set\+\_\+socketoptions}} (int sock)
+\begin{DoxyCompactList}\small\item\em set default socket options \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a5f67de5c23baba47e9ac95ec5bacb296}{du\+\_\+init\+\_\+and\+\_\+run}} (int il)
+\begin{DoxyCompactList}\small\item\em send parameters from config file and start the run \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a48578c7be15c03a1cda329eba691db17}{du\+\_\+connect}} ()
+\begin{DoxyCompactList}\small\item\em connects to the sockets for which this is needed loop over all stations, when needed reconnect and initialize and start the run again \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a5bf35051b5fe9f1aceeb5f985a65c4c6}{du\+\_\+read}} ()
+\begin{DoxyCompactList}\small\item\em read data from all sockets loop over all DUs check if there is a socket connection read data into a local buffer (50000 shorts long!) interpret data send an ALIVE message every second \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a7a5839c0f2ab52e99a537e6a877ff6a0}{du\+\_\+send}} (uint16\+\_\+t \texorpdfstring{$\ast$}{*}bf, int du)
+\begin{DoxyCompactList}\small\item\em write data to socket \end{DoxyCompactList}\item 
+uint16\+\_\+t \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_ad23e9ef3fdf8b030742d15f2252960c3}{du\+\_\+read\+\_\+initfile}} (int ls, uint16\+\_\+t \texorpdfstring{$\ast$}{*}bf)
+\begin{DoxyCompactList}\small\item\em reads the configuration file. Also calculates the filter parameters from the input file! note\+: does not check the size of the buffer (bf)! \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a11a7306f6d4ac91a0f9457687ed48b1a}{du\+\_\+write}} ()
+\begin{DoxyCompactList}\small\item\em write \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq__no_d_m_a_2du_8c_a7095f447803e19fdc6d6c62b0d45152a}{du\+\_\+main}} ()
+\begin{DoxyCompactList}\small\item\em main steering routine for the socket handling ignore SIGPIPE connecting to all detector units read from detector units write to detector units connect to all \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_ab50a2ed2e8f5977a8155b1cbba53c9ac}\label{_adaq__no_d_m_a_2du_8c_ab50a2ed2e8f5977a8155b1cbba53c9ac} 
+int {\bfseries idebug}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a803a443650cba8a1d46328b5db3cbf74}\label{_adaq__no_d_m_a_2du_8c_a803a443650cba8a1d46328b5db3cbf74} 
+char {\bfseries loglines} \mbox{[}MAXLOG\mbox{]}\mbox{[}80\mbox{]}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a2f45113638a0b749a8a205d2cd7fb42b}\label{_adaq__no_d_m_a_2du_8c_a2f45113638a0b749a8a205d2cd7fb42b} 
+int {\bfseries running}
+\item 
+\Hypertarget{_adaq__no_d_m_a_2du_8c_ad65a8842cc674e3ddf69355898c0ecbf}\label{_adaq__no_d_m_a_2du_8c_ad65a8842cc674e3ddf69355898c0ecbf} 
+int {\bfseries errno}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+routines interfacing to the socket 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a48578c7be15c03a1cda329eba691db17}\label{_adaq__no_d_m_a_2du_8c_a48578c7be15c03a1cda329eba691db17} 
+\index{du.c@{du.c}!du\_connect@{du\_connect}}
+\index{du\_connect@{du\_connect}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_connect()}{du\_connect()}}
+{\footnotesize\ttfamily void du\+\_\+connect (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+connects to the sockets for which this is needed loop over all stations, when needed reconnect and initialize and start the run again 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a48578c7be15c03a1cda329eba691db17}{du\+\_\+connect()} \Hypertarget{_adaq__no_d_m_a_2du_8c_a5f67de5c23baba47e9ac95ec5bacb296}\label{_adaq__no_d_m_a_2du_8c_a5f67de5c23baba47e9ac95ec5bacb296} 
+\index{du.c@{du.c}!du\_init\_and\_run@{du\_init\_and\_run}}
+\index{du\_init\_and\_run@{du\_init\_and\_run}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_init\_and\_run()}{du\_init\_and\_run()}}
+{\footnotesize\ttfamily void du\+\_\+init\+\_\+and\+\_\+run (\begin{DoxyParamCaption}\item[{int}]{il }\end{DoxyParamCaption})}
+
+
+
+send parameters from config file and start the run 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a5f67de5c23baba47e9ac95ec5bacb296}{du\+\_\+init\+\_\+and\+\_\+run(int il)} 
+\begin{DoxyParams}{Parameters}
+{\em il} & stationlist index \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_adaq__no_d_m_a_2du_8c_ab5dfa04029a2e3265b34b3af978961c5}\label{_adaq__no_d_m_a_2du_8c_ab5dfa04029a2e3265b34b3af978961c5} 
+\index{du.c@{du.c}!du\_interpret@{du\_interpret}}
+\index{du\_interpret@{du\_interpret}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_interpret()}{du\_interpret()}}
+{\footnotesize\ttfamily void du\+\_\+interpret (\begin{DoxyParamCaption}\item[{uint16\+\_\+t \texorpdfstring{$\ast$}{*}}]{buffer }\end{DoxyParamCaption})}
+
+
+
+interprets the data in the buffer 
+
+\textbackslash{}func \doxylink{_adaq_2du_8c_ab5dfa04029a2e3265b34b3af978961c5}{du\+\_\+interpret(uint16\+\_\+t \texorpdfstring{$\ast$}{*}buffer)} 
+\begin{DoxyParams}{Parameters}
+{\em buf} & pointer to the data to send Copies information in the buffer to either the event-\/shared memory or the t2 shared memory \\
+\hline
+\end{DoxyParams}
+\Hypertarget{_adaq__no_d_m_a_2du_8c_a7095f447803e19fdc6d6c62b0d45152a}\label{_adaq__no_d_m_a_2du_8c_a7095f447803e19fdc6d6c62b0d45152a} 
+\index{du.c@{du.c}!du\_main@{du\_main}}
+\index{du\_main@{du\_main}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_main()}{du\_main()}}
+{\footnotesize\ttfamily void du\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+main steering routine for the socket handling ignore SIGPIPE connecting to all detector units read from detector units write to detector units connect to all 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a7095f447803e19fdc6d6c62b0d45152a}{du\+\_\+main()} \Hypertarget{_adaq__no_d_m_a_2du_8c_a5bf35051b5fe9f1aceeb5f985a65c4c6}\label{_adaq__no_d_m_a_2du_8c_a5bf35051b5fe9f1aceeb5f985a65c4c6} 
+\index{du.c@{du.c}!du\_read@{du\_read}}
+\index{du\_read@{du\_read}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_read()}{du\_read()}}
+{\footnotesize\ttfamily void du\+\_\+read (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+read data from all sockets loop over all DUs check if there is a socket connection read data into a local buffer (50000 shorts long!) interpret data send an ALIVE message every second 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a5bf35051b5fe9f1aceeb5f985a65c4c6}{du\+\_\+read()} \Hypertarget{_adaq__no_d_m_a_2du_8c_ad23e9ef3fdf8b030742d15f2252960c3}\label{_adaq__no_d_m_a_2du_8c_ad23e9ef3fdf8b030742d15f2252960c3} 
+\index{du.c@{du.c}!du\_read\_initfile@{du\_read\_initfile}}
+\index{du\_read\_initfile@{du\_read\_initfile}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_read\_initfile()}{du\_read\_initfile()}}
+{\footnotesize\ttfamily uint16\+\_\+t du\+\_\+read\+\_\+initfile (\begin{DoxyParamCaption}\item[{int}]{ls,  }\item[{uint16\+\_\+t \texorpdfstring{$\ast$}{*}}]{bf }\end{DoxyParamCaption})}
+
+
+
+reads the configuration file. Also calculates the filter parameters from the input file! note\+: does not check the size of the buffer (bf)! 
+
+\textbackslash{}func uint16\+\_\+t \doxylink{_adaq_2du_8c_ad23e9ef3fdf8b030742d15f2252960c3}{du\+\_\+read\+\_\+initfile(int ls,uint16\+\_\+t \texorpdfstring{$\ast$}{*}bf)} bf\mbox{[}rcode++\mbox{]} = axi; bf\mbox{[}rcode++\mbox{]} = reg+2; bf\mbox{[}rcode++\mbox{]} = a\mbox{[}2\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+1; bf\mbox{[}rcode++\mbox{]} = reg+4; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}1\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+1; bf\mbox{[}rcode++\mbox{]} = reg+6; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}2\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+2; bf\mbox{[}rcode++\mbox{]} = reg+8; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}3\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+2; bf\mbox{[}rcode++\mbox{]} = reg+10; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}4\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+3; bf\mbox{[}rcode++\mbox{]} = reg+12; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}5\mbox{]}\&0xffff; bf\mbox{[}rcode++\mbox{]} = axi+3; bf\mbox{[}rcode++\mbox{]} = reg+14; bf\mbox{[}rcode++\mbox{]} = b\mbox{[}6\mbox{]}\&0xffff;\Hypertarget{_adaq__no_d_m_a_2du_8c_a7a5839c0f2ab52e99a537e6a877ff6a0}\label{_adaq__no_d_m_a_2du_8c_a7a5839c0f2ab52e99a537e6a877ff6a0} 
+\index{du.c@{du.c}!du\_send@{du\_send}}
+\index{du\_send@{du\_send}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_send()}{du\_send()}}
+{\footnotesize\ttfamily void du\+\_\+send (\begin{DoxyParamCaption}\item[{uint16\+\_\+t \texorpdfstring{$\ast$}{*}}]{bf,  }\item[{int}]{du }\end{DoxyParamCaption})}
+
+
+
+write data to socket 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a7a5839c0f2ab52e99a537e6a877ff6a0}{du\+\_\+send(uint16\+\_\+t \texorpdfstring{$\ast$}{*}bf,int ls)} \Hypertarget{_adaq__no_d_m_a_2du_8c_a11a7306f6d4ac91a0f9457687ed48b1a}\label{_adaq__no_d_m_a_2du_8c_a11a7306f6d4ac91a0f9457687ed48b1a} 
+\index{du.c@{du.c}!du\_write@{du\_write}}
+\index{du\_write@{du\_write}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{du\_write()}{du\_write()}}
+{\footnotesize\ttfamily void du\+\_\+write (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+write 
+
+\textbackslash{}func void \doxylink{_adaq_2du_8c_a11a7306f6d4ac91a0f9457687ed48b1a}{du\+\_\+write()} \Hypertarget{_adaq__no_d_m_a_2du_8c_a0a3c3390c14ffc01395c0a184d834315}\label{_adaq__no_d_m_a_2du_8c_a0a3c3390c14ffc01395c0a184d834315} 
+\index{du.c@{du.c}!set\_socketoptions@{set\_socketoptions}}
+\index{set\_socketoptions@{set\_socketoptions}!du.c@{du.c}}
+\doxysubsubsection{\texorpdfstring{set\_socketoptions()}{set\_socketoptions()}}
+{\footnotesize\ttfamily int set\+\_\+socketoptions (\begin{DoxyParamCaption}\item[{int}]{sock }\end{DoxyParamCaption})}
+
+
+
+set default socket options 
+
+\textbackslash{}func int \doxylink{_adaq__no_d_m_a_2du_8c_a0a3c3390c14ffc01395c0a184d834315}{set\+\_\+socketoptions(int sock)} 
+\begin{DoxyParams}{Parameters}
+{\em sock} & socket file descriptor \\
+\hline
+\end{DoxyParams}

@@ -1,0 +1,49 @@
+\doxysection{EV\+\_\+\+DATA Struct Reference}
+\hypertarget{struct_e_v___d_a_t_a}{}\label{struct_e_v___d_a_t_a}\index{EV\_DATA@{EV\_DATA}}
+\doxysubsubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{struct_e_v___d_a_t_a_a2badaba3e49f0867fa02e2fa6dc4271c}\label{struct_e_v___d_a_t_a_a2badaba3e49f0867fa02e2fa6dc4271c} 
+uint16\+\_\+t {\bfseries event\+\_\+nr}
+\begin{DoxyCompactList}\small\item\em an event number \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_aa9a3f6a5b62525ff1e6e9911efb93e12}\label{struct_e_v___d_a_t_a_aa9a3f6a5b62525ff1e6e9911efb93e12} 
+uint32\+\_\+t {\bfseries ts\+\_\+seconds}
+\begin{DoxyCompactList}\small\item\em second marker \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_a49c4721aa303d0a1ed49bd5459bf60ac}\label{struct_e_v___d_a_t_a_a49c4721aa303d0a1ed49bd5459bf60ac} 
+uint32\+\_\+t {\bfseries t3calc}
+\begin{DoxyCompactList}\small\item\em was the T3 time calculated (1/0) \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_a40f1311e24633a555ecdb77974130128}\label{struct_e_v___d_a_t_a_a40f1311e24633a555ecdb77974130128} 
+uint32\+\_\+t {\bfseries t3\+\_\+nanoseconds}
+\begin{DoxyCompactList}\small\item\em proper timing \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_a4d57a2c7a5847c6adc7d59883278e47a}\label{struct_e_v___d_a_t_a_a4d57a2c7a5847c6adc7d59883278e47a} 
+uint32\+\_\+t {\bfseries t2\+\_\+nanoseconds}
+\begin{DoxyCompactList}\small\item\em rough timing for t2 purposes only \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_ab555bdf2b5d4344cd9e1d613a4714f40}\label{struct_e_v___d_a_t_a_ab555bdf2b5d4344cd9e1d613a4714f40} 
+uint32\+\_\+t {\bfseries CTD}
+\begin{DoxyCompactList}\small\item\em clock tick of the trigger \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_aab0ee15373125d114c090038f122a747}\label{struct_e_v___d_a_t_a_aab0ee15373125d114c090038f122a747} 
+uint32\+\_\+t {\bfseries trig\+\_\+flag}
+\begin{DoxyCompactList}\small\item\em trigger flag \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_a206689fb10dce49892e0a139d4627ccf}\label{struct_e_v___d_a_t_a_a206689fb10dce49892e0a139d4627ccf} 
+uint32\+\_\+t {\bfseries evsize}
+\begin{DoxyCompactList}\small\item\em size of the event \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_aa0921e54d146b52308b27427bacbc9fe}\label{struct_e_v___d_a_t_a_aa0921e54d146b52308b27427bacbc9fe} 
+float {\bfseries quant1}
+\begin{DoxyCompactList}\small\item\em quant error previous PPS \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_aa6f0524a44d883c3091e13cf82ea1da6}\label{struct_e_v___d_a_t_a_aa6f0524a44d883c3091e13cf82ea1da6} 
+float {\bfseries quant2}
+\begin{DoxyCompactList}\small\item\em quant error next PPS \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_a0fd5f97466f6fbd0d5975768213c2a22}\label{struct_e_v___d_a_t_a_a0fd5f97466f6fbd0d5975768213c2a22} 
+uint32\+\_\+t {\bfseries CTP}
+\begin{DoxyCompactList}\small\item\em Number of clock ticks between PPS pulses. \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_aef7dab01ed8253794231d40daba6ef74}\label{struct_e_v___d_a_t_a_aef7dab01ed8253794231d40daba6ef74} 
+int16\+\_\+t {\bfseries sync}
+\begin{DoxyCompactList}\small\item\em Positive or Negative clock edge. \end{DoxyCompactList}\item 
+\Hypertarget{struct_e_v___d_a_t_a_abbdc344f80823d8ac51a9bf83891b8ea}\label{struct_e_v___d_a_t_a_abbdc344f80823d8ac51a9bf83891b8ea} 
+uint8\+\_\+t {\bfseries buf} \mbox{[}\mbox{\hyperlink{_d_u_2scope_8h_aabc28ccab6c53b56e624234fd8c3ce36}{MAX\+\_\+\+READOUT}}\mbox{]}
+\begin{DoxyCompactList}\small\item\em raw data buffer \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+The documentation for this struct was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/\+DU/\mbox{\hyperlink{_d_u_2scope_8h}{scope.\+h}}\end{DoxyCompactItemize}

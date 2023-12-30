@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/time.h>
+#include <time.h>
 #include "Adaq.h"
 #include "amsg.h"
 #include "eb.h"
@@ -19,17 +21,13 @@
 extern char *configfile;
 int ad_init_param(char *file);
 
-/* next lines copied from scope.h */
-#define FIRMWARE_VERSION(x) (10*((x>>20)&0xf)+((x>>16)&0xf))
-#define FIRMWARE_SUBVERSION(x)   (10*((x>>12)&0xf)+((x>>9)&0x7))
-#define SERIAL_NUMBER(x)    (100*((x>>8)&0x1)+10*((x>>4)&0xf)+((x>>0)&0xf))
 
 #define NDU (5*MAXDU) // maximally 5 events for each DU in memory
 #define EBTIMEOUT 5 // need to have at least 5 seconds of data before writing
 
 int running = 0;
 
-uint16_t DUbuffer[NDU][EVSIZE];
+uint32_t DUbuffer[NDU][EVSIZE];
 int i_DUbuffer = 0;
 
 int eb_sub = 1; //file subnumber
@@ -50,27 +48,42 @@ FILE *fpout = NULL,*fpten=NULL,*fpmon=NULL,*fpmb=NULL;
  */
 void eb_open(EVHDR *evhdr)
 {
-  char fname[100];
+  char fname[400];
+  struct tm *gtime;
+  struct timeval tp;
+  struct timezone tzp;
   
-  printf("Trying to open eventfiles\n");
-  sprintf(fname,"%s/AD/ad%06d.f%04d",eb_dir,eb_run,eb_sub);
+  tzp.tz_minuteswest = 0;
+  tzp.tz_dsttime = 0;
+  gettimeofday(&tp,&tzp);
+  printf("Trying to open eventfiles: %s %s %s\n",eb_dir,eb_site,eb_extra);
+  gtime = gmtime((const time_t *)&tp);
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_CD_%s",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+          eb_run,eb_extra);
+  printf("!!%s!!\n",fname);
   fpout = fopen(fname,"r");
   while(fpout != NULL){
-    eb_sub +=1;
-    if(eb_sub>9999){
-      eb_sub = 1;
-      eb_run++;
-    }
-    sprintf(fname,"%s/AD/ad%06d.f%04d",eb_dir,eb_run,eb_sub);
+    eb_run +=1;
+    sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_CD_%s",eb_dir,eb_site,gtime->tm_year+1900,
+            gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+            eb_run,eb_extra);
     fpout = fopen(fname,"r");
   }
+  printf("File = %s\n",fname);
   fpout = fopen(fname,"w");
-  sprintf(fname,"%s/TD/td%06d.f%04d",eb_dir,eb_run,eb_sub);
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_MD_%s",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+          eb_run,eb_extra);
   fpten = fopen(fname,"w");
-  sprintf(fname,"%s/MD/md%06d.f%04d",eb_dir,eb_run,eb_sub);
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_UD_%s",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+          eb_run,eb_extra);
   fpmb = fopen(fname,"w");
-  sprintf(fname,"%s/MON/MO%06d.f%04d",eb_dir,eb_run,eb_sub);
-  fpmon = fopen(fname,"w");
+  //sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_MN_%s",eb_dir,eb_site,gtime->tm_year+1900,
+  //        gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+  //        eb_run,eb_extra);
+  //fpmon = fopen(fname,"w");
   // next write file header
   eb_fhdr.length = sizeof(FILEHDR)-sizeof(int32_t);
   eb_fhdr.run_id = eb_run;
@@ -128,11 +141,11 @@ void eb_close()
  */
 int eb_DUcompare(const void *a, const void *b)
 { /* sorting in REVERSE order, easy removal of older data */
-  uint16_t  *t1,*t2;
+  uint32_t  *t1,*t2;
   uint32_t t1sec,t2sec;
   uint32_t t1nsec,t2nsec;
-  t1 = (uint16_t *)(a);
-  t2 = (uint16_t *)(b);
+  t1 = (uint32_t *)(a);
+  t2 = (uint32_t *)(b);
   /**if(t1[EVT_ID] < t2[EVT_ID]) {
     if((t1[EVT_ID]+1000) < t2[EVT_ID]) return(-1);
     else return(1);
@@ -168,14 +181,14 @@ void eb_getui()
   while((shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)]) !=  0){ // loop over the UI input
     if(((shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)]) &2) ==  2){ // loop over the UI input
       msg = (AMSG *)(&(shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)+1]));
-      //printf("EB: A GUI command\n");
+      printf("EB: A GUI command\n");
       if(msg->tag == DU_STOP){
         running = 0;
         if(fpout != NULL) eb_close();
       }
       else if(msg->tag == DU_START){
         ad_init_param(configfile);
-        //printf("EB: Starting the run\n");
+        printf("EB: Starting the run\n");
         running = 1;
         i_DUbuffer = 0; // get rid of old data
         eb_sub = 1;
@@ -220,9 +233,8 @@ void eb_gett3(){
  */
 void eb_getdata(){
   AMSG *msg;
-  uint16_t *DUinfo;
+  uint32_t *DUinfo;
   int inew=0;
-  int firmware;
   
   while(((shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)]) &1) ==  1){ // loop over the inputb
     //printf("EB: Get Data %d %d\n",*shm_eb.next_read,shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)]);
@@ -234,26 +246,17 @@ void eb_getdata(){
     msg = (AMSG *)(&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)+1]));
     //printf("EB getdata: loop over input. TAG = %d\n",msg->tag);
     if(msg->tag == DU_EVENT){
-      DUinfo = (uint16_t *)msg->body;
-      //printf("Trying to copy event of length %d (max is %d)\n",DUinfo[EVT_LENGTH],EVSIZE);
-      if(DUinfo[EVT_LENGTH] < EVSIZE){
-        if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,2*DUinfo[EVT_LENGTH]);
+      DUinfo = (uint32_t *)msg->body;
+      //printf("Trying to copy event of length %d (max is %d) %d\n",(DUinfo[EVT_LENGTH]>>16),EVSIZE,running);
+      //printf("EB: ADC = %08x %08x %08x %08x\n",DUinfo[EVT_HDR_LENGTH], DUinfo[EVT_HDR_LENGTH+1]
+      //       , DUinfo[EVT_HDR_LENGTH+2], DUinfo[EVT_HDR_LENGTH+3]);
+      if((DUinfo[EVT_LENGTH]>>16) < EVSIZE){
+        if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,INTSIZE*(DUinfo[EVT_LENGTH]>>16));
         if(running ==1) i_DUbuffer +=1;
         if(i_DUbuffer >= NDU) {
           printf("EB: Filling the buffer, loosing data\n");
           i_DUbuffer = NDU-1;
         }
-      }
-    } else if(msg->tag == DU_MONITOR){
-      if(fpmon != NULL){
-        memcpy(&firmware,&msg->body[1],4);
-        fprintf(fpmon,"%03d %03d %5d %d %4d %4d %4d %4d %4d %5.2f %5.2f %5.2f %d\n",DUPOS(msg->body[0]),
-                SERIAL_NUMBER(firmware),
-                1000*FIRMWARE_VERSION(firmware)+FIRMWARE_SUBVERSION(firmware),
-                *(int *)&msg->body[3],msg->body[5],
-                msg->body[6],msg->body[7],msg->body[8],msg->body[9],
-                *(float *)&msg->body[10],
-                *(float *)&msg->body[12],*(float *)&msg->body[14],msg->body[16]);
       }
     }
     shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_read)] = 0;
@@ -265,7 +268,7 @@ void eb_getdata(){
     i_DUbuffer = NDU-1;
   }
   if(i_DUbuffer>0 && inew == 1) {
-    qsort(DUbuffer[0],i_DUbuffer,2*EVSIZE,eb_DUcompare);
+    qsort(DUbuffer[0],i_DUbuffer,INTSIZE*EVSIZE,eb_DUcompare);
   }
 }
 
@@ -284,40 +287,41 @@ void eb_getdata(){
 void eb_write_events(){
   FILE *fp;
   EVHDR evhdr;
-  uint16_t *DUinfo,*DUn;
+  uint32_t *DUinfo,*DUn;
   uint32_t du_sec,du_nsec;
   int i,ils,il_start,DTime;
   static int n_written=0;
   
   if(i_DUbuffer == 0) return; //no buffers in memory
   //printf("EB: A buffer in memory\n");
-  DUinfo = (uint16_t *)DUbuffer[i_DUbuffer-1];
+  DUinfo = (uint32_t *)DUbuffer[i_DUbuffer-1];
   il_start = i_DUbuffer-1;
-  DUn = (uint16_t *)DUbuffer[0];
-  if((*(uint32_t *)&DUn[EVT_SECOND]<*(uint32_t *)&DUinfo[EVT_SECOND])) {
-    printf("EB: Second sorting went wrong %u %u\n",*(uint32_t *)&DUn[EVT_SECOND],*(uint32_t *)&DUinfo[EVT_SECOND]);
+  DUn = (uint32_t *)DUbuffer[0];
+  //printf("Write event %u %u\n",DUn[EVT_SECOND],DUinfo[EVT_SECOND]);
+  if(DUn[EVT_SECOND]<DUinfo[EVT_SECOND]) {
+    printf("EB: Second sorting went wrong %u %u\n",DUn[EVT_SECOND],DUinfo[EVT_SECOND]);
     i_DUbuffer = 0;
     return;
   }
-  if((*(uint32_t *)&DUn[EVT_SECOND]==*(uint32_t *)&DUinfo[EVT_SECOND])  &&(i_DUbuffer > (0.8*NDU))) {
+  if((DUn[EVT_SECOND]==DUinfo[EVT_SECOND])  &&(i_DUbuffer > (0.8*NDU))) {
     printf("EB: filling 80 percent of the data buffer, aborting event writing\n");
     i_DUbuffer = 0;
     return;
   }
-  if(((*(uint32_t *)&DUn[EVT_SECOND]-*(uint32_t *)&DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU)) ) return;
-  evhdr.t3_id = DUinfo[EVT_ID];
+  if(((DUn[EVT_SECOND]-DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU)) ) return;
+  evhdr.t3_id = DUinfo[EVT_EVT_ID];
   evhdr.DU_count = 1;
-  evhdr.length = 40+2*DUinfo[EVT_LENGTH];
+  evhdr.length = 40+4*(DUinfo[EVT_LENGTH]>>16);
   evhdr.run_id = eb_run;
   evhdr.event_id = eb_event;
-  evhdr.first_DU = DUinfo[EVT_HARDWARE];
-  evhdr.seconds = *(uint32_t *)&DUinfo[EVT_SECOND];
-  evhdr.nanosec = *(uint32_t *)&DUinfo[EVT_NANOSEC];
-  evhdr.type = DUinfo[EVT_T3FLAG];
-  evhdr.version=EVENTVERSION;
-  //printf("Event Type %d Version %d\n",evhdr.type,evhdr.version);
+  evhdr.first_DU = DUinfo[EVT_STATION_ID];
+  evhdr.seconds = DUinfo[EVT_SECOND];
+  evhdr.nanosec = DUinfo[EVT_NANOSEC];
+  evhdr.type = DUinfo[EVT_TRIGGER_STAT]>>16;
+  evhdr.version=DUinfo[EVT_VERSION];
+  //printf("Event Type %d Version %d Time %u\n",evhdr.type,evhdr.version,evhdr.seconds);
   for(i=(i_DUbuffer-2);i>=0;i--){
-    DUn = (uint16_t *)DUbuffer[i];
+    DUn = (uint32_t *)DUbuffer[i];
     du_sec = *(uint32_t *)&DUn[EVT_SECOND];
     du_nsec =*(uint32_t *)&DUn[EVT_NANOSEC];
     if(du_sec == evhdr.seconds){
@@ -346,16 +350,15 @@ void eb_write_events(){
           DTime = 1E9-(evhdr.nanosec-du_nsec);
       }
     }
-    if(DUn[EVT_ID] == evhdr.t3_id && DTime < 5E6){
+    if(DUn[EVT_EVT_ID] == evhdr.t3_id && DTime < 5E6){
       evhdr.DU_count ++;
-      evhdr.length += 2*DUn[EVT_LENGTH];
-      evhdr.type |= DUn[EVT_T3FLAG];
+      evhdr.length += 2*(DUn[EVT_LENGTH+1]>>16);
+      //evhdr.type |= DUn[EVT_T3FLAG];
     }else{
-      printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,du_sec,evhdr.seconds);
+      //printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,du_sec,evhdr.seconds);
       eb_fhdr.last_event_id = evhdr.event_id;
       eb_fhdr.last_event_time = evhdr.seconds;
       if(fpout == NULL) {
-        printf("EB: Opening %d\n",(int)fpout);
         eb_open(&evhdr);
         n_written = 0;
         for(isub=0;isub<3;isub++) write_sub[isub] = 0;
@@ -375,35 +378,24 @@ void eb_write_events(){
       //printf("EB: Writing event %d\n",(int)fp);
       fwrite(&evhdr,1,44,fp);
       for(ils=il_start;ils>(il_start-evhdr.DU_count);ils--){
-        DUn = (uint16_t *)DUbuffer[ils];
-        fwrite(DUn,1,2*DUn[EVT_LENGTH],fp);
+        DUn = (uint32_t *)DUbuffer[ils];
+        fwrite(DUn,1,4*(DUn[EVT_LENGTH]>>16),fp);
         *(uint32_t *)&DUn[EVT_SECOND] = 0;
       }// that is it, start a new event
       n_written++;
       write_sub[isub]++;
       if(n_written >=eb_max_evts) {
-        printf("EB: closing  files %d\n",(int)fpout);
         eb_close();
         //printf("EB: after closing  files %d\n",(int) fpout);
         //printf("EB: after closing  files %d\n",(int) fpout);
       }
       eb_event++;
-      DUinfo = (uint16_t *)DUbuffer[i];
-      DUn = (uint16_t *)DUbuffer[i-1];
+      DUinfo = (uint32_t *)DUbuffer[i];
+      DUn = (uint32_t *)DUbuffer[i-1];
       il_start = i;
       i_DUbuffer = i+1;
       break;
-/*      if(((*(uint32_t *)&DUn[EVT_SECOND]-*(uint32_t *)&DUinfo[EVT_SECOND])<EBTIMEOUT) &&(i_DUbuffer < (0.8*NDU))) break;
-      evhdr.t3_id = DUinfo[EVT_ID];
-      evhdr.DU_count = 1;
-      evhdr.length = 40+2*DUinfo[EVT_LENGTH];
-      evhdr.run_id = eb_run;
-      evhdr.event_id = eb_event;
-      evhdr.first_DU = DUinfo[EVT_HARDWARE];
-      evhdr.seconds = *(uint32_t *)&DUinfo[EVT_SECOND];
-      evhdr.nanosec = *(uint32_t *)&DUinfo[EVT_NANOSEC];
-      evhdr.type = DUinfo[EVT_T3FLAG];
-      evhdr.version=EVENTVERSION;*/
+
     }
   }
 }

@@ -1,0 +1,87 @@
+\doxysection{Adaq.\+h}
+\hypertarget{_adaq__no_d_m_a_2_adaq_8h_source}{}\label{_adaq__no_d_m_a_2_adaq_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq\_noDMA/Adaq.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq\_noDMA/Adaq.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{/***}}
+\DoxyCodeLine{00002\ \textcolor{comment}{DAQ\ Main\ project\ definitions}}
+\DoxyCodeLine{00003\ \textcolor{comment}{Version:1.0}}
+\DoxyCodeLine{00004\ \textcolor{comment}{Date:\ 17/2/2020}}
+\DoxyCodeLine{00005\ \textcolor{comment}{Author:\ Charles\ Timmermans,\ Nikhef/Radboud\ University}}
+\DoxyCodeLine{00006\ \textcolor{comment}{}}
+\DoxyCodeLine{00007\ \textcolor{comment}{Altering\ the\ code\ without\ explicit\ consent\ of\ the\ author\ is\ forbidden}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ ***/}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#include\ <sys/socket.h>}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#include\ <netinet/tcp.h>}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#include\ <netinet/in.h>}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#include\ <arpa/inet.h>}}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#include\ "{}ad\_shm.h"{}}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ MAXDU\ 2\ }\textcolor{comment}{//max\ number\ of\ Detector\ Units}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ ERROR\ -\/1}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ NORMAL\ 1}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ DEFAULT\_CONFIGFILE\ "{}conf/Adaq.conf"{}}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00021\ \ \ \textcolor{keywordtype}{int}\ DUid;\ \textcolor{comment}{//\ station\ number}}
+\DoxyCodeLine{00022\ \ \ \textcolor{keywordtype}{char}\ DUip[20];\ \textcolor{comment}{//\ IP\ address}}
+\DoxyCodeLine{00023\ \ \ \textcolor{keywordtype}{int}\ DUport;\ \ \ \textcolor{comment}{//\ port\ to\ connect\ to}}
+\DoxyCodeLine{00024\ \ \ \textcolor{keywordtype}{int}\ DUsock;}
+\DoxyCodeLine{00025\ \ \ time\_t\ LSTconnect;}
+\DoxyCodeLine{00026\ \ \ \textcolor{keyword}{struct\ }sockaddr\_in\ \ DUaddress;}
+\DoxyCodeLine{00027\ \ \ socklen\_t\ DUalength;}
+\DoxyCodeLine{00028\ \}\mbox{\hyperlink{struct_d_u_info}{DUInfo}};}
+\DoxyCodeLine{00029\ }
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ NT2BUF\ (30*MAXDU)\ }\textcolor{comment}{//30\ per\ DU}}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ T2SIZE\ 1000\ }\textcolor{comment}{//Max.\ size\ (in\ shorts)\ for\ T2\ info\ in\ 1\ message\ }}
+\DoxyCodeLine{00032\ }
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ NT3BUF\ 500\ }\textcolor{comment}{//\ max\ 500\ T3\ buffers\ (small\ messages\ anyway)}}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ T3SIZE\ (6+3*MAXDU)\ }\textcolor{comment}{//Max.\ size\ (in\ shorts)\ for\ T3\ info\ in\ 1\ message}}
+\DoxyCodeLine{00035\ }
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ NEVBUF\ 4\ }\textcolor{comment}{//\ maximal\ 40\ event\ buffers}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ EVSIZE\ 65000\ }\textcolor{comment}{//Max.\ size\ (in\ shorts)\ for\ evsize\ for\ each\ DU}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ CMDBUF\ 40\ }\textcolor{comment}{//\ leave\ 40\ command\ buffers}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ CMDSIZE\ 5000\ }\textcolor{comment}{//Max.\ size\ (in\ shorts)\ for\ command\ (should\ be\ able\ to\ hold\ config\ file)}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ CMDEBBUF\ 10\ }\textcolor{comment}{//\ leave\ 10\ command\ buffers\ for\ EB}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ CMDEBSIZE\ 50\ }\textcolor{comment}{//Max.\ size\ (in\ shorts)\ for\ command}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ LOG\_FOLDER\ "{}/tmp/daq"{}}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ TCOINC\ 2000\ \ }\textcolor{comment}{//\ Maximum\ coincidence\ time\ window}}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ NTRIG\ 2\ }\textcolor{comment}{//total\ at\ least\ 2\ stations}}
+\DoxyCodeLine{00047\ }
+\DoxyCodeLine{00048\ }
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#ifdef\ \_MAINDAQ}}
+\DoxyCodeLine{00050\ \mbox{\hyperlink{struct_d_u_info}{DUInfo}}\ DUinfo[MAXDU];}
+\DoxyCodeLine{00051\ \textcolor{keywordtype}{int}\ tot\_du;}
+\DoxyCodeLine{00052\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_t2;}
+\DoxyCodeLine{00053\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_t3;}
+\DoxyCodeLine{00054\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_cmd;}
+\DoxyCodeLine{00055\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_eb;}
+\DoxyCodeLine{00056\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_ebcmd;}
+\DoxyCodeLine{00057\ \textcolor{comment}{//next\ EB\ parameters}}
+\DoxyCodeLine{00058\ \textcolor{keywordtype}{int}\ eb\_run\ =\ 1;}
+\DoxyCodeLine{00059\ \textcolor{keywordtype}{int}\ eb\_run\_mode\ =\ 0;}
+\DoxyCodeLine{00060\ \textcolor{keywordtype}{int}\ eb\_max\_evts\ =\ 10;}
+\DoxyCodeLine{00061\ \textcolor{keywordtype}{char}\ eb\_dir[80];}
+\DoxyCodeLine{00062\ \textcolor{comment}{//T3\ parameters}}
+\DoxyCodeLine{00063\ \textcolor{keywordtype}{int}\ t3\_rand\ =\ 0;\ }
+\DoxyCodeLine{00064\ \textcolor{keywordtype}{int}\ t3\_stat\ =\ NTRIG;}
+\DoxyCodeLine{00065\ \textcolor{keywordtype}{int}\ t3\_time\ =\ TCOINC;}
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00067\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{struct_d_u_info}{DUInfo}}\ DUinfo[MAXDU];}
+\DoxyCodeLine{00068\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ tot\_du;}
+\DoxyCodeLine{00069\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_t2;}
+\DoxyCodeLine{00070\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_t3;}
+\DoxyCodeLine{00071\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_eb;}
+\DoxyCodeLine{00072\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_cmd;}
+\DoxyCodeLine{00073\ \textcolor{keyword}{extern}\ \mbox{\hyperlink{structshm__struct}{shm\_struct}}\ shm\_ebcmd;}
+\DoxyCodeLine{00074\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ eb\_run\ ;}
+\DoxyCodeLine{00075\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ eb\_run\_mode;}
+\DoxyCodeLine{00076\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ eb\_max\_evts\ ;}
+\DoxyCodeLine{00077\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{char}\ eb\_dir[80];\ }
+\DoxyCodeLine{00078\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ t3\_rand;}
+\DoxyCodeLine{00079\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ t3\_stat;}
+\DoxyCodeLine{00080\ \textcolor{keyword}{extern}\ \textcolor{keywordtype}{int}\ t3\_time;}
+\DoxyCodeLine{00081\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

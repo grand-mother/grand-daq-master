@@ -1,7 +1,7 @@
 /*** \file ad_shm.c
 DAQ shared memory 
 Version:1.0
-Date: 17/2/2020
+Date: 17/12/2023
 Author: Charles Timmermans, Nikhef/Radboud University
 
 Altering the code without explicit consent of the author is forbidden
@@ -12,13 +12,13 @@ Altering the code without explicit consent of the author is forbidden
 /**
  int ad_shm_create(shm_struct *ptr,int nbuf,int size)
  
-create a shared memory of useable size "(size+1)*nbuf" shorts
+create a shared memory of useable size "(size+1)*nbuf" integers
 The pointer to the shm_struct (defined in ad_shm.h) must be provided
  */
 int ad_shm_create(shm_struct *ptr,int nbuf,int size)
 {
   int sz_int = sizeof(int);
-  size_t isize = (size+1)*nbuf*sizeof(uint16_t)+5*sz_int;
+  size_t isize = (((size+1)*nbuf)+5)*sz_int;
   key_t key = IPC_PRIVATE;
 
   ptr->shmid = 0;
@@ -33,7 +33,7 @@ int ad_shm_create(shm_struct *ptr,int nbuf,int size)
   if(ptr->shmid < 0) return(-1);
   ptr->buf = shmat(ptr->shmid,NULL,0600);
   memset((void *)ptr->buf,0,isize);
-  ptr->Ubuf = (uint16_t *)(&(ptr->buf[5*sz_int]));
+  ptr->Ubuf = (uint32_t *)(&(ptr->buf[5*sz_int]));
   ptr->next_write = (int *)&(ptr->buf[0]);
   ptr->next_read = (int *)&(ptr->buf[sz_int]);
   ptr->next_readb = (int *)&(ptr->buf[2*sz_int]);

@@ -1,6 +1,7 @@
-// @file
+/// @file dudaq.c
 /// @brief steering file for the Detector Unit software
-/// @author C. Timmermans, Nikhef/RU
+/// @author C. Timmermans, RU/Nikhef
+/// @date 30/12/2023
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,81 +26,69 @@
 #include "amsg.h"
 #include "scope.h"
 #include "ad_shm.h"
-// #include "du_monitor.h"
 
-int buffer_add_t2(unsigned short *bf,int bfsize,short id);
-int buffer_add_t3(unsigned short *bf,int bfsize,short id);
-int buffer_add_monitor(unsigned short *bf,int bfsize,short id);
-void scope_flush();
 
-shm_struct shm_ev; //!< shared memory containing all event info, including read/write pointers
-shm_struct shm_gps; //!< shared memory containing all GPS info, including read/write pointers
-shm_struct shm_ts; //!< shared memory containing all timestamp info, including read/write pointers
+int send_t3_event(int t3_id, int index, int evttype);
+
+shm_struct shm_ev; //!< shared memory containing event indices, including read/write pointers
+shm_struct shm_gps; //!< shared memory containing all GPS indices, including read/write pointers
 shm_struct shm_cmd; //!< shared memory containing all command info, including read/write pointers
-shm_struct shm_mon; //!< shared memory containing monitoring info
-TS_DATA *timestampbuf;
-GPS_DATA *gpsbuf; //!< buffer to hold GPS information
 extern int errno; //!< the number of the error encountered
-extern uint32_t shadowlist[Reg_End>>2];
+extern uint32_t *vadd_psddr;
 
 
-#define SOCKETS_BUFFER_SIZE  1048576//131072
-#define SOCKETS_TIMEOUT      100//1600
 
 int du_port;       //!<port number on which to connect to the central daq
 
-int run=0;                //!< current run number
+int run=0;                //!< are you running!
 
 int station_id  = -1;           //!< id of the LS, obtained from the ip address
 
 fd_set sockset;           //!< socket series to be manipulated
+
+uint32_t DU_output[MAX_OUT_MSG];  //!< memory used to store the data to be sent to the central DAQ
+uint32_t DU_input[MAX_INP_MSG];   //!< memory in which to receive the socket data from the central DAQ
+
 int32_t DU_socket = -1;   //!< main socket for accepting connections
-int32_t DU_comms = -1;    //!< socket for the accepted connection
 struct sockaddr_in  DU_address; //!< structure containing address information of socket
 socklen_t DU_alength;           //!< length of sending socket address
 socklen_t RD_alength;           //!< length of receiving socket address
-
-uint16_t DU_input[MAX_INP_MSG];   //!< memory in which to receive the socket data from the central DAQ
-uint16_t DU_output[MAX_OUT_MSG];  //!< memory used to store the data to be sent to the central DAQ
-
+int32_t DU_comms = -1;    //!< socket for the accepted connection
 
 unsigned int prev_mask; //!< old signal mask
 unsigned int mask;      //!< signal mask
 
 pid_t pid_scope;        //!< process id of the process reading/writing the fpga
 pid_t pid_socket;       //!< process id of the process reading/writing to the central DAQ
-pid_t pid_monitor;       //!< process id of the process reading/writing the monitor info
 uint8_t stop_process=0; //!< after an interrupt this flag is set so that all forked processes are killed
 
 
-void chc_read();
-
-
+/*!
+ * \fn remove_shared_memory()
+ * \brief deletes all shared memories
+ * \author C. Timmermans
+*/
 void remove_shared_memory()
 {
     ad_shm_delete(&shm_ev);
-    ad_shm_delete(&shm_ts);
     ad_shm_delete(&shm_gps);
     ad_shm_delete(&shm_cmd);
-    ad_shm_delete(&shm_mon);
 }
 
 /*!
 \fn void clean_stop(int signum)
 * \brief kill processes
 * \param signum input signal (not used)
-* kill child processes and perform a clean stop to clean up shared memory
 * \author C. Timmermans
+ * kill child processes and perform a clean stop to clean up shared memory
 */
-void clean_stop (int signum)
+void clean_stop(int signum)
 {
     remove_shared_memory();
     stop_process = 1;
     kill(pid_scope,9);
-    kill(pid_monitor,9);
     kill(pid_socket,9);
 }
-
 
 /*!
  \fn void block_signals(int iblock)
@@ -108,7 +97,6 @@ void clean_stop (int signum)
  * \param iblock When 1, block signals. Otherwise release block
  * \author C. Timmermans
  */
-
 void block_signals(int iblock)
 {
     if(iblock == 1){
@@ -126,14 +114,6 @@ void block_signals(int iblock)
  * \brief set default socket options
  * \retval 0 ok
  * \param sock socket id
- * - Default options:
- *   - re-use address
- *   - not keepalive
- *   - no delay
- *   - receive buffer size 1048576
- *   - send buffer size 1048576
- *   - receive timeout 100 msec
- *   - send timeout 100 msec
  * \author C. Timmermans
  */
 int set_socketoptions(int sock)
@@ -141,11 +121,11 @@ int set_socketoptions(int sock)
     int option;
     struct timeval timeout;
     // set default socket options
-    option = 1;
+    option = SOCKETS_REUSEADDR_OPT;
     if(setsockopt (sock,SOL_SOCKET, SO_REUSEADDR,&option,sizeof (int) )<0) return(-1);
-    option = 0;
+    option = SOCKETS_KEEPALIVE_OPT;
     if(setsockopt (sock,SOL_SOCKET, SO_KEEPALIVE,&option,sizeof (int) ) < 0) return(-1);
-    option = 1;
+    option = SOCKETS_NODELAY_OPT;
     if(setsockopt (sock,IPPROTO_TCP, TCP_NODELAY, &option,sizeof (int) )<0) return(-1);
     option = SOCKETS_BUFFER_SIZE;
     if(setsockopt (sock,SOL_SOCKET, SO_SNDBUF,&option,sizeof (int) )<0) return(-1);
@@ -209,8 +189,8 @@ int make_server_connection(int port)
     DU_comms = accept(DU_socket, (struct sockaddr*)&DU_address,&DU_alength);
     if(DU_comms <0){
       if(errno != EWOULDBLOCK && errno != EAGAIN) {
-	printf("Return an error\n");
-	return(-1); // an error if socket is not non-blocking
+        printf("Return an error\n");
+        return(-1); // an error if socket is not non-blocking
       }
     }else{
       FD_ZERO(&sockset);
@@ -234,8 +214,9 @@ int make_server_connection(int port)
 * - read data until all is read or there is an error
 *   - on error shut down socket connection
 * - interpret messages:
-*   - DU_RESET, DU_INITIALIZE, DU_START, DU_STOP, DU_BOOT are stored in shared memory for interpretation by scope_check_commands()
-*   - DU_GETEVENT moves event into the T3-buffer
+ * - DU_START/DU_STOP set run value to 1/0
+*   - DU_INITIALIZE is stored in shared memory for interpretation by scope_check_commands()
+*   - DU_GETEVENT DU_GET_MINBIAS_EVENT DU_GET_RANDOM_EVENT moves event to the central DAQ
 *   - ALIVE responds with ACK_ALIVE to central DAQ
 *
 * \author C. Timmermans
@@ -243,15 +224,11 @@ int make_server_connection(int port)
 
 int check_server_data()
 {
-  uint16_t *msg_start;
-  uint16_t msg_tag, msg_len;
-  uint16_t ackalive[6]={5,3,ALIVE_ACK,station_id,GRND1,GRND2};
-  int32_t port,i,il,isize;
-  uint16_t isec;
-  uint32_t ssec;
-  
+  uint32_t *msg_start;
+  uint32_t msg_tag, msg_len;
+  uint32_t ackalive[6]={6,3,ALIVE_ACK,station_id,GRND1,GRND2};
+  int i;
   int32_t bytesRead,recvRet,ntry;
-  int32_t length;
   unsigned char *bf = (unsigned char *)DU_input;
   struct timeval timeout;
   
@@ -293,7 +270,7 @@ int check_server_data()
   while(DU_input[0] <= 1){
     DU_input[0] = -1;
     RD_alength = DU_alength;
-    if((recvRet = recvfrom(DU_comms, DU_input,2,MSG_WAITALL,(struct sockaddr*)&DU_address,&RD_alength))==2){ //read the buffer size
+    if((recvRet = recvfrom(DU_comms, DU_input,INTSIZE,MSG_WAITALL,(struct sockaddr*)&DU_address,&RD_alength))==INTSIZE){ //read the buffer size
       if ((DU_input[0] < 0) || (DU_input[0]>MAX_INP_MSG)) {
         printf("Check Server Data: bad buffer size when receiving socket data (%d shorts)\n", DU_input[0]);
         shutdown(DU_comms,SHUT_RDWR);
@@ -301,12 +278,12 @@ int check_server_data()
         DU_comms = -1;
         return(-1);
       }
-      bytesRead = 2;
+      bytesRead = INTSIZE;
       ntry = 0;
-      while (bytesRead < (2*DU_input[0]+2)&&ntry<1000) {
+      while (bytesRead < (INTSIZE*DU_input[0])&&ntry<1000) {
         RD_alength = DU_alength;
         recvRet = recvfrom(DU_comms,&bf[bytesRead],
-                           2*DU_input[0]+2-bytesRead,0,(struct sockaddr*)&DU_address,&RD_alength);
+                           INTSIZE*DU_input[0]-bytesRead,0,(struct sockaddr*)&DU_address,&RD_alength);
         if(recvRet>0) ntry=0;
         else ntry++;
         if(errno == EAGAIN && recvRet<0) continue;
@@ -320,22 +297,17 @@ int check_server_data()
         bytesRead += recvRet;
       } // while read data
     }else{
-      // if(errno == EAGAIN) { // no data
-      //  DU_input[0] = 0;
-      //  break;
-      //}else{
       printf("Check Server Data: connection died before getting data\n");
       shutdown(DU_comms,SHUT_RDWR);
       close(DU_comms);
       DU_comms = -1;
       return(-1);
-      //}
     }
   }
   
   i = 1;
   //printf("Message length = %d\n",DU_input[0]);
-  while(i<DU_input[0]-1){
+  while(i<DU_input[0]-2){
     msg_start = &(DU_input[i]);
     msg_len = msg_start[AMSG_OFFSET_LENGTH];
     msg_tag = msg_start[AMSG_OFFSET_TAG];
@@ -344,21 +316,23 @@ int check_server_data()
       printf("Error: message is too short (no tag field)!\n");
       break;
     }
-    if (msg_len > MAXMSGSIZE) {
+    if (msg_len > MAX_INP_MSG) {
       printf("Error: message is too long: %d\n",msg_len);
       break;
     }
     //printf("Received message %d\n",msg_tag);
     switch(msg_tag){
-      case DU_RESET:
-      case DU_INITIALIZE:
       case DU_START:
+        run = 1;
+        break;
       case DU_STOP:
-      case DU_BOOT:
+        run = 0;
+        break;
+      case DU_INITIALIZE:
         while(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] == 1) {
           usleep(1000); // wait for the scope to read the shm
         }
-        memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)msg_start,2*msg_start[AMSG_OFFSET_LENGTH]);
+        memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)msg_start,INTSIZE*msg_start[AMSG_OFFSET_LENGTH]);
         shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 1;
         *shm_cmd.next_write = *shm_cmd.next_write + 1;
         if(*shm_cmd.next_write >= *shm_cmd.nbuf) *shm_cmd.next_write = 0;
@@ -367,10 +341,8 @@ int check_server_data()
       case DU_GET_MINBIAS_EVENT:                    // calculate sec and subsec, move the event to the t3 buffer
       case DU_GET_RANDOM_EVENT:                    // calculate sec and subsec, move the event to the t3 buffer
         if (msg_len == AMSG_OFFSET_BODY + 3 + 1) {
-          memcpy((void *)&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)+1]),(void *)msg_start,2*msg_start[AMSG_OFFSET_LENGTH]);
-          shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] = 1;
-          *shm_cmd.next_write = *shm_cmd.next_write + 1;
-          if(*shm_cmd.next_write >= *shm_cmd.nbuf) *shm_cmd.next_write = 0;
+          //printf("request evt %d %d %d\n",msg_start[2],msg_start[3],msg_start[4]);
+          send_t3_event(msg_start[3],msg_start[4],msg_tag);
         }
         else
           printf("Error: message DU_GETEVENT was wrong length (%d)\n", msg_len);
@@ -386,28 +358,58 @@ int check_server_data()
   if(msg_len<1) return(1);
   return(msg_len);
 }
+/*!
+ \fn int socket_send(char *bf, int length)
+ * \brief send buffer to the central DAQ
+ * \retval number of bytes sent
+ * try to send a buffer bf of size length over the socket to the central DAQ. Up to 100 tries are made
+ *
+ * \author C. Timmermans
+ */
+int socket_send(char *bf, int length)
+{
+  int bsent,rsend;
+  int sentBytes = 0;
+  int ntry = 0;
+  while(sentBytes<length && ntry < 100){
+    bsent = length-sentBytes;
+    rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
+                   (struct sockaddr*)&DU_address,DU_alength);
+    if(rsend<0 && errno != EAGAIN) {
+      printf("Sending event failed %d %d %s\n",length,sentBytes,strerror(errno));
+      sentBytes = rsend;
+      break;
+    }
+    if(rsend>0) {
+      sentBytes +=rsend;
+      ntry = 0;
+    } else{
+      ntry++;
+      usleep(20);
+    }
+  } //while sentbytes
+  return(sentBytes);
+}
 
 /*!
  \fn int send_server_data()
- * \brief send t2 and monitoring data to the central DAQ
+ * \brief send t2 data to the central DAQ
  * \retval -1 Error
  * \retval 0 No connection to DAQ
  * \retval 1 All ok
  * - If there is no connection to the central DAQ, try to connect
- * - Add t2 data to the output buffer
- * - send output buffer to the central DAQ
- * - If this failed, close the connection to the central DAQ
- * - Add monitoring data to the output buffer
+ * - get T2 information from DDR and add to output buffer
  * - send output buffer to the central DAQ
  *
  * \author C. Timmermans
  */
 int send_server_data(){
-  int32_t sentBytes;
-  int32_t rsend,ntry;
   char *bf = (char *)DU_output;
-  int32_t length,bsent;
+  int32_t length;
   DU_alength = sizeof(DU_address);
+  
+  int ievt,imsg,iten;
+  uint32_t *evt0,*evt1;
   
   if(DU_comms< 0){
     if(DU_socket < 0){
@@ -423,73 +425,37 @@ int send_server_data(){
     FD_SET(DU_comms, &sockset);
     set_socketoptions(DU_comms);
   }
-  buffer_add_t2(&(DU_output[1]),MAX_T2-1,station_id); // first add the T2 information
-  rsend = 0;
-  if(DU_output[1] > 0) {
-    DU_output[0] = DU_output[1]+2;
-    //printf("Sending T2's %d\n",DU_output[0]);
-    DU_output[DU_output[0]-1] = GRND1;
-    DU_output[DU_output[0]] = GRND2;
-    length = 2*DU_output[0]+2;
-    sentBytes = 0;
-    ntry = 0;
-    while(sentBytes<length && ntry < 1000){
-      if(length-sentBytes>40000) bsent=40000;
-      else
-        bsent = length-sentBytes;
-      rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
-                     (struct sockaddr*)&DU_address,DU_alength);
-      if(rsend<0 && errno != EAGAIN) {
-        printf("Sending T2 did not really work\n");
-        sentBytes = rsend;
-        break;
+  ievt=*(shm_ev.next_read);
+  if(ievt != *(shm_ev.next_write)){
+    imsg = 1;
+    DU_output[imsg++] = 0;
+    DU_output[imsg++] = DU_T2;
+    evt0 =&vadd_psddr[shm_ev.Ubuf[ievt]];
+    DU_output[imsg++] = station_id;
+    //printf("Time: %u %x %d\n",evt0[EVT_SECOND],evt0[EVT_SECOND],ievt);
+    DU_output[imsg++] = evt0[EVT_SECOND];
+    do {
+      evt1 =&vadd_psddr[shm_ev.Ubuf[ievt]];
+      if(evt1[EVT_SECOND] == evt0[EVT_SECOND]){
+        DU_output[imsg++] = evt1[EVT_NANOSEC];
+        iten = 0;
+        if((evt1[EVT_TRIGGER_STAT]&0x100)!= 0) iten+=4;
+        if((evt1[EVT_TRIGGER_STAT]&0x7f)!= 0) iten+=2;
+        DU_output[imsg++] = (ievt<<16)+(iten<<4);
+        ievt++;
+        if(ievt >= *shm_ev.nbuf) ievt = 0;
       }
-      if(rsend>0) {
-        sentBytes +=rsend;
-        ntry = 0;
-      } else{
-        ntry++;
-        if(sentBytes<length) usleep(100);
-      }
-    } //while sentbytes
-    if(sentBytes <= 0 || ntry >= 1000) { // it did not work
-      printf("Sending T2 did not work for socket %d %d\n",DU_comms,errno);
-      shutdown(DU_comms,SHUT_RDWR);
-      close(DU_comms);
-      DU_comms = -1;
-      return(-1);
-    }
-    usleep(100);
+    }while (ievt != *(shm_ev.next_write) &&imsg<(MAX_T2-4) && evt1[EVT_SECOND] == evt0[EVT_SECOND]); //each T2 adds 4 words
+    *(shm_ev.next_read) = ievt;
+    DU_output[imsg++] = GRND1;
+    DU_output[imsg] = GRND2;
+    DU_output[1] = imsg-1;
+    DU_output[0] = imsg+1;
+    
+    length = INTSIZE*DU_output[0];
+    if(run == 1) socket_send((char *)bf,length);
   }
-  buffer_add_monitor(&(DU_output[1]),MAX_OUT_MSG-1,station_id); // Next: monitor information
-  if(DU_output[1] == 0) return(rsend); // nothing to do
-  //printf("Sending T2's %d\n",DU_output[0]);
-  DU_output[0] = DU_output[1]+2;
-  DU_output[DU_output[0]-1] = GRND1;
-  DU_output[DU_output[0]] = GRND2;
-  length = 2*DU_output[0]+2;
-  sentBytes = 0;
-  ntry = 0;
-  while(sentBytes<length && ntry < 1000){
-    if(length-sentBytes>40000) bsent=40000;
-    else
-      bsent = length-sentBytes;
-    rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
-                   (struct sockaddr*)&DU_address,DU_alength);
-    if(rsend<0 && errno != EAGAIN) {
-      printf("Sending T2 did not really work\n");
-      sentBytes = rsend;
-      break;
-    }
-    if(rsend>0) {
-      sentBytes +=rsend;
-      ntry = 0;
-    }else{
-      ntry++;
-      usleep(100);
-    }
-  } //while sentbytes
-  
+  usleep(100);
   return(1);
 }
 
@@ -500,19 +466,19 @@ int send_server_data(){
  * \retval 0 No connection to DAQ
  * \retval 1 All ok
  * - If there is no connection to the central DAQ, try to connect
- * - Add requested event to the output buffer
- * - send output buffer to the central DAQ
- * - If this failed, close the connection to the central DAQ
- * 
+ * - Check if the link given by the central DAQ corresponds to a valid event
+ * - set the appropriate T3 trigger flag
+ * - create and send header of event message
+ * - send the event data
+ * - send the tail of the message
+ *
  * \author C. Timmermans
  */
 
-int send_t3_event()
+int send_t3_event(int t3_id, int index, int evttype)
 {
-  int32_t sentBytes;
-  int32_t rsend,ntry;
-  char *bf = (char *)DU_output;
-  int32_t length,bsent;
+  int32_t length;
+  short trflag;
   DU_alength= sizeof(DU_address);
   
   if(DU_comms< 0){
@@ -529,45 +495,35 @@ int send_t3_event()
     FD_SET(DU_comms, &sockset);
     set_socketoptions(DU_comms);
   }
-  buffer_add_t3(&(DU_output[1]),MAX_OUT_MSG-3,station_id);
-  if(DU_output[1] == 0) return(0); // nothing to do
-  //printf("Sending T3 event %d\n",DU_output[1]);
-  DU_output[0] = DU_output[1]+2;
-  DU_output[DU_output[0]-1] = GRND1;
-  DU_output[DU_output[0]] = GRND2;
-  //for(int i=0;i<10;i++) printf("%d ",DU_output[i]);
-  //printf("\n");
-  length = 2*DU_output[0]+2;
-  sentBytes = 0;
-  ntry = 0;
-  while(sentBytes<length && ntry < 100){
-    //if(length-sentBytes>40000) bsent=40000;
-    //else 
-      bsent = length-sentBytes;
-    rsend = sendto(DU_comms, &(bf[sentBytes]),bsent, 0,
-                   (struct sockaddr*)&DU_address,DU_alength);
-    if(rsend<0 && errno != EAGAIN) {
-      printf("Sending event failed %d %d %s\n",length,sentBytes,strerror(errno));
-      sentBytes = rsend;
-      break;
-    }
-    if(rsend>0) {
-      sentBytes +=rsend;
-      ntry = 0;
-      //usleep(20);
-    } else{
-      ntry++;
-      usleep(20);
-    }
-  } //while sentbytes
-  if(sentBytes < length) { // it did not work
-    printf("Sending event failed %d\n",length-sentBytes);
-    shutdown(DU_comms,SHUT_RDWR);
-    close(DU_comms);
-    DU_comms = -1;
-    return(-1);
+  uint32_t *evt = &vadd_psddr[shm_ev.Ubuf[index]];
+  if((evt[EVT_LENGTH]&0xffff)!= EVT_HDR_LENGTH){
+    printf("Error requesting event. Not a proper pointer %08x ",vadd_psddr[shm_ev.Ubuf[index]]);
+    if(index> 0) printf("( %08x ",vadd_psddr[shm_ev.Ubuf[index-1]]);
+    else  printf("( %08x ",vadd_psddr[shm_ev.Ubuf[BUFSIZE-1]]);
+    if(index < (BUFSIZE-1)) printf( " %08x)\n",vadd_psddr[shm_ev.Ubuf[index+1]]);
+    else printf( " %08x)\n",vadd_psddr[shm_ev.Ubuf[0]]);
+    return(0);
   }
-  //printf("Sending event succeeded\n");
+  evt[EVT_EVT_ID] = t3_id;
+  trflag = 0;
+  if(evttype == DU_GET_MINBIAS_EVENT)trflag = TRIGGER_T3_MINBIAS;
+  if(evttype == DU_GET_RANDOM_EVENT)trflag = TRIGGER_T3_RANDOM;
+  length =evt[EVT_LENGTH]>>16;
+  evt[EVT_TRIGGER_STAT] = ((trflag&0xffff)<<16)+(evt[EVT_TRIGGER_STAT]&0xffff);
+  if(run == 1){
+    DU_output[1] = length+2; //event + 2 words (length+tag)
+    DU_output[2] = DU_EVENT; // tag
+    DU_output[0] = DU_output[1]+3; //add 2 tail words, and length word
+    //printf("Sending T3 event %d\n",DU_output[1]);
+    socket_send((char *)DU_output,3*INTSIZE);
+    socket_send((char *)evt,length*INTSIZE);
+    //memcpy(&DU_output[3],evt,length*sizeof(uint32_t));
+    //printf("Send_T3 %d %d %x %x\n",DU_output[1],DU_output[2],DU_output[3],DU_output[4]);
+    DU_output[0] = GRND1;
+    DU_output[1] = GRND2;
+    socket_send((char *)&DU_output[0],2*INTSIZE);
+    //length = 2*DU_output[0]+2; //next we need the length in bytes
+  }
   return(1);
 }
 
@@ -576,11 +532,11 @@ int send_t3_event()
  * \brief interpreting DAQ commands for fpga
  * - while there is a command in shared memory
  *    - get the command tag
- *      - on DU_BOOT, DU_RESET and DU_INITIALIZE initialize the scope and set parameters
- *      - on DU_START start run
- *      - on DU_STOP stop run
- *      - on DU_CALIBRATE perform calibration
- *      - no other commands are implemented
+ *      - on DU_BOOT, DU_RESET and DU_INITIALIZE 
+ *                 - creates file /Dudef.sh with all required devmem commands to initialize the fpga
+ *                 - sources this file
+ *                 - file is also used when booting the board
+ *      - no other commands are implemented here
  *    - remove "to be executed" mark for this command
  *    - go to next command in shared memory
  *
@@ -589,19 +545,15 @@ int send_t3_event()
 
 void du_scope_check_commands()
 {
-  uint16_t *msg_start;
-  uint16_t msg_tag,msg_len,addr;
+  uint32_t *msg_start;
+  uint32_t msg_tag,msg_len,addr;
   uint32_t il;
-  uint16_t *sl = (uint16_t *)shadowlist;
-  du_geteventbody *getevt;
-  uint32_t ssec;
-  uint16_t trflag;
   FILE *fp;
   
   //printf("Check cmds %d\n",*shm_cmd.next_read);
   while(((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)]) &1) ==  1){ // loop over the T3 input
     //printf("Received command\n");
-    msg_start = (uint16_t *)(&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)+1]));
+    msg_start = (uint32_t *)(&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)+1]));
     msg_len = msg_start[AMSG_OFFSET_LENGTH];
     msg_tag = msg_start[AMSG_OFFSET_TAG];
     
@@ -609,45 +561,23 @@ void du_scope_check_commands()
       case DU_BOOT:
       case DU_RESET:
       case DU_INITIALIZE:
-        printf("Initializing scope\n");
-        scope_initialize(&station_id); // resets and initialize scope
-        il = 3;
+        il = 2;
         fp = fopen("/DUdef.sh","w");
         fprintf(fp,"#/bin/sh\n");
-        while(il<msg_len){ //word swapping
+        while(il<(msg_len-2)){ 
           addr = msg_start[il+1]>>1;
           //if((addr&1))addr -=1;
           //else addr+=1;
-          if(msg_start[il+1]<Reg_End) sl[addr] = msg_start[il+2];
-          if((addr%4) == 2){
-            fprintf(fp,"devmem 0x%x 32 0x%08x\n",0x80000000+addr-2,shadowlist[addr>>2]);
-            fprintf(fp,"sleep 0.1\n");
-          }
-          il+=3;
+          //if(msg_start[il+1]<127) sl[addr] = msg_start[il+2];
+          fprintf(fp,"devmem 0x%x 32 0x%08x\n",0x80000000+(msg_start[il+1]>>16),msg_start[il+2]);
+          fprintf(fp,"sleep 0.1\n");
+          il+=2;
         }
         fclose(fp);
-        scope_copy_shadow();
-        scope_create_memory();
-        break;
-      case DU_START:
-        printf("Trying to start a run\n");
-        scope_start_run();                  // start the run
-        run = 1;
-        break;
-      case DU_STOP:
-        scope_stop_run();                  // stop the run
-        run = 0;
-        break;
-      case DU_GETEVENT:                 // request event
-      case DU_GET_MINBIAS_EVENT:                 // request event
-      case DU_GET_RANDOM_EVENT:                 // request event
-        getevt = (du_geteventbody *)&msg_start[AMSG_OFFSET_BODY];
-        trflag = 0;
-        if(msg_tag == DU_GET_MINBIAS_EVENT)trflag = TRIGGER_T3_MINBIAS;
-        if(msg_tag == DU_GET_RANDOM_EVENT)trflag = TRIGGER_T3_RANDOM;
-        ssec = (getevt->NS3+(getevt->NS2<<8)+(getevt->NS1<<16));
-        printf("Requesting Event %d %d %d %d (%d)\n",getevt->event_nr,msg_tag,getevt->sec,ssec,*shm_cmd.next_read);
-        scope_event_to_shm(getevt->event_nr,trflag,getevt->sec,ssec);
+        system("source /DUdef.sh\n"); 
+        sleep(5);
+        printf("Initializing scope\n");
+        scope_initialize(); // resets and initialize scope
         break;
       default:
         printf("Received unimplemented message %d\n",msg_tag);
@@ -661,16 +591,11 @@ void du_scope_check_commands()
 /*!
  \fn void du_scope_main()
  * \brief main fpga handling routine
- * - opens connection to fpga
- * - enables the pps and sending of data
- * - stop the run
+ *
  * - continuous while loop
  *    - when running:
- *      - read data, on error flush the connection
- *      - if there is no data for 20 sec, give start run command to fpga
- *    - when not running
- *      - read data from fpga, do not update the ringbuffer
- *    - check if there has been a command from the DAQ
+ *      - read data,
+ *      - check if there has been a command from the DAQ
  *
  * \author C. Timmermans
  */
@@ -679,34 +604,21 @@ void du_scope_main()
 {
   int i;
   
-  scope_open();           // open connection to the scope
-  scope_stop_run(); // we will not start in running mode for now
-  run = 0; // this is because of recovery from crashes
   while(stop_process == 0){
-    if(run){
-      if((i =scope_run_read(&station_id)) < 0){
-        scope_flush();
-        printf("Error reading scope %d\n",i);  // read out the scope
-      }
-    }else{
-      scope_no_run_read();                   // read out scope without updating ringbuffer
+    if((i =scope_read()) < 0){
+      //scope_flush();
+      printf("Error reading scope %d\n",i);  // read out the scope
     }
     du_scope_check_commands();
   }
 }
 
-// void du_monitor_main()
-// {
-//   monitor_open();
-//   while(1){
-//     monitor_read();
-//   }
-// }
 
 /*!
  \fn void du_get_station_id()
  * Obtains station id from the ip address of the machine.
- * The ip address can be found in /etc/network/interfaces
+ * The ip address can be obtained from the eth0 interface
+ * If the network address does not start with 10., the routine returns -1
  *
  * \author C. Timmermans
  */
@@ -735,12 +647,13 @@ void du_get_station_id()
   ioctl(fd, SIOCGIFADDR, &ifr);
   /*closing fd*/
   close(fd);
-  strcpy(ip_address, inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+  strcpy((char *)ip_address, inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
   
   printf("System IP Address is: %s\n", ip_address);
-  if(sscanf(ip_address,"%d.%d.%d.%d",&n1,&n2,&n3,&n4) == 4){
+  if(sscanf((char *)ip_address,"%d.%d.%d.%d",&n1,&n2,&n3,&n4) == 4){
     station_id = n4;
   }
+  if(n1 != 10) station_id = -1; //dangerous!
   if(station_id ==0) station_id = -1;
   printf("Read station %d\n",station_id);
   return;
@@ -760,36 +673,26 @@ void du_get_station_id()
 }
 
 /*!
- \fn void du_socket_main(int argc,char **argv)
+ \fn void du_socket_main()
  * \brief Handles all communication with the IP socket.
  * - Opens a connection to the central DAQ
  *  - In an infinite loop
- *     - Every 0.3 seconds
- *       - Send requested events
- *       - Check commands from the central DAQ
- *       - send data to the central DAQ
- *     - If there has not been contact for 20 seconds
- *       - reboot the PC
+ *     - Every 0.2 seconds
+ *        - Check commands from the central DAQ
+ *       - send T2-data to the central DAQ
  *     - If there has not been contact for 13 seconds
  *       - close and reopen the socket
  *
  * \author C. Timmermans
  */
-void du_socket_main(int argc,char **argv)
+void du_socket_main()
 {
-  int i=0,du_port=DU_PORT;
+  int du_port=DU_PORT;
   struct timeval tprev,tnow,tcontact;
   struct timezone tzone;
   float tdif,tdifc;
   int prev_msg = 0;
-  int prevgps = -1;
-  uint32_t tgpsprev=0;
-#ifdef Fake
-  if(argc >= 2) {
-    sscanf(argv[1],"%d",&du_port);
-    if(du_port == -1) du_port = DU_PORT;
-  }
-#endif
+
   printf("Opening Connection %d\n",du_port);
   if(make_server_connection(du_port) < 0) {  // connect to DAQ
     printf("Cannot open sockets\n");
@@ -803,12 +706,10 @@ void du_socket_main(int argc,char **argv)
     //printf("In the main loop\n");
     gettimeofday(&tnow,&tzone);
     tdif = (float)(tnow.tv_sec-tprev.tv_sec)+(float)( tnow.tv_usec-tprev.tv_usec)/1000000.;
-    if(tdif>=0.2 || prev_msg == 1 ){                          // every 0.3 seconds, this is really only needed for phase2
-      i = 0;
-      while(send_t3_event() > 0 &&i<1) i++;
+    if(tdif>=0.2 ){//|| prev_msg == 1 ){                          // every 0.2 seconds, this is really only needed for phase2
       prev_msg = 0;
       //printf("Check server data\n");
-      if(check_server_data() > 0){  // check on an Adaq command
+      while(check_server_data() > 0){  // check on an Adaq command
         //printf("handled server data\n");
         tcontact.tv_sec = tnow.tv_sec;
         tcontact.tv_usec = tnow.tv_usec;
@@ -820,17 +721,6 @@ void du_socket_main(int argc,char **argv)
       }
       tprev.tv_sec = tnow.tv_sec;
       tprev.tv_usec = tnow.tv_usec;
-    }
-    if(tgpsprev == 0) tgpsprev = tnow.tv_sec;
-    if((tnow.tv_sec-tgpsprev)>20){
-      if(*(shm_gps.next_read) != *(shm_gps.next_write)){
-        if(*(shm_gps.next_write) == prevgps){
-          printf("There used to be a reboot due to timeout on socket\n");
-          //  system("/sbin/reboot");
-        }
-        prevgps = *(shm_gps.next_write);
-      }
-      tgpsprev = tnow.tv_sec;
     }
     tdifc = (float)(tnow.tv_sec-tcontact.tv_sec)+(float)( tnow.tv_usec-tcontact.tv_usec)/1000000.;
     if(tdifc>13.){ // no contact for 13 seconds!
@@ -853,11 +743,12 @@ void du_socket_main(int argc,char **argv)
   }
 }
 
-/*! 
+/*!
  \fn int main(int argc, char **argv)
  * main program:
  * - Initializes responses to signals
- * - read station ID from hosts file
+ * - get station ID from ip-address, start with 10.
+ * - Opens the connection to the DDR memory, this way this memory is available to all child processes
  * - Create shared memories
  * - Create child processes for:
  *   - Reading/writing IP-sockets
@@ -880,58 +771,39 @@ int main(int argc, char **argv)
   signal(SIGABRT,clean_stop);
   signal(SIGKILL,clean_stop);
   
-#ifndef Fake
   i = 0;
   while(station_id <= 0 && i < 60) {
     du_get_station_id();
-    if(station_id <=0) sleep(1);
+    if(station_id <=0) sleep(2);
     i++;
   }
-#else
-  if(argc < 2) station_id = DU_PORT;
-  else sscanf(argv[1],"%d",&station_id);
-#endif
-  if(ad_shm_create(&shm_ev,MAXT3,MAX_READOUT) <0){ //ad_shm_create is in shorts!
+
+  if(ad_shm_create(&shm_ev,BUFSIZE,1) <0){
     printf("Cannot create T3  shared memory !!\n");
     exit(-1);
   }
   *(shm_ev.next_read) = 0;
   *(shm_ev.next_write) = 0;
-  if(ad_shm_create(&shm_ts,BUFSIZE,sizeof(TS_DATA)/sizeof(uint16_t)) <0){ //ad_shm_create is in shorts!
-    printf("Cannot create Timestamp shared memory !!\n");
-    exit(-1);
-  }
-  *(shm_ts.next_read) = 0;
-  *(shm_ts.next_write) = 0;
-  timestampbuf = (TS_DATA *)shm_ts.Ubuf;
-  if(ad_shm_create(&shm_gps,GPSSIZE,sizeof(GPS_DATA)/sizeof(uint16_t)) <0){ //ad_shm_create is in shorts!
+  if(ad_shm_create(&shm_gps,GPSSIZE,1) <0){
     printf("Cannot create GPS shared memory !!\n");
     exit(-1);
   }
   *(shm_gps.next_read) = 0;
   *(shm_gps.next_write) = 0;
-  gpsbuf = (GPS_DATA *) shm_gps.Ubuf;
-  if(ad_shm_create(&shm_cmd,MSGSTOR,MAXMSGSIZE) <0){
+  if(ad_shm_create(&shm_cmd,MSGSTOR,sizeof(int)) <0){
     printf("Cannot create CMD shared memory !!\n");
     exit(-1);
   }
-  // if(ad_shm_create(&shm_mon,MONBUF,N_MON) <0){
-  //     printf("Cannot create Monitor shared memory !!\n");
-  //     exit(-1);
-  // }
+  scope_open();
   if((pid_scope = fork()) == 0) du_scope_main();
-  // if((pid_monitor = fork()) == 0) du_monitor_main(argc,argv);
-  if((pid_socket = fork()) == 0) du_socket_main(argc,argv);
+  if((pid_socket = fork()) == 0) du_socket_main();
   while(stop_process == 0){
     pid = waitpid (WAIT_ANY, &status, 0);
     if(pid == pid_scope && stop_process == 0) {
       if((pid_scope = fork()) == 0) du_scope_main();
     }
-    //      if(pid == pid_monitor && stop_process == 0) {
-    // if((pid_monitor = fork()) == 0) du_monitor_main();
-    //      }
     if(pid == pid_socket && stop_process == 0) {
-      if((pid_socket = fork()) == 0) du_socket_main(argc,argv);
+      if((pid_socket = fork()) == 0) du_socket_main();
     }
     sleep(1);
   }

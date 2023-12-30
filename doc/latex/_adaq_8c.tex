@@ -1,0 +1,275 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/\+Adaq/\+Adaq.c File Reference}
+\hypertarget{_adaq_8c}{}\label{_adaq_8c}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.c}}
+
+
+DAQ Main project.  
+
+
+{\ttfamily \#include $<$sys/types.\+h$>$}\newline
+{\ttfamily \#include $<$sys/wait.\+h$>$}\newline
+{\ttfamily \#include $<$sys/stat.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$signal.\+h$>$}\newline
+{\ttfamily \#include "{}Adaq.\+h"{}}\newline
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_adaq_8c_a0ee62c8205b5b75125a13b17ab94d0fd}\label{_adaq_8c_a0ee62c8205b5b75125a13b17ab94d0fd} 
+\#define {\bfseries \+\_\+\+MAINDAQ}
+\item 
+\Hypertarget{_adaq_8c_ac5c94d4acb22a5e925beb2fdbcdabf49}\label{_adaq_8c_ac5c94d4acb22a5e925beb2fdbcdabf49} 
+\#define {\bfseries DU\+\_\+\+PORT}~5001
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{_adaq_8c_a7095f447803e19fdc6d6c62b0d45152a}{du\+\_\+main}} ()
+\begin{DoxyCompactList}\small\item\em main steering routine for the socket handling ignore SIGPIPE connecting to all detector units read from detector units write to detector units connect to all \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq_8c_a74a57fdde205738fd7ef54608de17606}{t3\+\_\+main}} ()
+\item 
+void \mbox{\hyperlink{_adaq_8c_acacb5dca2a2355ff9bab4e5812269e56}{eb\+\_\+main}} ()
+\item 
+void \mbox{\hyperlink{_adaq_8c_aeb2e1601d36246a534a09742b6676a73}{ui\+\_\+main}} ()
+\item 
+void \mbox{\hyperlink{_adaq_8c_a153b946aabe02576231eb44476c8312c}{gui\+\_\+main}} ()
+\item 
+void \mbox{\hyperlink{_adaq_8c_a4c013f26e92b41be52cc066ce2b05520}{remove\+\_\+shared\+\_\+memory}} ()
+\begin{DoxyCompactList}\small\item\em deletes all shared memories \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{_adaq_8c_a0e7526227a6d67734cfd602e2614111e}{clean\+\_\+stop}} (int signum)
+\begin{DoxyCompactList}\small\item\em kill processes \end{DoxyCompactList}\item 
+pid\+\_\+t \mbox{\hyperlink{_adaq_8c_adc3ddf07005dc64cdff0a11d6b70bdea}{ad\+\_\+spawn\+\_\+du}} ()
+\item 
+pid\+\_\+t \mbox{\hyperlink{_adaq_8c_af161d40a0246dc0957a172b2c5ecccb5}{ad\+\_\+spawn\+\_\+t3}} ()
+\item 
+pid\+\_\+t \mbox{\hyperlink{_adaq_8c_a5c83ba624985910c8d6f2a0b53ad8b4f}{ad\+\_\+spawn\+\_\+eb}} ()
+\item 
+pid\+\_\+t \mbox{\hyperlink{_adaq_8c_a3e10ab1a20ca0d856d7af11ce54e1914}{ad\+\_\+spawn\+\_\+ui}} ()
+\item 
+pid\+\_\+t \mbox{\hyperlink{_adaq_8c_a5ce9c583308daecd0bf4708847b5913c}{ad\+\_\+spawn\+\_\+gui}} ()
+\item 
+int \mbox{\hyperlink{_adaq_8c_a41d75e78dcfd749bf915dca835d3ae86}{ad\+\_\+init\+\_\+param}} (char \texorpdfstring{$\ast$}{*}file)
+\item 
+void \mbox{\hyperlink{_adaq_8c_a6d59fd3be8562c7b75ed31ce7466915e}{ad\+\_\+initialize}} (char \texorpdfstring{$\ast$}{*}file)
+\item 
+void \mbox{\hyperlink{_adaq_8c_a74e9e27b530bbd818e2005ed63b0c6e2}{ad\+\_\+check\+\_\+processes}} ()
+\item 
+int \mbox{\hyperlink{_adaq_8c_a3c04138a5bfe5d72780bb7e82a18e627}{main}} (int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}argv)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{_adaq_8c_a41f587a1d5403324a9915a7c6594586e}\label{_adaq_8c_a41f587a1d5403324a9915a7c6594586e} 
+pid\+\_\+t {\bfseries pid\+\_\+du}
+\item 
+\Hypertarget{_adaq_8c_a696ccb6e6dc97dca1e9d432f0d944e7f}\label{_adaq_8c_a696ccb6e6dc97dca1e9d432f0d944e7f} 
+pid\+\_\+t {\bfseries pid\+\_\+t3}
+\item 
+\Hypertarget{_adaq_8c_ab00070b387e93b331fce7ce4380ad3ee}\label{_adaq_8c_ab00070b387e93b331fce7ce4380ad3ee} 
+pid\+\_\+t {\bfseries pid\+\_\+eb}
+\item 
+\Hypertarget{_adaq_8c_a9de303748a6bc235a0178696230861a3}\label{_adaq_8c_a9de303748a6bc235a0178696230861a3} 
+pid\+\_\+t {\bfseries pid\+\_\+ui}
+\item 
+\Hypertarget{_adaq_8c_af9e9f33b6cf51e01e361bcbb90c19417}\label{_adaq_8c_af9e9f33b6cf51e01e361bcbb90c19417} 
+pid\+\_\+t {\bfseries pid\+\_\+gui}
+\item 
+\Hypertarget{_adaq_8c_a832e9b64cbef8533a190e71ab02344fe}\label{_adaq_8c_a832e9b64cbef8533a190e71ab02344fe} 
+uint8\+\_\+t {\bfseries stop\+\_\+process} =0
+\item 
+\Hypertarget{_adaq_8c_ab50a2ed2e8f5977a8155b1cbba53c9ac}\label{_adaq_8c_ab50a2ed2e8f5977a8155b1cbba53c9ac} 
+int {\bfseries idebug} = 0
+\item 
+\Hypertarget{_adaq_8c_a761e2c812e0a5ab3b7afcbb2586d4012}\label{_adaq_8c_a761e2c812e0a5ab3b7afcbb2586d4012} 
+char \texorpdfstring{$\ast$}{*} {\bfseries configfile}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+DAQ Main project. 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{_adaq_8c_a74e9e27b530bbd818e2005ed63b0c6e2}\label{_adaq_8c_a74e9e27b530bbd818e2005ed63b0c6e2} 
+\index{Adaq.c@{Adaq.c}!ad\_check\_processes@{ad\_check\_processes}}
+\index{ad\_check\_processes@{ad\_check\_processes}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_check\_processes()}{ad\_check\_processes()}}
+{\footnotesize\ttfamily void ad\+\_\+check\+\_\+processes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+void \doxylink{_adaq_8c_a74e9e27b530bbd818e2005ed63b0c6e2}{ad\+\_\+check\+\_\+processes()}
+
+check if the several spawned processes (interface to detector units, T3\+Maker, Eventbuilder, command line and graphical interface to the user) are still alive; if not it spawns a new instance \Hypertarget{_adaq_8c_a41d75e78dcfd749bf915dca835d3ae86}\label{_adaq_8c_a41d75e78dcfd749bf915dca835d3ae86} 
+\index{Adaq.c@{Adaq.c}!ad\_init\_param@{ad\_init\_param}}
+\index{ad\_init\_param@{ad\_init\_param}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_init\_param()}{ad\_init\_param()}}
+{\footnotesize\ttfamily int ad\+\_\+init\+\_\+param (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{file }\end{DoxyParamCaption})}
+
+int \doxylink{_adaq_8c_a41d75e78dcfd749bf915dca835d3ae86}{ad\+\_\+init\+\_\+param(char \texorpdfstring{$\ast$}{*}file)} interprets the initialization file with keywords\+: DU ipaddress port EBRUN runnr EBSIZE maxevents -\/-\/\texorpdfstring{$>$}{>} maximum number of events in a file EBDIR datadir -\/-\/\texorpdfstring{$>$}{>} folder in which the data is stored EBSITE sitename -\/-\/\texorpdfstring{$>$}{>} site where data is taken T3\+RAND randfrac -\/-\/\texorpdfstring{$>$}{>} one T2 in every randfrac events is raised to a T3 \Hypertarget{_adaq_8c_a6d59fd3be8562c7b75ed31ce7466915e}\label{_adaq_8c_a6d59fd3be8562c7b75ed31ce7466915e} 
+\index{Adaq.c@{Adaq.c}!ad\_initialize@{ad\_initialize}}
+\index{ad\_initialize@{ad\_initialize}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_initialize()}{ad\_initialize()}}
+{\footnotesize\ttfamily void ad\+\_\+initialize (\begin{DoxyParamCaption}\item[{char \texorpdfstring{$\ast$}{*}}]{file }\end{DoxyParamCaption})}
+
+void \doxylink{_adaq_8c_a6d59fd3be8562c7b75ed31ce7466915e}{ad\+\_\+initialize(char \texorpdfstring{$\ast$}{*}file)}
+
+Initializes the main daq\+:
+\begin{DoxyItemize}
+\item read parameters from the initialization file
+\item create the T2 shared memory
+\item create the T3 shared memory
+\item create event shared memory
+\item create a shared memory for commands
+\item spawn the T3 maker, event builder, interface to the detector units, graphical and command line interfaces to the user 
+\end{DoxyItemize}\Hypertarget{_adaq_8c_adc3ddf07005dc64cdff0a11d6b70bdea}\label{_adaq_8c_adc3ddf07005dc64cdff0a11d6b70bdea} 
+\index{Adaq.c@{Adaq.c}!ad\_spawn\_du@{ad\_spawn\_du}}
+\index{ad\_spawn\_du@{ad\_spawn\_du}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_spawn\_du()}{ad\_spawn\_du()}}
+{\footnotesize\ttfamily pid\+\_\+t ad\+\_\+spawn\+\_\+du (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+pid\+\_\+t \doxylink{_adaq_8c_adc3ddf07005dc64cdff0a11d6b70bdea}{ad\+\_\+spawn\+\_\+du()} creates a new instance of the interface to the detector units \Hypertarget{_adaq_8c_a5c83ba624985910c8d6f2a0b53ad8b4f}\label{_adaq_8c_a5c83ba624985910c8d6f2a0b53ad8b4f} 
+\index{Adaq.c@{Adaq.c}!ad\_spawn\_eb@{ad\_spawn\_eb}}
+\index{ad\_spawn\_eb@{ad\_spawn\_eb}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_spawn\_eb()}{ad\_spawn\_eb()}}
+{\footnotesize\ttfamily pid\+\_\+t ad\+\_\+spawn\+\_\+eb (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+pid\+\_\+t \doxylink{_adaq_8c_a5c83ba624985910c8d6f2a0b53ad8b4f}{ad\+\_\+spawn\+\_\+eb()} creates a new instance of the event builder \Hypertarget{_adaq_8c_a5ce9c583308daecd0bf4708847b5913c}\label{_adaq_8c_a5ce9c583308daecd0bf4708847b5913c} 
+\index{Adaq.c@{Adaq.c}!ad\_spawn\_gui@{ad\_spawn\_gui}}
+\index{ad\_spawn\_gui@{ad\_spawn\_gui}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_spawn\_gui()}{ad\_spawn\_gui()}}
+{\footnotesize\ttfamily pid\+\_\+t ad\+\_\+spawn\+\_\+gui (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+pid\+\_\+t \doxylink{_adaq_8c_a5ce9c583308daecd0bf4708847b5913c}{ad\+\_\+spawn\+\_\+gui()} creates a new instance of the interface to the graphical user interface \Hypertarget{_adaq_8c_af161d40a0246dc0957a172b2c5ecccb5}\label{_adaq_8c_af161d40a0246dc0957a172b2c5ecccb5} 
+\index{Adaq.c@{Adaq.c}!ad\_spawn\_t3@{ad\_spawn\_t3}}
+\index{ad\_spawn\_t3@{ad\_spawn\_t3}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_spawn\_t3()}{ad\_spawn\_t3()}}
+{\footnotesize\ttfamily pid\+\_\+t ad\+\_\+spawn\+\_\+t3 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+pid\+\_\+t \doxylink{_adaq_8c_af161d40a0246dc0957a172b2c5ecccb5}{ad\+\_\+spawn\+\_\+t3()} creates a new instance of the T3 maker \Hypertarget{_adaq_8c_a3e10ab1a20ca0d856d7af11ce54e1914}\label{_adaq_8c_a3e10ab1a20ca0d856d7af11ce54e1914} 
+\index{Adaq.c@{Adaq.c}!ad\_spawn\_ui@{ad\_spawn\_ui}}
+\index{ad\_spawn\_ui@{ad\_spawn\_ui}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ad\_spawn\_ui()}{ad\_spawn\_ui()}}
+{\footnotesize\ttfamily pid\+\_\+t ad\+\_\+spawn\+\_\+ui (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+pid\+\_\+t \doxylink{_adaq_8c_a3e10ab1a20ca0d856d7af11ce54e1914}{ad\+\_\+spawn\+\_\+ui()} creates a new instance of the command line interface \Hypertarget{_adaq_8c_a0e7526227a6d67734cfd602e2614111e}\label{_adaq_8c_a0e7526227a6d67734cfd602e2614111e} 
+\index{Adaq.c@{Adaq.c}!clean\_stop@{clean\_stop}}
+\index{clean\_stop@{clean\_stop}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{clean\_stop()}{clean\_stop()}}
+{\footnotesize\ttfamily void clean\+\_\+stop (\begin{DoxyParamCaption}\item[{int}]{signum }\end{DoxyParamCaption})}
+
+
+
+kill processes 
+
+void r clean\+\_\+stop (int signum) removes all attached shared memories and remove all spawned processes
+
+
+\begin{DoxyParams}{Parameters}
+{\em signum} & input signal (not used) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyAuthor}{Author}
+C. Timmermans kill child processes and perform a clean stop to clean up shared memory 
+\end{DoxyAuthor}
+\Hypertarget{_adaq_8c_a7095f447803e19fdc6d6c62b0d45152a}\label{_adaq_8c_a7095f447803e19fdc6d6c62b0d45152a} 
+\index{Adaq.c@{Adaq.c}!du\_main@{du\_main}}
+\index{du\_main@{du\_main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{du\_main()}{du\_main()}}
+{\footnotesize\ttfamily void du\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+main steering routine for the socket handling ignore SIGPIPE connecting to all detector units read from detector units write to detector units connect to all 
+
+\textbackslash{}func void \doxylink{du_8c_a7095f447803e19fdc6d6c62b0d45152a}{du\+\_\+main()} \Hypertarget{_adaq_8c_acacb5dca2a2355ff9bab4e5812269e56}\label{_adaq_8c_acacb5dca2a2355ff9bab4e5812269e56} 
+\index{Adaq.c@{Adaq.c}!eb\_main@{eb\_main}}
+\index{eb\_main@{eb\_main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{eb\_main()}{eb\_main()}}
+{\footnotesize\ttfamily void eb\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+void eb\+\_\+main()
+
+main eventbuilder loop. Get data from the (graphical) user interface Get data from the T3\+Maker Get data from the DUs Write events to file \Hypertarget{_adaq_8c_a153b946aabe02576231eb44476c8312c}\label{_adaq_8c_a153b946aabe02576231eb44476c8312c} 
+\index{Adaq.c@{Adaq.c}!gui\_main@{gui\_main}}
+\index{gui\_main@{gui\_main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{gui\_main()}{gui\_main()}}
+{\footnotesize\ttfamily void gui\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+void gui\+\_\+main()
+
+Create a TCP/\+IP socket wait for connections read command close connection \Hypertarget{_adaq_8c_a3c04138a5bfe5d72780bb7e82a18e627}\label{_adaq_8c_a3c04138a5bfe5d72780bb7e82a18e627} 
+\index{Adaq.c@{Adaq.c}!main@{main}}
+\index{main@{main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}}]{argv }\end{DoxyParamCaption})}
+
+int main(int argc, char \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}argv)
+
+Main program; first kills possible remnants of earlier instances. Afterwards it reads the configuration file and start the T3 maker, Event builder, Detector Unit communication and User interfaces. While the main DAQ process is alive it checks the state of the child processes.
+
+Possible parameter\+: name of the configuration file
+
+main program\+:
+\begin{DoxyItemize}
+\item Initializes responses to signals
+\item get station ID from ip-\/address, start with 10.
+\item Opens the connection to the DDR memory, this way this memory is available to all child processes
+\item Create shared memories
+\item Create child processes for\+:
+\begin{DoxyItemize}
+\item Reading/writing IP-\/sockets
+\item Reading/writing the scope
+\end{DoxyItemize}
+\item Restart these processes when needed
+\item After a stop is requested through an interrupt, clean up shared memories
+\end{DoxyItemize}
+
+
+\begin{DoxyParams}{Parameters}
+{\em argc} & Number of arguments when starting the program (not used) \\
+\hline
+{\em argv} & character string of arguments (not used) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyAuthor}{Author}
+C. Timmermans 
+\end{DoxyAuthor}
+\Hypertarget{_adaq_8c_a4c013f26e92b41be52cc066ce2b05520}\label{_adaq_8c_a4c013f26e92b41be52cc066ce2b05520} 
+\index{Adaq.c@{Adaq.c}!remove\_shared\_memory@{remove\_shared\_memory}}
+\index{remove\_shared\_memory@{remove\_shared\_memory}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{remove\_shared\_memory()}{remove\_shared\_memory()}}
+{\footnotesize\ttfamily remove\+\_\+shared\+\_\+memory (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+deletes all shared memories 
+
+void remove\+\_\+shared\+\_\+memory()
+
+removes all central DAQ shared memories\+: t2, t3, event builder and commands
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans 
+\end{DoxyAuthor}
+\Hypertarget{_adaq_8c_a74a57fdde205738fd7ef54608de17606}\label{_adaq_8c_a74a57fdde205738fd7ef54608de17606} 
+\index{Adaq.c@{Adaq.c}!t3\_main@{t3\_main}}
+\index{t3\_main@{t3\_main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{t3\_main()}{t3\_main()}}
+{\footnotesize\ttfamily void t3\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+void t3\+\_\+main()
+
+infinite loop\+: gett2 and maket3 \Hypertarget{_adaq_8c_aeb2e1601d36246a534a09742b6676a73}\label{_adaq_8c_aeb2e1601d36246a534a09742b6676a73} 
+\index{Adaq.c@{Adaq.c}!ui\_main@{ui\_main}}
+\index{ui\_main@{ui\_main}!Adaq.c@{Adaq.c}}
+\doxysubsubsection{\texorpdfstring{ui\_main()}{ui\_main()}}
+{\footnotesize\ttfamily void ui\+\_\+main (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+void ui\+\_\+main()
+
+prints prompt continuous loop waiting for input on the command line. Sends the following commands to the DAQ\+: STOP\+\_\+\+RUN START\+\_\+\+RUN INITIALIZE 

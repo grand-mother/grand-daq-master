@@ -1,0 +1,113 @@
+\indexentry{grand-\/daq-\/master@{grand-\/daq-\/master}|hyperpage}{1}
+\indexentry{AMSG@{AMSG}|hyperpage}{7}
+\indexentry{DUInfo@{DUInfo}|hyperpage}{7}
+\indexentry{EVHDR@{EVHDR}|hyperpage}{8}
+\indexentry{FILEHDR@{FILEHDR}|hyperpage}{8}
+\indexentry{GPS\_DATA@{GPS\_DATA}|hyperpage}{8}
+\indexentry{shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!buf@{buf}|hyperpage}{9}
+\indexentry{buf@{buf}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!nbuf@{nbuf}|hyperpage}{9}
+\indexentry{nbuf@{nbuf}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!next\_read@{next\_read}|hyperpage}{9}
+\indexentry{next\_read@{next\_read}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!next\_readb@{next\_readb}|hyperpage}{9}
+\indexentry{next\_readb@{next\_readb}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!next\_write@{next\_write}|hyperpage}{9}
+\indexentry{next\_write@{next\_write}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!shmid@{shmid}|hyperpage}{9}
+\indexentry{shmid@{shmid}!shm\_struct@{shm\_struct}|hyperpage}{9}
+\indexentry{shm\_struct@{shm\_struct}!size@{size}|hyperpage}{10}
+\indexentry{size@{size}!shm\_struct@{shm\_struct}|hyperpage}{10}
+\indexentry{shm\_struct@{shm\_struct}!Ubuf@{Ubuf}|hyperpage}{10}
+\indexentry{Ubuf@{Ubuf}!shm\_struct@{shm\_struct}|hyperpage}{10}
+\indexentry{T2evts@{T2evts}|hyperpage}{10}
+\indexentry{T3BODY@{T3BODY}|hyperpage}{11}
+\indexentry{T3STATION@{T3STATION}|hyperpage}{11}
+\indexentry{TS\_DATA@{TS\_DATA}|hyperpage}{11}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.c}|hyperpage}{13}
+\indexentry{Adaq.c@{Adaq.c}!ad\_check\_processes@{ad\_check\_processes}|hyperpage}{14}
+\indexentry{ad\_check\_processes@{ad\_check\_processes}!Adaq.c@{Adaq.c}|hyperpage}{14}
+\indexentry{Adaq.c@{Adaq.c}!ad\_init\_param@{ad\_init\_param}|hyperpage}{14}
+\indexentry{ad\_init\_param@{ad\_init\_param}!Adaq.c@{Adaq.c}|hyperpage}{14}
+\indexentry{Adaq.c@{Adaq.c}!ad\_initialize@{ad\_initialize}|hyperpage}{14}
+\indexentry{ad\_initialize@{ad\_initialize}!Adaq.c@{Adaq.c}|hyperpage}{14}
+\indexentry{Adaq.c@{Adaq.c}!ad\_spawn\_du@{ad\_spawn\_du}|hyperpage}{15}
+\indexentry{ad\_spawn\_du@{ad\_spawn\_du}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!ad\_spawn\_eb@{ad\_spawn\_eb}|hyperpage}{15}
+\indexentry{ad\_spawn\_eb@{ad\_spawn\_eb}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!ad\_spawn\_gui@{ad\_spawn\_gui}|hyperpage}{15}
+\indexentry{ad\_spawn\_gui@{ad\_spawn\_gui}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!ad\_spawn\_t3@{ad\_spawn\_t3}|hyperpage}{15}
+\indexentry{ad\_spawn\_t3@{ad\_spawn\_t3}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!ad\_spawn\_ui@{ad\_spawn\_ui}|hyperpage}{15}
+\indexentry{ad\_spawn\_ui@{ad\_spawn\_ui}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!clean\_stop@{clean\_stop}|hyperpage}{15}
+\indexentry{clean\_stop@{clean\_stop}!Adaq.c@{Adaq.c}|hyperpage}{15}
+\indexentry{Adaq.c@{Adaq.c}!du\_main@{du\_main}|hyperpage}{16}
+\indexentry{du\_main@{du\_main}!Adaq.c@{Adaq.c}|hyperpage}{16}
+\indexentry{Adaq.c@{Adaq.c}!eb\_main@{eb\_main}|hyperpage}{16}
+\indexentry{eb\_main@{eb\_main}!Adaq.c@{Adaq.c}|hyperpage}{16}
+\indexentry{Adaq.c@{Adaq.c}!gui\_main@{gui\_main}|hyperpage}{16}
+\indexentry{gui\_main@{gui\_main}!Adaq.c@{Adaq.c}|hyperpage}{16}
+\indexentry{Adaq.c@{Adaq.c}!main@{main}|hyperpage}{16}
+\indexentry{main@{main}!Adaq.c@{Adaq.c}|hyperpage}{16}
+\indexentry{Adaq.c@{Adaq.c}!remove\_shared\_memory@{remove\_shared\_memory}|hyperpage}{17}
+\indexentry{remove\_shared\_memory@{remove\_shared\_memory}!Adaq.c@{Adaq.c}|hyperpage}{17}
+\indexentry{Adaq.c@{Adaq.c}!t3\_main@{t3\_main}|hyperpage}{17}
+\indexentry{t3\_main@{t3\_main}!Adaq.c@{Adaq.c}|hyperpage}{17}
+\indexentry{Adaq.c@{Adaq.c}!ui\_main@{ui\_main}|hyperpage}{17}
+\indexentry{ui\_main@{ui\_main}!Adaq.c@{Adaq.c}|hyperpage}{17}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.h}|hyperpage}{18}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/du.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/du.c}|hyperpage}{19}
+\indexentry{du.c@{du.c}!du\_connect@{du\_connect}|hyperpage}{20}
+\indexentry{du\_connect@{du\_connect}!du.c@{du.c}|hyperpage}{20}
+\indexentry{du.c@{du.c}!du\_init\_and\_run@{du\_init\_and\_run}|hyperpage}{20}
+\indexentry{du\_init\_and\_run@{du\_init\_and\_run}!du.c@{du.c}|hyperpage}{20}
+\indexentry{du.c@{du.c}!du\_interpret@{du\_interpret}|hyperpage}{21}
+\indexentry{du\_interpret@{du\_interpret}!du.c@{du.c}|hyperpage}{21}
+\indexentry{du.c@{du.c}!du\_main@{du\_main}|hyperpage}{21}
+\indexentry{du\_main@{du\_main}!du.c@{du.c}|hyperpage}{21}
+\indexentry{du.c@{du.c}!du\_read@{du\_read}|hyperpage}{21}
+\indexentry{du\_read@{du\_read}!du.c@{du.c}|hyperpage}{21}
+\indexentry{du.c@{du.c}!du\_read\_initfile@{du\_read\_initfile}|hyperpage}{21}
+\indexentry{du\_read\_initfile@{du\_read\_initfile}!du.c@{du.c}|hyperpage}{21}
+\indexentry{du.c@{du.c}!du\_send@{du\_send}|hyperpage}{21}
+\indexentry{du\_send@{du\_send}!du.c@{du.c}|hyperpage}{21}
+\indexentry{du.c@{du.c}!du\_write@{du\_write}|hyperpage}{22}
+\indexentry{du\_write@{du\_write}!du.c@{du.c}|hyperpage}{22}
+\indexentry{du.c@{du.c}!set\_socketoptions@{set\_socketoptions}|hyperpage}{22}
+\indexentry{set\_socketoptions@{set\_socketoptions}!du.c@{du.c}|hyperpage}{22}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/eb.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/eb.h}|hyperpage}{22}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/ad\_shm.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/ad\_shm.h}|hyperpage}{23}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/ad\_shm.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/ad\_shm.h}|hyperpage}{23}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h}|hyperpage}{24}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h}|hyperpage}{26}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.c}|hyperpage}{27}
+\indexentry{dudaq.c@{dudaq.c}!block\_signals@{block\_signals}|hyperpage}{29}
+\indexentry{block\_signals@{block\_signals}!dudaq.c@{dudaq.c}|hyperpage}{29}
+\indexentry{dudaq.c@{dudaq.c}!check\_server\_data@{check\_server\_data}|hyperpage}{30}
+\indexentry{check\_server\_data@{check\_server\_data}!dudaq.c@{dudaq.c}|hyperpage}{30}
+\indexentry{dudaq.c@{dudaq.c}!du\_get\_station\_id@{du\_get\_station\_id}|hyperpage}{30}
+\indexentry{du\_get\_station\_id@{du\_get\_station\_id}!dudaq.c@{dudaq.c}|hyperpage}{30}
+\indexentry{dudaq.c@{dudaq.c}!du\_scope\_check\_commands@{du\_scope\_check\_commands}|hyperpage}{30}
+\indexentry{du\_scope\_check\_commands@{du\_scope\_check\_commands}!dudaq.c@{dudaq.c}|hyperpage}{30}
+\indexentry{dudaq.c@{dudaq.c}!du\_scope\_main@{du\_scope\_main}|hyperpage}{31}
+\indexentry{du\_scope\_main@{du\_scope\_main}!dudaq.c@{dudaq.c}|hyperpage}{31}
+\indexentry{dudaq.c@{dudaq.c}!du\_socket\_main@{du\_socket\_main}|hyperpage}{31}
+\indexentry{du\_socket\_main@{du\_socket\_main}!dudaq.c@{dudaq.c}|hyperpage}{31}
+\indexentry{dudaq.c@{dudaq.c}!make\_server\_connection@{make\_server\_connection}|hyperpage}{31}
+\indexentry{make\_server\_connection@{make\_server\_connection}!dudaq.c@{dudaq.c}|hyperpage}{31}
+\indexentry{dudaq.c@{dudaq.c}!send\_server\_data@{send\_server\_data}|hyperpage}{32}
+\indexentry{send\_server\_data@{send\_server\_data}!dudaq.c@{dudaq.c}|hyperpage}{32}
+\indexentry{dudaq.c@{dudaq.c}!socket\_send@{socket\_send}|hyperpage}{32}
+\indexentry{socket\_send@{socket\_send}!dudaq.c@{dudaq.c}|hyperpage}{32}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.h}|hyperpage}{33}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.c}|hyperpage}{33}
+\indexentry{scope.c@{scope.c}!scope\_read\_event@{scope\_read\_event}|hyperpage}{35}
+\indexentry{scope\_read\_event@{scope\_read\_event}!scope.c@{scope.c}|hyperpage}{35}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h}|hyperpage}{36}
+\indexentry{scope.h@{scope.h}!scope\_read\_event@{scope\_read\_event}|hyperpage}{40}
+\indexentry{scope\_read\_event@{scope\_read\_event}!scope.h@{scope.h}|hyperpage}{40}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h}|hyperpage}{40}
+\indexentry{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/tools/Traces.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/tools/Traces.h}|hyperpage}{43}

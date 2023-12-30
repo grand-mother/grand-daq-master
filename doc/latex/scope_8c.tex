@@ -1,0 +1,261 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/files/scope.c File Reference}
+\hypertarget{scope_8c}{}\label{scope_8c}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.c}}
+
+
+routines interfacing to the fpga  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$unistd.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$fcntl.\+h$>$}\newline
+{\ttfamily \#include $<$time.\+h$>$}\newline
+{\ttfamily \#include $<$sys/time.\+h$>$}\newline
+{\ttfamily \#include $<$sys/mman.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include $<$errno.\+h$>$}\newline
+{\ttfamily \#include "{}ad\+\_\+shm.\+h"{}}\newline
+{\ttfamily \#include "{}dudaq.\+h"{}}\newline
+{\ttfamily \#include "{}scope.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{scope_8c_aa4db4dee42d11a369eae58bb66251e9e}\label{scope_8c_aa4db4dee42d11a369eae58bb66251e9e} 
+void {\bfseries short\+\_\+wait} ()
+\item 
+\Hypertarget{scope_8c_a0b7f604b2fea6dfec5f5c921081f3467}\label{scope_8c_a0b7f604b2fea6dfec5f5c921081f3467} 
+unsigned int {\bfseries dma\+\_\+wr\+\_\+reg} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+virtual\+\_\+address, int offset, unsigned int value)
+\item 
+\Hypertarget{scope_8c_a13274657b618e58eb92362cd1a7c3311}\label{scope_8c_a13274657b618e58eb92362cd1a7c3311} 
+unsigned int {\bfseries dma\+\_\+rd\+\_\+reg} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+virtual\+\_\+address, int offset)
+\item 
+\Hypertarget{scope_8c_aa5d1b527aea3ade6e13e1526448448c2}\label{scope_8c_aa5d1b527aea3ade6e13e1526448448c2} 
+unsigned int {\bfseries dma\+\_\+wr\+\_\+bit} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+virtual\+\_\+address, int offset, uint8\+\_\+t bit\+No, uint8\+\_\+t bit\+Val)
+\item 
+\Hypertarget{scope_8c_a63b8dfa6a67e38808daa0c9823e9c7ed}\label{scope_8c_a63b8dfa6a67e38808daa0c9823e9c7ed} 
+unsigned int {\bfseries dma\+\_\+rd\+\_\+bit} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+virtual\+\_\+address, int offset, uint8\+\_\+t bit\+No)
+\item 
+\Hypertarget{scope_8c_aad6b641873194307ce95d8901df99511}\label{scope_8c_aad6b641873194307ce95d8901df99511} 
+void {\bfseries DUreg\+\_\+write} (uint32\+\_\+t reg\+\_\+addr, uint32\+\_\+t value)
+\item 
+\Hypertarget{scope_8c_ad0cafa07a446cc804ca6c78b29d29c09}\label{scope_8c_ad0cafa07a446cc804ca6c78b29d29c09} 
+uint32\+\_\+t {\bfseries DUreg\+\_\+read} (uint32\+\_\+t reg\+\_\+addr)
+\item 
+\Hypertarget{scope_8c_a3ebca6397507eb51af464ace55b30a33}\label{scope_8c_a3ebca6397507eb51af464ace55b30a33} 
+unsigned int {\bfseries DUreg\+\_\+rd\+\_\+bit} (uint32\+\_\+t reg\+\_\+addr, uint8\+\_\+t bit\+No)
+\item 
+\Hypertarget{scope_8c_a8d05f26854331ac45045c352d48ae91b}\label{scope_8c_a8d05f26854331ac45045c352d48ae91b} 
+unsigned int {\bfseries DUreg\+\_\+rd\+\_\+excerpt} (uint32\+\_\+t reg\+\_\+addr, uint8\+\_\+t bit\+No\+Start, uint8\+\_\+t bit\+No\+Stop)
+\item 
+\Hypertarget{scope_8c_a41cae0df766aedff3bf6913447687502}\label{scope_8c_a41cae0df766aedff3bf6913447687502} 
+unsigned int {\bfseries print\+\_\+\+CDMA\+\_\+regs} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+virtual\+\_\+address)
+\item 
+\Hypertarget{scope_8c_a14a4aa815534c1e6eca3385debfcdff9}\label{scope_8c_a14a4aa815534c1e6eca3385debfcdff9} 
+unsigned int {\bfseries print\+\_\+\+CDMA\+\_\+\+SG\+\_\+descriptors} (unsigned int \texorpdfstring{$\ast$}{*}dma\+\_\+\+SG\+\_\+virtual\+\_\+address, int offset)
+\item 
+\Hypertarget{scope_8c_a647637a036311227688cac5348790f4a}\label{scope_8c_a647637a036311227688cac5348790f4a} 
+void {\bfseries dma\+\_\+initiate} ()
+\item 
+\Hypertarget{scope_8c_afa00a8a52a6fc9d18b724ee685843ce0}\label{scope_8c_afa00a8a52a6fc9d18b724ee685843ce0} 
+int {\bfseries dma\+\_\+completion} ()
+\item 
+\Hypertarget{scope_8c_ad05316dce038194a8a59231b8ea061c6}\label{scope_8c_ad05316dce038194a8a59231b8ea061c6} 
+void {\bfseries dma\+\_\+reset} ()
+\item 
+\Hypertarget{scope_8c_af8cb1fe09b1922fa0913e2bff0a61c37}\label{scope_8c_af8cb1fe09b1922fa0913e2bff0a61c37} 
+int {\bfseries hardware\+\_\+id} ()
+\item 
+\Hypertarget{scope_8c_a9247308a7c4c77218798d40126e1b2be}\label{scope_8c_a9247308a7c4c77218798d40126e1b2be} 
+int {\bfseries scope\+\_\+open} ()
+\item 
+\Hypertarget{scope_8c_a02756ee62fea9a11b9f89c44e12a0a65}\label{scope_8c_a02756ee62fea9a11b9f89c44e12a0a65} 
+void {\bfseries scope\+\_\+close} ()
+\item 
+\Hypertarget{scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9}\label{scope_8c_ae6ea501f53ade3c79f11f9b3935e8aa9} 
+void {\bfseries scope\+\_\+start\+\_\+run} ()
+\item 
+\Hypertarget{scope_8c_ab6ad70489062a18bc3f394452758e035}\label{scope_8c_ab6ad70489062a18bc3f394452758e035} 
+void {\bfseries scope\+\_\+stop\+\_\+run} ()
+\item 
+\Hypertarget{scope_8c_a34f554820dbaa982450d7584532e11f2}\label{scope_8c_a34f554820dbaa982450d7584532e11f2} 
+void {\bfseries scope\+\_\+initialize} ()
+\item 
+\Hypertarget{scope_8c_a2d124ffd36c1e3a016ee61958a63521c}\label{scope_8c_a2d124ffd36c1e3a016ee61958a63521c} 
+int {\bfseries scope\+\_\+t2} (uint32\+\_\+t \texorpdfstring{$\ast$}{*}evt)
+\item 
+int \mbox{\hyperlink{scope_8c_af2a9c3c10b503868e736167e9c71d453}{scope\+\_\+read\+\_\+event}} (uint32\+\_\+t index)
+\item 
+\Hypertarget{scope_8c_aa8d5f49b06dbc33e2895f98ec91594bf}\label{scope_8c_aa8d5f49b06dbc33e2895f98ec91594bf} 
+int32\+\_\+t {\bfseries scope\+\_\+read\+\_\+pps} (uint32\+\_\+t index)
+\item 
+\Hypertarget{scope_8c_afcd15b300ed290a654788d2db72f1509}\label{scope_8c_afcd15b300ed290a654788d2db72f1509} 
+int {\bfseries scope\+\_\+read} ()
+\item 
+\Hypertarget{scope_8c_a1e9e1846d23748fed964091fd99a22c7}\label{scope_8c_a1e9e1846d23748fed964091fd99a22c7} 
+int {\bfseries scope\+\_\+calc\+\_\+t3nsec} ()
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{scope_8c_a13e632acd3bbf45b0e86f3b16a681e07}\label{scope_8c_a13e632acd3bbf45b0e86f3b16a681e07} 
+int32\+\_\+t {\bfseries dev} = 0
+\item 
+\Hypertarget{scope_8c_ad1a4dd288242c6ca6e150b449517b010}\label{scope_8c_ad1a4dd288242c6ca6e150b449517b010} 
+void \texorpdfstring{$\ast$}{*} {\bfseries axi\+\_\+ptr}
+\item 
+\Hypertarget{scope_8c_a0179c8ebaa94683c32ca7328a5040d33}\label{scope_8c_a0179c8ebaa94683c32ca7328a5040d33} 
+uint32\+\_\+t {\bfseries page\+\_\+offset}
+\item 
+\Hypertarget{scope_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b}\label{scope_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+ev}
+\begin{DoxyCompactList}\small\item\em shared memory containing event indices, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{scope_8c_a243df20e2497f32e6fe4835b594b2d52}\label{scope_8c_a243df20e2497f32e6fe4835b594b2d52} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+gps}
+\begin{DoxyCompactList}\small\item\em shared memory containing all GPS indices, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{scope_8c_a0a8a4b1c98c0ad55e5854a002f18caba}\label{scope_8c_a0a8a4b1c98c0ad55e5854a002f18caba} 
+int {\bfseries hw\+\_\+id} = 0
+\item 
+\Hypertarget{scope_8c_a6df3518cc59d21ff002ca20083a46dce}\label{scope_8c_a6df3518cc59d21ff002ca20083a46dce} 
+uint32\+\_\+t {\bfseries last\+\_\+sec}
+\item 
+\Hypertarget{scope_8c_a0b7a284bd04961e67ed45243f53ca21e}\label{scope_8c_a0b7a284bd04961e67ed45243f53ca21e} 
+uint32\+\_\+t {\bfseries prev\+\_\+ppsid} =0
+\item 
+\Hypertarget{scope_8c_a967e91bd9e44a1bf4c1f7d2623b8b9d1}\label{scope_8c_a967e91bd9e44a1bf4c1f7d2623b8b9d1} 
+int {\bfseries station\+\_\+id}
+\begin{DoxyCompactList}\small\item\em id of the LS, obtained from the ip address \end{DoxyCompactList}\item 
+\Hypertarget{scope_8c_a3aada873ef59246cdaf51a87bde3e5d0}\label{scope_8c_a3aada873ef59246cdaf51a87bde3e5d0} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram1}
+\item 
+\Hypertarget{scope_8c_ae328de8e229c30909cbc37b7ccf88479}\label{scope_8c_ae328de8e229c30909cbc37b7ccf88479} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram2}
+\item 
+\Hypertarget{scope_8c_a76979dd40af8876bb795c9a09c7d132b}\label{scope_8c_a76979dd40af8876bb795c9a09c7d132b} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram3}
+\item 
+\Hypertarget{scope_8c_a4aa93bc6032a30209dee437553b60989}\label{scope_8c_a4aa93bc6032a30209dee437553b60989} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram4}
+\item 
+\Hypertarget{scope_8c_a4a210de60fba7c3795bf2d135b389d5a}\label{scope_8c_a4a210de60fba7c3795bf2d135b389d5a} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram5}
+\item 
+\Hypertarget{scope_8c_a398cce30701e63be834a96fc04ca9dbb}\label{scope_8c_a398cce30701e63be834a96fc04ca9dbb} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram6}
+\item 
+\Hypertarget{scope_8c_ad54e5ef5db20e32930d4f6b85a1df69f}\label{scope_8c_ad54e5ef5db20e32930d4f6b85a1df69f} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram7}
+\item 
+\Hypertarget{scope_8c_a967e9fd7a0a4fdef03bae0a6a000a7dc}\label{scope_8c_a967e9fd7a0a4fdef03bae0a6a000a7dc} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+ram8}
+\item 
+\Hypertarget{scope_8c_ab2302974ab647009c23d6be475739bb1}\label{scope_8c_ab2302974ab647009c23d6be475739bb1} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+psddr}
+\item 
+\Hypertarget{scope_8c_a77599c25af326dca7024e7524a05b98d}\label{scope_8c_a77599c25af326dca7024e7524a05b98d} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+cdma}
+\item 
+\Hypertarget{scope_8c_adbb5c0bc04e513bf6dcee3190cbf2fe2}\label{scope_8c_adbb5c0bc04e513bf6dcee3190cbf2fe2} 
+uint32\+\_\+t \texorpdfstring{$\ast$}{*} {\bfseries vadd\+\_\+sg}
+\item 
+\Hypertarget{scope_8c_a0923d283dfbc9e171611498cfc66820a}\label{scope_8c_a0923d283dfbc9e171611498cfc66820a} 
+unsigned int {\bfseries page\+\_\+size}
+\item 
+\Hypertarget{scope_8c_ac25bb250974802c9309574d61903f4d1}\label{scope_8c_ac25bb250974802c9309574d61903f4d1} 
+volatile uint8\+\_\+t {\bfseries reset\+Bit}
+\item 
+\Hypertarget{scope_8c_a8b4b01e10494657a83fe1a5157ed1076}\label{scope_8c_a8b4b01e10494657a83fe1a5157ed1076} 
+volatile uint8\+\_\+t {\bfseries idle\+Bit}
+\item 
+\Hypertarget{scope_8c_a989d0080becf51109844bc2e853831dd}\label{scope_8c_a989d0080becf51109844bc2e853831dd} 
+volatile uint8\+\_\+t {\bfseries IOC\+\_\+\+Irq}
+\item 
+\Hypertarget{scope_8c_ac77a064b945aff8945c67490607f39f1}\label{scope_8c_ac77a064b945aff8945c67490607f39f1} 
+volatile uint8\+\_\+t {\bfseries error\+Irq}
+\item 
+\Hypertarget{scope_8c_acee2ff27477a8ae33f3c02ea387da2d4}\label{scope_8c_acee2ff27477a8ae33f3c02ea387da2d4} 
+volatile uint8\+\_\+t {\bfseries pps\+Ready}
+\item 
+\Hypertarget{scope_8c_a322f92c3cf94dbca5e0227a7d0853072}\label{scope_8c_a322f92c3cf94dbca5e0227a7d0853072} 
+volatile uint8\+\_\+t {\bfseries evt\+Ready}
+\item 
+\Hypertarget{scope_8c_a2a5bee7bfc4d37c370f8ced483af1291}\label{scope_8c_a2a5bee7bfc4d37c370f8ced483af1291} 
+volatile uint8\+\_\+t {\bfseries SGDec\+Err}
+\item 
+\Hypertarget{scope_8c_a62e16add6afed3903f52a967d7d835f2}\label{scope_8c_a62e16add6afed3903f52a967d7d835f2} 
+volatile uint8\+\_\+t {\bfseries SGSlv\+Err}
+\item 
+\Hypertarget{scope_8c_a62b1ba733338a667acadbadbd5e9f0e7}\label{scope_8c_a62b1ba733338a667acadbadbd5e9f0e7} 
+volatile uint8\+\_\+t {\bfseries SGInt\+Err}
+\item 
+\Hypertarget{scope_8c_aca9ca6ee7bc6b6fb7027023716c91199}\label{scope_8c_aca9ca6ee7bc6b6fb7027023716c91199} 
+volatile uint8\+\_\+t {\bfseries DMADec\+Err}
+\item 
+\Hypertarget{scope_8c_a79c02c970d837b089fd83556ffea24c7}\label{scope_8c_a79c02c970d837b089fd83556ffea24c7} 
+volatile uint8\+\_\+t {\bfseries DMASlv\+Err}
+\item 
+\Hypertarget{scope_8c_a371469fdc63d5e3e4160c3f8ebf03e65}\label{scope_8c_a371469fdc63d5e3e4160c3f8ebf03e65} 
+volatile uint8\+\_\+t {\bfseries DMAInt\+Err}
+\item 
+\Hypertarget{scope_8c_a5d821dfdf4f8a53a124afe0e489b240d}\label{scope_8c_a5d821dfdf4f8a53a124afe0e489b240d} 
+uint32\+\_\+t {\bfseries addr1}
+\item 
+\Hypertarget{scope_8c_aada74631db44b8dbc5e0cc31cdd644dc}\label{scope_8c_aada74631db44b8dbc5e0cc31cdd644dc} 
+uint32\+\_\+t {\bfseries addr2}
+\item 
+\Hypertarget{scope_8c_a7a716b3e6d5cbf315cf37b53a8d6eedf}\label{scope_8c_a7a716b3e6d5cbf315cf37b53a8d6eedf} 
+uint32\+\_\+t {\bfseries addr3}
+\item 
+\Hypertarget{scope_8c_a31d1ceb9c911379f23f4872d5c67df90}\label{scope_8c_a31d1ceb9c911379f23f4872d5c67df90} 
+uint32\+\_\+t {\bfseries addr4}
+\item 
+\Hypertarget{scope_8c_aa8c8bda29bc84de9082c00f34c6fc5be}\label{scope_8c_aa8c8bda29bc84de9082c00f34c6fc5be} 
+uint32\+\_\+t {\bfseries addr5}
+\item 
+\Hypertarget{scope_8c_ab759248e6d3449e1e4a8734db059429a}\label{scope_8c_ab759248e6d3449e1e4a8734db059429a} 
+uint32\+\_\+t {\bfseries addr6}
+\item 
+\Hypertarget{scope_8c_a901a35bbbc7ca9a4d1389bec9ef69556}\label{scope_8c_a901a35bbbc7ca9a4d1389bec9ef69556} 
+uint32\+\_\+t {\bfseries addr7}
+\item 
+\Hypertarget{scope_8c_ac81a8acc6593f412ac1bd1d04624fffe}\label{scope_8c_ac81a8acc6593f412ac1bd1d04624fffe} 
+uint32\+\_\+t {\bfseries addr8}
+\item 
+\Hypertarget{scope_8c_aa85488ee97d560147c933f341dd28ef4}\label{scope_8c_aa85488ee97d560147c933f341dd28ef4} 
+uint32\+\_\+t {\bfseries ddr\+Offset} =0
+\item 
+\Hypertarget{scope_8c_a8c41386c7d431268de2338a601e7ebca}\label{scope_8c_a8c41386c7d431268de2338a601e7ebca} 
+uint32\+\_\+t {\bfseries ddr\+Prev\+Offset} = 0
+\item 
+\Hypertarget{scope_8c_aea9e0c204fe15f156b6c808e9009911e}\label{scope_8c_aea9e0c204fe15f156b6c808e9009911e} 
+uint32\+\_\+t {\bfseries event\+Length}
+\item 
+\Hypertarget{scope_8c_a14b7a322adade06a0f4685c54d680950}\label{scope_8c_a14b7a322adade06a0f4685c54d680950} 
+uint32\+\_\+t {\bfseries pps\+Length}
+\item 
+\Hypertarget{scope_8c_a9eef080fe1e595201872f0fc9beb0ee5}\label{scope_8c_a9eef080fe1e595201872f0fc9beb0ee5} 
+uint32\+\_\+t {\bfseries Overlap}
+\item 
+\Hypertarget{scope_8c_a347c13b5cd3a1eca414b417f91451556}\label{scope_8c_a347c13b5cd3a1eca414b417f91451556} 
+uint32\+\_\+t {\bfseries pre\+Overlap}
+\item 
+\Hypertarget{scope_8c_afc9777278c1caaaad073f0eef611a6f7}\label{scope_8c_afc9777278c1caaaad073f0eef611a6f7} 
+uint32\+\_\+t {\bfseries post\+Overlap}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+routines interfacing to the fpga 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, N. Cucu Laurenciu Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{scope_8c_af2a9c3c10b503868e736167e9c71d453}\label{scope_8c_af2a9c3c10b503868e736167e9c71d453} 
+\index{scope.c@{scope.c}!scope\_read\_event@{scope\_read\_event}}
+\index{scope\_read\_event@{scope\_read\_event}!scope.c@{scope.c}}
+\doxysubsubsection{\texorpdfstring{scope\_read\_event()}{scope\_read\_event()}}
+{\footnotesize\ttfamily int scope\+\_\+read\+\_\+event (\begin{DoxyParamCaption}\item[{uint32\+\_\+t}]{index }\end{DoxyParamCaption})}
+
+temp fix for ARG

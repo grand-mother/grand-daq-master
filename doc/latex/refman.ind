@@ -1,0 +1,213 @@
+\begin{theindex}
+
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.c}, 
+		\hyperpage{13}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/Adaq.h}, 
+		\hyperpage{18}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/ad\_shm.h}, 
+		\hyperpage{23}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/du.c}, 
+		\hyperpage{19}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Adaq/eb.h}, 
+		\hyperpage{22}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/ad\_shm.h}, 
+		\hyperpage{23}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h}, 
+		\hyperpage{24}, \hyperpage{26}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.c}, 
+		\hyperpage{27}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/dudaq.h}, 
+		\hyperpage{33}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.c}, 
+		\hyperpage{33}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h}, 
+		\hyperpage{36}, \hyperpage{40}
+  \item {/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/tools/Traces.h}, 
+		\hyperpage{43}
+
+  \indexspace
+
+  \item {ad\_check\_processes}
+    \subitem {Adaq.c}, \hyperpage{14}
+  \item {ad\_init\_param}
+    \subitem {Adaq.c}, \hyperpage{14}
+  \item {ad\_initialize}
+    \subitem {Adaq.c}, \hyperpage{14}
+  \item {ad\_spawn\_du}
+    \subitem {Adaq.c}, \hyperpage{15}
+  \item {ad\_spawn\_eb}
+    \subitem {Adaq.c}, \hyperpage{15}
+  \item {ad\_spawn\_gui}
+    \subitem {Adaq.c}, \hyperpage{15}
+  \item {ad\_spawn\_t3}
+    \subitem {Adaq.c}, \hyperpage{15}
+  \item {ad\_spawn\_ui}
+    \subitem {Adaq.c}, \hyperpage{15}
+  \item {Adaq.c}
+    \subitem {ad\_check\_processes}, \hyperpage{14}
+    \subitem {ad\_init\_param}, \hyperpage{14}
+    \subitem {ad\_initialize}, \hyperpage{14}
+    \subitem {ad\_spawn\_du}, \hyperpage{15}
+    \subitem {ad\_spawn\_eb}, \hyperpage{15}
+    \subitem {ad\_spawn\_gui}, \hyperpage{15}
+    \subitem {ad\_spawn\_t3}, \hyperpage{15}
+    \subitem {ad\_spawn\_ui}, \hyperpage{15}
+    \subitem {clean\_stop}, \hyperpage{15}
+    \subitem {du\_main}, \hyperpage{16}
+    \subitem {eb\_main}, \hyperpage{16}
+    \subitem {gui\_main}, \hyperpage{16}
+    \subitem {main}, \hyperpage{16}
+    \subitem {remove\_shared\_memory}, \hyperpage{17}
+    \subitem {t3\_main}, \hyperpage{17}
+    \subitem {ui\_main}, \hyperpage{17}
+  \item {AMSG}, \hyperpage{7}
+
+  \indexspace
+
+  \item {block\_signals}
+    \subitem {dudaq.c}, \hyperpage{29}
+  \item {buf}
+    \subitem {shm\_struct}, \hyperpage{9}
+
+  \indexspace
+
+  \item {check\_server\_data}
+    \subitem {dudaq.c}, \hyperpage{30}
+  \item {clean\_stop}
+    \subitem {Adaq.c}, \hyperpage{15}
+
+  \indexspace
+
+  \item {du.c}
+    \subitem {du\_connect}, \hyperpage{20}
+    \subitem {du\_init\_and\_run}, \hyperpage{20}
+    \subitem {du\_interpret}, \hyperpage{21}
+    \subitem {du\_main}, \hyperpage{21}
+    \subitem {du\_read}, \hyperpage{21}
+    \subitem {du\_read\_initfile}, \hyperpage{21}
+    \subitem {du\_send}, \hyperpage{21}
+    \subitem {du\_write}, \hyperpage{22}
+    \subitem {set\_socketoptions}, \hyperpage{22}
+  \item {du\_connect}
+    \subitem {du.c}, \hyperpage{20}
+  \item {du\_get\_station\_id}
+    \subitem {dudaq.c}, \hyperpage{30}
+  \item {du\_init\_and\_run}
+    \subitem {du.c}, \hyperpage{20}
+  \item {du\_interpret}
+    \subitem {du.c}, \hyperpage{21}
+  \item {du\_main}
+    \subitem {Adaq.c}, \hyperpage{16}
+    \subitem {du.c}, \hyperpage{21}
+  \item {du\_read}
+    \subitem {du.c}, \hyperpage{21}
+  \item {du\_read\_initfile}
+    \subitem {du.c}, \hyperpage{21}
+  \item {du\_scope\_check\_commands}
+    \subitem {dudaq.c}, \hyperpage{30}
+  \item {du\_scope\_main}
+    \subitem {dudaq.c}, \hyperpage{31}
+  \item {du\_send}
+    \subitem {du.c}, \hyperpage{21}
+  \item {du\_socket\_main}
+    \subitem {dudaq.c}, \hyperpage{31}
+  \item {du\_write}
+    \subitem {du.c}, \hyperpage{22}
+  \item {dudaq.c}
+    \subitem {block\_signals}, \hyperpage{29}
+    \subitem {check\_server\_data}, \hyperpage{30}
+    \subitem {du\_get\_station\_id}, \hyperpage{30}
+    \subitem {du\_scope\_check\_commands}, \hyperpage{30}
+    \subitem {du\_scope\_main}, \hyperpage{31}
+    \subitem {du\_socket\_main}, \hyperpage{31}
+    \subitem {make\_server\_connection}, \hyperpage{31}
+    \subitem {send\_server\_data}, \hyperpage{32}
+    \subitem {socket\_send}, \hyperpage{32}
+  \item {DUInfo}, \hyperpage{7}
+
+  \indexspace
+
+  \item {eb\_main}
+    \subitem {Adaq.c}, \hyperpage{16}
+  \item {EVHDR}, \hyperpage{8}
+
+  \indexspace
+
+  \item {FILEHDR}, \hyperpage{8}
+
+  \indexspace
+
+  \item {GPS\_DATA}, \hyperpage{8}
+  \item {grand-\/daq-\/master}, \hyperpage{1}
+  \item {gui\_main}
+    \subitem {Adaq.c}, \hyperpage{16}
+
+  \indexspace
+
+  \item {main}
+    \subitem {Adaq.c}, \hyperpage{16}
+  \item {make\_server\_connection}
+    \subitem {dudaq.c}, \hyperpage{31}
+
+  \indexspace
+
+  \item {nbuf}
+    \subitem {shm\_struct}, \hyperpage{9}
+  \item {next\_read}
+    \subitem {shm\_struct}, \hyperpage{9}
+  \item {next\_readb}
+    \subitem {shm\_struct}, \hyperpage{9}
+  \item {next\_write}
+    \subitem {shm\_struct}, \hyperpage{9}
+
+  \indexspace
+
+  \item {remove\_shared\_memory}
+    \subitem {Adaq.c}, \hyperpage{17}
+
+  \indexspace
+
+  \item {scope.c}
+    \subitem {scope\_read\_event}, \hyperpage{35}
+  \item {scope.h}
+    \subitem {scope\_read\_event}, \hyperpage{40}
+  \item {scope\_read\_event}
+    \subitem {scope.c}, \hyperpage{35}
+    \subitem {scope.h}, \hyperpage{40}
+  \item {send\_server\_data}
+    \subitem {dudaq.c}, \hyperpage{32}
+  \item {set\_socketoptions}
+    \subitem {du.c}, \hyperpage{22}
+  \item {shm\_struct}, \hyperpage{9}
+    \subitem {buf}, \hyperpage{9}
+    \subitem {nbuf}, \hyperpage{9}
+    \subitem {next\_read}, \hyperpage{9}
+    \subitem {next\_readb}, \hyperpage{9}
+    \subitem {next\_write}, \hyperpage{9}
+    \subitem {shmid}, \hyperpage{9}
+    \subitem {size}, \hyperpage{10}
+    \subitem {Ubuf}, \hyperpage{10}
+  \item {shmid}
+    \subitem {shm\_struct}, \hyperpage{9}
+  \item {size}
+    \subitem {shm\_struct}, \hyperpage{10}
+  \item {socket\_send}
+    \subitem {dudaq.c}, \hyperpage{32}
+
+  \indexspace
+
+  \item {T2evts}, \hyperpage{10}
+  \item {t3\_main}
+    \subitem {Adaq.c}, \hyperpage{17}
+  \item {T3BODY}, \hyperpage{11}
+  \item {T3STATION}, \hyperpage{11}
+  \item {TS\_DATA}, \hyperpage{11}
+
+  \indexspace
+
+  \item {Ubuf}
+    \subitem {shm\_struct}, \hyperpage{10}
+  \item {ui\_main}
+    \subitem {Adaq.c}, \hyperpage{17}
+
+\end{theindex}

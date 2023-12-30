@@ -3,9 +3,9 @@
 /// @author C. Timmermans, Nikhef/RU
 
 /*
- * Header file for GP300 scope
+ * Header file for GP300 scope - DMA version
  *
- * C. Timmermans
+ * C. Timmermans/N. Cucu Laurenciu
  * c.timmermans@science.ru.nl
  *
  * NOT backward compatible with older versions!
@@ -13,6 +13,62 @@
  */
 
 #include <stdint.h>
+
+/*********************************************************************/
+/*                       define mmap locations                       */
+/*********************************************************************/
+#define DDR_BASE_ADDR               0x20000000      /* base address DDR */
+#define CDMA_BASE_ADDR              0xA0000000      /* base address CDMA regs configuration (FPGA) */
+#define SG_BASE_ADDR                0xA0008000      /* base address scatter-gather configuration (FPGA) */
+#define RAM1_BASE_ADDR              0xC0000000      /* base address RAM1 - event header (FPGA) */
+#define RAM2_BASE_ADDR              0xC2000000      /* base address RAM2 - CH1 RAM pre  (preTrigger+Overlap) data samples (FPGA) */
+#define RAM3_BASE_ADDR              0xC4000000      /* base address RAM3 - CH2 RAM pre  (preTrigger+Overlap) data samples (FPGA) */
+#define RAM4_BASE_ADDR              0xC6000000      /* base address RAM4 - CH3 RAM pre  (preTrigger+Overlap) data samples (FPGA) */
+#define RAM5_BASE_ADDR              0xC8000000      /* base address RAM5 - CH1 RAM post (postTrigger) data samples (FPGA) */
+#define RAM6_BASE_ADDR              0xCA000000      /* base address RAM6 - CH2 RAM post (postTrigger) data samples (FPGA) */
+#define RAM7_BASE_ADDR              0xCC000000      /* base address RAM7 - CH3 RAM post (postTrigger) data samples (FPGA) */
+#define RAM8_BASE_ADDR              0xCE000000      /* base address RAM8 - PPS (FPGA) */
+
+#define TDAQDUregs_BASE_ADDR        0x80000000      /* base address DU registers (FPGA) */
+/*********************************************************************/
+/*                       define mmap size                            */
+/*********************************************************************/
+#define NUM_OF_DESCRIPTORS          8              /* number of transfer descriptors (1 for header + 4 channels * 2 for data) */
+#define DESCRIPTOR_SIZE             64             /* transfer descriptors are aligned on 16 32-bit word alignment. => 16*4=64B per transfer descriptor */
+
+#define DDR_MAP_SIZE                0x20000000     /* 512MB */
+#define RAM_DATA_MAP_SIZE           16384          /* 16KB for all data RAMs (RAM2 - RAM7) */
+#define RAM_HEADER_MAP_SIZE         1024           /* for the event header RAM (RAM1) and PPS RAM (RAM8) */
+#define CDMA_MAP_SIZE               128            /* 11 32-bit registers, memory alignment on 128-byte boundaries */
+#define SG_MAP_SIZE                 (DESCRIPTOR_SIZE*NUM_OF_DESCRIPTORS) /* 576B but will allocate the minimum page size (4096B)? */
+
+/*********************************************************************/
+/*             define CDMA registers locations & configs             */
+/*********************************************************************/
+// -- address offsets for CDMA registers (DMA in Scatter-Gather Mode)
+#define CDMA_CR                     0x00000000      /* Control register */
+#define CDMA_SR                     0x00000004      /* Status register */
+#define CDMA_CURDESC_PNTR           0x00000008      /* Current descriptor pointer */
+#define CDMA_CURDESC_PNTR_MSB       0x0000000C      /* Current descriptor pointer MSB */
+#define CDMA_TAILDESC_PNTR          0x00000010      /* Tail descriptor pointer */
+#define CDMA_TAILDESC_PNTR_MSB      0x00000014      /* Tail descriptor pointer MSB */
+
+// -- address offsets for scatter-gather transfer descriptors registers
+#define SG_NXTDESC_PNTR             0x00000000      /* Next descriptor pointer */
+#define SG_NXTDESC_PNTR_MSB         0x00000004      /* Next descriptor pointer MSB */
+#define SG_SA                       0x00000008      /* Source address */
+#define SG_SA_MSB                   0x0000000C      /* Source address MSB */
+#define SG_DA                       0x00000010      /* Destination address */
+#define SG_DA_MSB                   0x00000014      /* Destination address MSB */
+#define SG_CONTROL                  0x00000018      /* Transfer control */
+#define SG_STATUS                   0x0000001C      /* Transfer status */
+
+// -- configuration for CDMA_CR register
+#define IRQ_MASK_AND_SG             0x02027008     /* IRQDelay=0x02 (125*SGclock*IRQDelay); IRQThreshold=0x02; IOC_IrqEn=1; SGMmode=1 */
+#define IRQ_MASK_AND_SG_evt       0x02077008   /* IRQDelay=0x02 (125*SGclock*IRQDelay); IRQThreshold=0x07; IOC_IrqEn=1; SGMmode=1 */
+#define IRQ_MASK_AND_SG_pps       0x02017008   /* IRQDelay=0x02 (125*SGclock*IRQDelay); IRQThreshold=0x01; IOC_IrqEn=1; SGMmode=1 */
+#define IRQ_MASK_AND_SG_evtpps    0x02087008   /* IRQDelay=0x02 (125*SGclock*IRQDelay); IRQThreshold=0x08; IOC_IrqEn=1; SGMmode=1 */
+
 
 /*----------------------------------------------------------------------*/
 #define SAMPLING_FREQ 500 //!< 500 MHz scope
@@ -27,190 +83,135 @@
 /* Maximum event size = header + ADC data + message end       */
 #define DATA_MAX_SAMP   8192                       //!< Maximal trace length (samples)
 
-#define MAX_READOUT     (256 + DATA_MAX_SAMP*4) //!< Maximal raw event size
+#define MAX_READOUT     (146*2 + 3*DATA_MAX_SAMP) //!< Maximal raw event size
 
 /*----------------------------------------------------------------------*/
 #define TDAQ_BASE             0x80000000
 /* Register Definitions*/
-#define Reg_Dig_Control       0x000
-#define Reg_Trig_Enable       0x002
-#define Reg_TestPulse_ChRead  0x004
-#define Reg_Time_Common       0x006
-#define Reg_Inp_Select        0x008
-#define Reg_Battery_Off       0x00A
-#define Reg_Battery_On        0x00C
-#define Reg_Spare_C           0x00E
-#define Reg_Time1_Pre         0x010
-#define Reg_Time1_Post        0x012
-#define Reg_Time2_Pre         0x014
-#define Reg_Time2_Post        0x016
-#define Reg_Time3_Pre         0x018
-#define Reg_Time3_Post        0x01A
-#define Reg_Time4_Pre         0x01C
-#define Reg_Time4_Post        0x01E
-#define Reg_ADC1_Gain         0x020
-#define Reg_ADC1_IntOff       0x022
-#define Reg_ADC1_BaseMa       0x024
-#define Reg_ADC1_BaseMi       0x026
-#define Reg_ADC1_SpareA       0x028
-#define Reg_ADC1_SpareB       0x02A
-#define Reg_ADC2_Gain         0x02C
-#define Reg_ADC2_IntOff       0x02E
-#define Reg_ADC2_BaseMax      0x030
-#define Reg_ADC2_BaseMin      0x032
-#define Reg_ADC2_SpareA       0x034
-#define Reg_ADC2_SpareB       0x036
-#define Reg_ADC3_Gain         0x038
-#define Reg_ADC3_IntOff       0x03A
-#define Reg_ADC3_BaseMax      0x03C
-#define Reg_ADC3_BaseMin      0x03E
-#define Reg_ADC3_SpareA       0x040
-#define Reg_ADC3_SpareB       0x042
-#define Reg_ADC4_Gain         0x044
-#define Reg_ADC4_IntOff       0x046
-#define Reg_ADC4_BaseMax      0x048
-#define Reg_ADC4_BaseMin      0x04A
-#define Reg_ADC4_SpareA       0x04C
-#define Reg_ADC4_SpareB       0x04E
-#define Reg_Trig1_ThresA      0x050
-#define Reg_Trig1_ThresB      0x052
-#define Reg_Trig1_Times       0x054
-#define Reg_Trig1_Tmax        0x056
-#define Reg_Trig1_Nmin        0x058
-#define Reg_Trig1_Qmin        0x05A
-#define Reg_Trig2_ThresA      0x05C
-#define Reg_Trig2_ThresB      0x05E
-#define Reg_Trig2_Times       0x060
-#define Reg_Trig2_Tmax        0x062
-#define Reg_Trig2_Nmin        0x064
-#define Reg_Trig2_Qmin        0x066
-#define Reg_Trig3_ThresA      0x068
-#define Reg_Trig3_ThresB      0x06A
-#define Reg_Trig3_Times       0x06C
-#define Reg_Trig3_Tmax        0x06E
-#define Reg_Trig3_Nmin        0x070
-#define Reg_Trig3_Qmin        0x072
-#define Reg_Trig4_ThresA      0x074
-#define Reg_Trig4_ThresB      0x076
-#define Reg_Trig4_Times       0x078
-#define Reg_Trig4_Tmax        0x07A
-#define Reg_Trig4_Nmin        0x07C
-#define Reg_Trig4_Qmin        0x07E
-#define Reg_FltA1_A1          0x080
-#define Reg_FltA1_A2          0x082
-#define Reg_FltA1_B1          0x084
-#define Reg_FltA1_B2          0x086
-#define Reg_FltA1_B3          0x088
-#define Reg_FltA1_B4          0x08A
-#define Reg_FltA1_B5          0x08C
-#define Reg_FltA1_B6          0x08E
-#define Reg_FWStatus          0x1C0
-#define Reg_GenStatus         0x1D0
-#define Reg_GenControl        0x1D4
-#define Reg_Data              0x1D8
-#define Reg_TestTrace         0x1DC
-#define Reg_Rate              0x1E0
-#define Reg_End               0x1FC
-
+#define Reg_HVL            0x0000
+#define Reg_HTL            0x0004
+#define Reg_HTLH_GPS       0x0008
+#define Reg_HTLL_GPS       0x000C
+#define Reg_MNG            0x004C
+#define Reg_DMA            0x0050
+#define Reg_AGC12          0x0054
+#define Reg_AGC34          0x0058
+#define Reg_RW             0x0010
+#define Reg_RS             0x0014
+#define Reg_TS             0x0018
+#define Reg_CH1SNTH        0x001C
+#define Reg_CH1TP          0x0020
+#define Reg_CH2SNTH        0x0028
+#define Reg_CH2TP          0x002C
+#define Reg_CH3SNTH        0x0034
+#define Reg_CH3TP          0x0038
+#define Reg_BSC12          0x005C
+#define Reg_BSC34          0x0060
+#define Reg_CH1NF1P1       0x0064
+#define Reg_CH1NF2P1       0x007C
+#define Reg_CH1NF3P1       0x0094
+#define Reg_CH1NF4P1       0x00AC
+#define Reg_CH2NF1P1       0x00C4
+#define Reg_CH2NF2P1       0x00DC
+#define Reg_CH2NF3P1       0x00F4
+#define Reg_CH2NF4P1       0x010C
+#define Reg_CH3NF1P1       0x0124
+#define Reg_CH3NF2P1       0x013C
+#define Reg_CH3NF3P1       0x0154
+#define Reg_CH3NF4P1       0x016C
 /*----------------------------------------------------------------------*/
-/* Control register bits */
-#define CTRL_SEND_EN    (1 << 0)
-#define CTRL_PPS_EN     (1 << 1)
-#define CTRL_FLTR_EN    (1 << 3)
-#define CTRL_FAKE_ADC   (1 << 6)
-#define CTRL_FILTER1    (1 <<  8)
-#define CTRL_FILTER2    (1 <<  9)
-#define CTRL_FILTER3    (1 << 10)
-#define CTRL_FILTER4    (1 << 11)
-#define CTRL_AUTOBOOT   (1 << 15)
 
-#define GENSTAT_PPSFIFO  (1<<24)
-#define GENSTAT_EVTFIFO  (1<<25)
-#define GENSTAT_DMAFIFO  (1<<26)
-#define GENCTRL_EVTREAD  (1<<25)
-
-// general event types
-#define TRIGGER_T3_MINBIAS 0x1000
-#define TRIGGER_T3_RANDOM  0x8000
 
 /*----------------------------------------------------------------------*/
 /* PPS definition */
 #define MAGIC_PPS     0xFACE
-#define WCNT_PPS      32
-#define PPS_MAGIC       1
-#define PPS_TRIG_PAT    2
-#define PPS_TRIG_RATE   3
-#define PPS_CTD         4
-#define PPS_CTP         6
-#define PPS_OFFSET      8
-#define PPS_LEAP       10
-#define PPS_STATFLAG   11
-#define PPS_CRITICAL   12
-#define PPS_WARNING    13
-#define PPS_YEAR       14
-#define PPS_DAYMONTH   15
-#define PPS_MINHOUR    16
-#define PPS_STATSEC    17
-#define PPS_LONGITUDE  18
-#define PPS_LATITUDE   22
-#define PPS_ALTITUDE   26
-#define PPS_TEMPERATURE 30
+#define WCNT_PPS        22 // length in 32 bit words!
+#define PPS_LENGTH      0
+#define PPS_ID          1
+#define PPS_CTP         2
+#define PPS_WEEKTIME    3
+#define PPS_WEEKOFFSET  4
+#define PPS_SECMINHOUR  5
+#define PPS_DAYMONTH    6
+#define PPS_YEAR        7
+#define PPS_GPSMODE     8
+#define PPS_GPSSTATUS   9
+#define PPS_OFFSET      10
+#define PPS_TEMPERATURE 11
+#define PPS_LATITUDE    12
+#define PPS_LONGITUDE   14
+#define PPS_ALTITUDE    16
+#define PPS_ATM_TP      18
+#define PPS_HM_AX       19
+#define PPS_AY_AZ       20
+#define PPS_BATTERY     21
 
 /*----------------------------------------------------------------------*/
 /* Event definition */
 #define MAGIC_EVT         0xADC0
-#define HEADER_EVT        256
-#define FORMAT_EVT        1
-#define EVT_LENGTH        0 // nr of int16 words
-#define EVT_ID            1 // nr of int16 words
-#define EVT_HARDWARE      2
-#define EVT_HDRLEN        3 //256 (int16 words in the header)
-#define EVT_SECOND        4
-#define EVT_NANOSEC       6
-#define EVT_TRIGGERPOS    8
-#define EVT_T3FLAG        9
-#define EVT_ATM_TEMP      17
-#define EVT_ATM_PRES      18
-#define EVT_ATM_HUM       19
-#define EVT_ACCEL_X       20
-#define EVT_ACCEL_Y       21
-#define EVT_ACCEL_Z       22
-#define EVT_BATTERY       23
-#define EVT_VERSION       24
-#define EVT_MSPS          25
-#define EVT_ADC_RES       26
-#define EVT_INP_SELECT    27
-#define EVT_CH_ENABLE     28
-#define EVT_TOT_SAMPLES   29
-#define EVT_CH1_SAMPLES   30
-#define EVT_CH2_SAMPLES   31
-#define EVT_CH3_SAMPLES   32
-#define EVT_CH4_SAMPLES   33
-#define EVT_TRIG_PAT      34
-#define EVT_TRIG_RATE     35
-#define EVT_CTD           36
-#define EVT_CTP           38
-#define EVT_PPS_OFFSET    40
-#define EVT_LEAP          42
-#define EVT_GPS_STATFLAG  43
-#define EVT_GPS_CRITICAL  44
-#define EVT_GPS_WARNING   45
-#define EVT_YEAR          46
-#define EVT_DAYMONTH      47
-#define EVT_MINHOUR       48
-#define EVT_STATSEC       49
-#define EVT_LONGITUDE     50
-#define EVT_LATITUDE      54
-#define EVT_ALTITUDE      58
-#define EVT_GPS_TEMP      62
-#define EVT_CTRL          64
-#define EVT_WINDOWS       72
-#define EVT_CHANNEL       80
-#define EVT_TRIGGER       104
-#define EVT_FILTER1       128
-#define EVT_FILTER2       160
-#define EVT_FILTER3       192
-#define EVT_FILTER4       224
+#define EVT_HDR_LENGTH    146
+#define EVT_LENGTH        0 // nr of int32 words
+#define EVT_VERSION       1
+#define EVT_STATION_ID    2
+#define EVT_HARDWARE_ID   3
+#define EVT_EVT_ID        4
+#define EVT_CTP           5
+#define EVT_CTD           6
+#define EVT_ADCINFO       7
+#define EVT_SECOND        8
+#define EVT_NANOSEC       9
+#define EVT_TRIGGER_POS   10
+#define EVT_TRIGGER_STAT  11
+#define EVT_STATISTICS    12
+#define EVT_PPS_ID        13
+#define EVT_SPARE1        14
+#define EVT_SPARE2        15
+#define EVT_SPARE3        16
+#define EVT_ATM_TP        17
+#define EVT_HM_AX         18
+#define EVT_AY_AZ         19
+#define EVT_BATTERY       20
+#define EVT_WEEKTIME      21
+#define EVT_WEEKOFFSET    22
+#define EVT_SECMINHOUR    23
+#define EVT_DAYMONTH      24
+#define EVT_YEAR          25
+#define EVT_GPSMODE       26
+#define EVT_GPSSTATUS     27
+#define EVT_OFFSET        28
+#define EVT_TEMPERATURE   29
+#define EVT_LATITUDE      30
+#define EVT_LONGITUDE     32
+#define EVT_ALTITUDE      34
+#define EVT_TRACELENGTH   36
+#define EVT_INP_SELECT    37
+#define EVT_TRIG_SELECT   38
+#define EVT_THRES_C1      39
+#define EVT_THRES_C2      40
+#define EVT_THRES_C3      41
+#define EVT_TRIG_C1       43
+#define EVT_TRIG_C2       45
+#define EVT_TRIG_C3       47
+#define EVT_GAIN_AB       51
+#define EVT_GAIN_CD       52
+#define EVT_BASELINE_12   53
+#define EVT_BASELINE_3    54
+#define EVT_NOTCH_C1_F1   63
+#define EVT_NOTCH_C1_F2   68
+#define EVT_NOTCH_C1_F3   73
+#define EVT_NOTCH_C1_F4   78
+#define EVT_NOTCH_C2_F1   83
+#define EVT_NOTCH_C2_F2   88
+#define EVT_NOTCH_C2_F3   93
+#define EVT_NOTCH_C2_F4   98
+#define EVT_NOTCH_C3_F1   103
+#define EVT_NOTCH_C3_F2   108
+#define EVT_NOTCH_C3_F3   113
+#define EVT_NOTCH_C3_F4   118
+#define EVT_TOT_SAMPLEP   143
+#define EVT_CH12_SAMPLEP  144
+#define EVT_CH3_SAMPLEP   145
+#define EVT_START_ADC     146
 
 /*----------------------------------------------------------------------*/
 
@@ -218,15 +219,18 @@
   buffer definitions for the scope readout process.
  */
 
-#define BUFSIZE 3000            //!< store up to 3000 events in circular buffer
+#define BUFSIZE 30000            //!< store up to 30000 event pointers in circular buffer
 
-#define GPSSIZE 35              //!< buffer upto 35 GPS seconds info in circular buffer
-#define MAXT3 50               //!< 20 T3 events in circular cuffer
+#define GPSSIZE 35              //!< buffer upto 35 GPS pointers in circular buffer
 
 // next: what did we read from the scope?
 
 #define SCOPE_EVENT 2          //!< return code for reading an event
 #define SCOPE_GPS   3          //!< return code for reading a PPS message
+
+#define TRIGGER_T3_MINBIAS 0x1000
+#define TRIGGER_T3_RANDOM  0x8000
+
 
 typedef struct
 {
@@ -239,7 +243,7 @@ typedef struct
 typedef struct
 {
   uint32_t ts_seconds;      //!< time marker in GPS sec
-  uint16_t data[WCNT_PPS];  //! all data read in PPS
+  uint32_t data[WCNT_PPS];  //! all data read in PPS
 } GPS_DATA;
 
 
@@ -253,18 +257,12 @@ void scope_close();
 void scope_reset();
 void scope_start_run();
 void scope_stop_run();
-void scope_set_parameters(uint32_t reg_addr, uint32_t value,uint32_t to_shadow);
 void scope_reboot();
-void scope_copy_shadow();
-void scope_init_shadow();
 void scope_initialize();
 void scope_create_memory();
-int scope_read_event(int32_t ioff);
-int scope_read_pps();
-int scope_read(int ioff);
-int scope_no_run_read();
-int scope_run_read();
-void scope_event_to_shm(uint16_t evnr,uint16_t trflag,uint16_t sec,uint32_t ssec);
-int scope_calc_t3nsec(uint16_t *pps);
+int scope_read_event(uint32_t index);
+int scope_read_pps(uint32_t index);
+int scope_read();
+int scope_calc_t3nsec();
 //
 

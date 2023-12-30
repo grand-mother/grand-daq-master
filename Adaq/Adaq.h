@@ -12,7 +12,8 @@ Altering the code without explicit consent of the author is forbidden
 #include <arpa/inet.h>
 #include "ad_shm.h"
 
-#define MAXDU 10 //max number of Detector Units
+#define ADAQ_VERSION 2
+#define MAXDU 2 //max number of Detector Units
 #define ERROR -1
 #define NORMAL 1
 #define DEFAULT_CONFIGFILE "conf/Adaq.conf"
@@ -27,19 +28,33 @@ typedef struct{
   socklen_t DUalength;
 }DUInfo;
 
+
+#define T3STATIONSIZE 2 //!< size of T3 request message
+
+typedef struct{
+  uint32_t DU_id;     //!< identifier of Detector Unit
+  uint32_t index;     //!< index in DDR memory of the event
+}T3STATION;
+
+typedef struct{
+  uint32_t event_nr;       //!< T3 event number
+  T3STATION  t3station[];  //!< Information required for LS
+}T3BODY;
+
+
 #define NT2BUF (30*MAXDU) //30 per DU
-#define T2SIZE 1000 //Max. size (in shorts) for T2 info in 1 message 
+#define T2SIZE 1000 //Max. size (in ints) for T2 info in 1 message
 
 #define NT3BUF 500 // max 500 T3 buffers (small messages anyway)
-#define T3SIZE (6+3*MAXDU) //Max. size (in shorts) for T3 info in 1 message
+#define T3SIZE (3+2*MAXDU) //Max. size (in ints) for T3 info in 1 message
 
-#define NEVBUF 40 // maximal 40 event buffers
-#define EVSIZE 65000 //Max. size (in shorts) for evsize for each DU
+#define NEVBUF 4 // maximal 40 event buffers
+#define EVSIZE 65000 //Max. size (in ints) for evsize for each DU
 
 #define CMDBUF 40 // leave 40 command buffers
-#define CMDSIZE 5000 //Max. size (in shorts) for command (should be able to hold config file)
+#define CMDSIZE 5000 //Max. size (in ints) for command (should be able to hold config file)
 #define CMDEBBUF 10 // leave 10 command buffers for EB
-#define CMDEBSIZE 50 //Max. size (in shorts) for command
+#define CMDEBSIZE 50 //Max. size (in ints) for command
 #define LOG_FOLDER "/tmp/daq"
 
 #define TCOINC 2000  // Maximum coincidence time window
@@ -59,6 +74,8 @@ int eb_run = 1;
 int eb_run_mode = 0;
 int eb_max_evts = 10;
 char eb_dir[80];
+char eb_site[80];
+char eb_extra[80];
 //T3 parameters
 int t3_rand = 0; 
 int t3_stat = NTRIG;
@@ -75,6 +92,8 @@ extern int eb_run ;
 extern int eb_run_mode;
 extern int eb_max_evts ;
 extern char eb_dir[80]; 
+extern char eb_site[80];
+extern char eb_extra[80];
 extern int t3_rand;
 extern int t3_stat;
 extern int t3_time;

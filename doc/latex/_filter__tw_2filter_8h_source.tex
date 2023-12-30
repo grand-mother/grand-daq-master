@@ -1,0 +1,34 @@
+\doxysection{filter.\+h}
+\hypertarget{_filter__tw_2filter_8h_source}{}\label{_filter__tw_2filter_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Notch/Filter\_tw/filter.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/Notch/Filter\_tw/filter.h}}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ \textcolor{comment}{//\ filter.h\ \ \ \ \ 27-\/Feb-\/2012}}
+\DoxyCodeLine{00002\ }
+\DoxyCodeLine{00003\ \textcolor{comment}{//\ Thei:\ choose\ between\ 12\ bit\ or\ 14\ bit\ ADC}}
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ ADC12\ 1}}
+\DoxyCodeLine{00006\ \textcolor{comment}{//\#define\ ADC14\ 1}}
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#ifdef\ ADC12}}
+\DoxyCodeLine{00009\ \textcolor{preprocessor}{\#define\ W\_INPUT\ 12\ \ }\textcolor{comment}{//14b:\ adcbits:\ \ \ \ 14\ \ \ //12b:\ 12}}
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ W\_FRAC\ \ 10\ \ }\textcolor{comment}{//14b:\ w\_input-\/2:\ \ 12\ \ \ //12b:\ 10}}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ W\_INT\ \ \ 22\ \ }\textcolor{comment}{//14b:\ 32-\/w\_frac:\ \ 20\ \ \ //12b:\ 22}}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00013\ }
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#ifdef\ ADC14}}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ W\_INPUT\ 14\ \ }\textcolor{comment}{//14b:\ adcbits:\ \ \ \ 14\ \ \ //12b:\ 12}}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ W\_FRAC\ \ 12\ \ }\textcolor{comment}{//14b:\ w\_input-\/2:\ \ 12\ \ \ //12b:\ 10}}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ W\_INT\ \ \ 20\ \ }\textcolor{comment}{//14b:\ 32-\/w\_frac:\ \ 20\ \ \ //12b:\ 22}}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00019\ }
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ SAMP\_FREQ\ 200.0}}
+\DoxyCodeLine{00021\ }
+\DoxyCodeLine{00022\ \textcolor{keywordtype}{int}\ getNotchFilterCoeffs(\textcolor{keywordtype}{double}\ nu\_s,\ \textcolor{keywordtype}{double}\ r,\ \textcolor{keywordtype}{int}\ xtraPipe,\ \textcolor{keywordtype}{int}\ *a,\ \textcolor{keywordtype}{int}\ *b,\ \textcolor{keywordtype}{int}\ *aLen,\ \textcolor{keywordtype}{int}\ *bLen);}
+\DoxyCodeLine{00023\ }
+\DoxyCodeLine{00024\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ iirNotchFixed(\textcolor{keywordtype}{int}\ reset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ in,\ \textcolor{keywordtype}{double}\ nu,\ \textcolor{keywordtype}{double}\ r,\ \textcolor{keywordtype}{int}\ debug);}
+\DoxyCodeLine{00025\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ iirNotchPipe2(\textcolor{keywordtype}{int}\ reset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ in,\ \textcolor{keywordtype}{double}\ nu,\ \textcolor{keywordtype}{double}\ r,\ \textcolor{keywordtype}{int}\ debug);}
+\DoxyCodeLine{00026\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ iirNotchPipe4(\textcolor{keywordtype}{int}\ reset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ in,\ \textcolor{keywordtype}{double}\ nu,\ \textcolor{keywordtype}{double}\ r,\ \textcolor{keywordtype}{int}\ debug);}
+\DoxyCodeLine{00027\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ iirNotchType2(\textcolor{keywordtype}{int}\ reset,\ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{short}\ in,\ \textcolor{keywordtype}{double}\ nu,\ \textcolor{keywordtype}{double}\ r);}
+\DoxyCodeLine{00028\ }
+
+\end{DoxyCode}

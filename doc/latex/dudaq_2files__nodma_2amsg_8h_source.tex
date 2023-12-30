@@ -1,0 +1,165 @@
+\doxysection{amsg.\+h}
+\hypertarget{dudaq_2files__nodma_2amsg_8h_source}{}\label{dudaq_2files__nodma_2amsg_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_nodma/amsg.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_nodma/amsg.h}}
+\mbox{\hyperlink{dudaq_2files__nodma_2amsg_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00004\ \textcolor{preprocessor}{\#ifndef\ \_AMSG\_H\_}}
+\DoxyCodeLine{00005\ \textcolor{preprocessor}{\#define\ \_AMSG\_H\_}}
+\DoxyCodeLine{00006\ }
+\DoxyCodeLine{00007\ }
+\DoxyCodeLine{00008\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00009\ }
+\DoxyCodeLine{00010\ \textcolor{preprocessor}{\#define\ DU\_BOOT\ \ \ \ \ 0\ \ \ \ \ \ }}
+\DoxyCodeLine{00011\ \textcolor{preprocessor}{\#define\ DU\_UPLOAD\ \ \ 1\ \ \ \ \ \ }}
+\DoxyCodeLine{00012\ \textcolor{preprocessor}{\#define\ DU\_RESET\ \ \ \ 2\ \ \ \ \ \ }}
+\DoxyCodeLine{00013\ \textcolor{preprocessor}{\#define\ DU\_INITIALIZE\ 3\ \ \ \ }}
+\DoxyCodeLine{00014\ \textcolor{preprocessor}{\#define\ DU\_SET\ \ \ \ \ \ 4\ \ \ \ \ \ }}
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#define\ DU\_GET\ \ \ \ \ \ 5\ \ \ \ \ \ }}
+\DoxyCodeLine{00016\ \textcolor{preprocessor}{\#define\ DU\_MONITOR\ \ 6\ \ \ \ \ \ }}
+\DoxyCodeLine{00017\ \textcolor{preprocessor}{\#define\ DU\_START\ \ \ \ 7\ \ \ \ \ \ }}
+\DoxyCodeLine{00018\ \textcolor{preprocessor}{\#define\ DU\_STOP\ \ \ \ \ 8\ \ \ \ \ \ }}
+\DoxyCodeLine{00019\ \textcolor{preprocessor}{\#define\ DU\_T2\ \ \ \ \ \ \ 9\ \ \ \ \ \ }}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ DU\_GETEVENT\ 10\ \ \ \ \ }}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ DU\_NO\_EVENT\ 11\ \ \ \ \ }}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ DU\_EVENT\ \ \ \ 12\ \ \ \ \ }}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ DU\_GETMEM\ \ \ 13\ \ \ \ \ }}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ DU\_SETMEM\ \ \ 14\ \ \ \ \ }}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ DU\_SETBIT\ \ \ 15\ \ \ \ \ }}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ DU\_CLRBIT\ \ \ 16\ \ \ \ \ }}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ DU\_GETFILE\ \ 17\ \ \ \ \ }}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ DU\_SENDFILE\ 18\ \ \ \ \ }}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ DU\_EXEC\ \ \ \ \ 19\ \ \ \ \ }}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ DU\_CONNECT\ \ 20\ \ \ \ \ }}
+\DoxyCodeLine{00031\ \textcolor{preprocessor}{\#define\ DU\_LISTEN\ \ \ 21\ \ \ \ \ }}
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ DU\_SCRIPT\ \ \ 22\ \ \ \ \ }}
+\DoxyCodeLine{00033\ \textcolor{preprocessor}{\#define\ DU\_GET\_MINBIAS\_EVENT\ \ \ \ \ \ \ \ \ \ \ 29\ }}
+\DoxyCodeLine{00034\ \textcolor{preprocessor}{\#define\ DU\_GET\_RANDOM\_EVENT\ \ \ \ \ \ \ \ \ \ \ \ 32\ }}
+\DoxyCodeLine{00035\ \textcolor{preprocessor}{\#define\ T3\_EVENT\_REQUEST\_LIST\ 201\ \ }}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ GUI\_UPDATE\_DB\ 401\ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ GUI\_INITIALIZE\ 402\ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00038\ \textcolor{preprocessor}{\#define\ GUI\_START\_RUN\ 403\ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ GUI\_STOP\_RUN\ 404\ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ GUI\_DELETE\_RUN\ 406\ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ GUI\_BC\_SETATTENUATION\ \ 450\ \ }}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ GUI\_BC\_SWITCHIO\ \ 451\ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ GUI\_BC\_SETMODE\ \ 452\ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{preprocessor}{\#define\ GRND1\ 0x5247\ \ \ \ }}
+\DoxyCodeLine{00046\ \textcolor{preprocessor}{\#define\ GRND2\ 0x444E\ \ \ \ }}
+\DoxyCodeLine{00047\ \textcolor{preprocessor}{\#define\ ALIVE\ 9998\ \ \ \ \ \ }}
+\DoxyCodeLine{00048\ \textcolor{preprocessor}{\#define\ ALIVE\_ACK\ 9999\ \ }}
+\DoxyCodeLine{00049\ }
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ DU\_HWNL\ 1\ \ \ \ \ \ \ }}
+\DoxyCodeLine{00051\ }
+\DoxyCodeLine{00052\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00053\ \ \ uint16\_t\ length;\ \ \ \ \ \ }
+\DoxyCodeLine{00054\ \ \ uint16\_t\ tag;\ \ \ \ \ \ \ \ \ }
+\DoxyCodeLine{00055\ \ \ uint16\_t\ body[];\ \ \ \ \ \ }
+\DoxyCodeLine{00056\ \}\mbox{\hyperlink{struct_a_m_s_g}{AMSG}};}
+\DoxyCodeLine{00057\ }
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ AMSG\_OFFSET\_LENGTH\ \ 0\ }}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ AMSG\_OFFSET\_TAG\ \ \ \ \ 1\ }}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ AMSG\_OFFSET\_BODY\ \ \ \ 2\ }}
+\DoxyCodeLine{00061\ }
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ DUPOS(a)\ \ \ \ \ \ \ (a\&0xff)\ \ \ \ \ \ \ }}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ DUHWTYPE(a)\ \ \ \ ((a>>8)\&0x7)\ \ \ }}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ DUHWVERSION(a)\ ((a>>11)\&0x1f)\ }}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{preprocessor}{\#define\ T2FILL(a,b,c)\ \{a-\/>NS1=(b\&0xff0000)>>16;a-\/>NS2=(b\&0xff00)>>8;a-\/>NS3=(b\&0xff);a-\/>ADC=c\&0xff;\}}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ T2NSEC(a)\ ((((unsigned\ int)(a-\/>NS3))<<6)+(((unsigned\ int)(a-\/>NS2))<<14)+(((unsigned\ int)(a-\/>NS1))<<22))}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ T2ADC(a)\ \ (a-\/>ADC)}}
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00074\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS1;\ }
+\DoxyCodeLine{00075\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS2;\ }
+\DoxyCodeLine{00076\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS3;\ }
+\DoxyCodeLine{00077\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ ADC;\ }
+\DoxyCodeLine{00078\ \}\mbox{\hyperlink{struct_t2_s_s_e_c}{T2SSEC}};}
+\DoxyCodeLine{00079\ }
+\DoxyCodeLine{00080\ \textcolor{preprocessor}{\#define\ T0(a)\ ((a[1]<<16)+a[0])\ }}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00083\ \ \ uint16\_t\ DU\_id;\ \ \ }
+\DoxyCodeLine{00084\ \ \ uint16\_t\ t0[2];\ \ \ }
+\DoxyCodeLine{00085\ \ \ \mbox{\hyperlink{struct_t2_s_s_e_c}{T2SSEC}}\ t2ssec[];\ \ }
+\DoxyCodeLine{00086\ \}\mbox{\hyperlink{struct_t2_b_o_d_y}{T2BODY}};}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{preprocessor}{\#define\ T3STATIONSIZE\ 3\ }}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ T3STATFILL(a,b,c,d)\ \{a-\/>DU\_id=b;a-\/>sec=c\&0xff;a-\/>NS1=(d\&0xff0000)>>16;a-\/>NS2=(d\&0xff00)>>8;a-\/>NS3=(d\&0xff);\}}}
+\DoxyCodeLine{00091\ }
+\DoxyCodeLine{00092\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00093\ \ \ uint16\_t\ DU\_id;\ \ \ \ \ }
+\DoxyCodeLine{00094\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ sec;\ \ }
+\DoxyCodeLine{00095\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS1;\ \ }
+\DoxyCodeLine{00096\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS2;\ \ }
+\DoxyCodeLine{00097\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS3;\ \ }
+\DoxyCodeLine{00098\ \}\mbox{\hyperlink{struct_t3_s_t_a_t_i_o_n}{T3STATION}};}
+\DoxyCodeLine{00099\ }
+\DoxyCodeLine{00100\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00101\ \ \ uint16\_t\ event\_nr;\ \ \ \ \ \ \ }
+\DoxyCodeLine{00102\ \ \ \mbox{\hyperlink{struct_t3_s_t_a_t_i_o_n}{T3STATION}}\ \ t3station[];\ \ }
+\DoxyCodeLine{00103\ \}\mbox{\hyperlink{struct_t3_b_o_d_y}{T3BODY}};}
+\DoxyCodeLine{00104\ }
+\DoxyCodeLine{00105\ }
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#define\ USE\_EVENTBODY\_VERSION\ }}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ EVENTBODY\_VERSION\ \ \ \ \ \ \ 3\ }}
+\DoxyCodeLine{00108\ }
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ MIN\_EVHEADER\_LENGTH\ 12\ }}
+\DoxyCodeLine{00110\ }
+\DoxyCodeLine{00111\ }
+\DoxyCodeLine{00112\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00113\ \ \ uint16\_t\ length;}
+\DoxyCodeLine{00114\ \ \ uint16\_t\ event\_nr;}
+\DoxyCodeLine{00115\ \ \ uint16\_t\ DU\_id;}
+\DoxyCodeLine{00116\ \ \ uint16\_t\ header\_length;}
+\DoxyCodeLine{00117\ \ \ uint32\_t\ GPSseconds;}
+\DoxyCodeLine{00118\ \ \ uint32\_t\ GPSnanoseconds;}
+\DoxyCodeLine{00119\ \ \ uint16\_t\ trigger\_flag;}
+\DoxyCodeLine{00120\ \ \ uint16\_t\ trigger\_pos;}
+\DoxyCodeLine{00121\ \ \ uint16\_t\ sampling\_freq;}
+\DoxyCodeLine{00122\ \ \ uint16\_t\ channel\_mask;}
+\DoxyCodeLine{00123\ \ \ uint16\_t\ ADC\_resolution;}
+\DoxyCodeLine{00124\ \ \ uint16\_t\ tracelength;}
+\DoxyCodeLine{00125\ \ \ uint16\_t\ version;\ \ \ \ \ \ \ \ \ \ \ \ \ \textcolor{comment}{//\ use\ a\ version\ information,\ in\ use\ since\ ??.02.2011}}
+\DoxyCodeLine{00126\ \ \ uint16\_t\ info\_ADCbuffer[];}
+\DoxyCodeLine{00127\ \}\mbox{\hyperlink{struct_e_v_e_n_t_b_o_d_y}{EVENTBODY}};}
+\DoxyCodeLine{00128\ }
+\DoxyCodeLine{00129\ \textcolor{comment}{/*\ Halfword\ offset\ of\ EVENTBODY\ fields\ assuming\ struct\ is\ packed\ */}}
+\DoxyCodeLine{00130\ \textcolor{comment}{/*\ Necessary\ to\ avoid\ alignment\ problems\ on\ ARM\ */}}
+\DoxyCodeLine{00131\ \textcolor{comment}{/*\ These\ need\ to\ be\ updated\ if\ struct\ is\ changed\ */}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_LENGTH\ \ \ \ \ \ \ 0}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_EVENT\_NR\ \ \ \ \ 1}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_DU\_ID\ \ \ \ \ \ \ \ 2}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_HDR\_LENGTH\ \ \ 3}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_GPSSEC\ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_GPSNSEC\ \ \ \ \ \ 6}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_TRIG\_FLAG\ \ \ \ 8}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_TRIG\_POS\ \ \ \ \ 9}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_SAMP\_FREQ\ \ \ 10}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_CHAN\_MASK\ \ \ 11}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_ADC\_RES\ \ \ \ \ 12}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_TRACELENGTH\ 13}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#ifdef\ USE\_EVENTBODY\_VERSION}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_VERSION\ \ \ \ \ 14}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_ADCBUFFER\ \ \ 15}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00148\ \textcolor{preprocessor}{\#define\ EB\_OFFSET\_ADCBUFFER\ \ \ 14}}
+\DoxyCodeLine{00149\ \textcolor{preprocessor}{\#endif}}
+\DoxyCodeLine{00150\ }
+\DoxyCodeLine{00151\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00152\ \ \ uint16\_t\ DU\_id;}
+\DoxyCodeLine{00153\ \ \ uint16\_t\ event\_nr;}
+\DoxyCodeLine{00154\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ sec;}
+\DoxyCodeLine{00155\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS1;}
+\DoxyCodeLine{00156\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS2;}
+\DoxyCodeLine{00157\ \ \ \textcolor{keywordtype}{unsigned}\ \textcolor{keywordtype}{char}\ NS3;}
+\DoxyCodeLine{00158\ \}\mbox{\hyperlink{structdu__geteventbody}{du\_geteventbody}};}
+\DoxyCodeLine{00159\ }
+\DoxyCodeLine{00160\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}\{}
+\DoxyCodeLine{00161\ \ \ uint16\_t\ event\_nr;}
+\DoxyCodeLine{00162\ \ \ uint16\_t\ DU\_id;}
+\DoxyCodeLine{00163\ \}\mbox{\hyperlink{structls__no__eventbody}{ls\_no\_eventbody}};}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#else}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}

@@ -1,0 +1,218 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/files\+\_\+20231205/buffer.c File Reference}
+\hypertarget{dudaq_2files__20231205_2buffer_8c}{}\label{dudaq_2files__20231205_2buffer_8c}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_20231205/buffer.c@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files\_20231205/buffer.c}}
+
+
+routines for handling of the memory buffers  
+
+
+{\ttfamily \#include $<$stdio.\+h$>$}\newline
+{\ttfamily \#include $<$stdlib.\+h$>$}\newline
+{\ttfamily \#include $<$string.\+h$>$}\newline
+{\ttfamily \#include "{}dudaq.\+h"{}}\newline
+{\ttfamily \#include "{}amsg.\+h"{}}\newline
+{\ttfamily \#include "{}ad\+\_\+shm.\+h"{}}\newline
+{\ttfamily \#include "{}scope.\+h"{}}\newline
+\doxysubsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{dudaq_2files__20231205_2buffer_8c_ae48450a3bbf03edb76ed26b6fb3b272d}{buffer\+\_\+add\+\_\+t2}} (unsigned short \texorpdfstring{$\ast$}{*}bf, int bfsize, short id)
+\begin{DoxyCompactList}\small\item\em copies timestamps from all-\/event buffer into t2-\/list for DAQ. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__20231205_2buffer_8c_ad88a35049377df2a04710c8dfeac462d}{buffer\+\_\+add\+\_\+t3}} (unsigned short \texorpdfstring{$\ast$}{*}bf, int bfsize, short id)
+\begin{DoxyCompactList}\small\item\em copies events that are ready into DU\+\_\+\+EVENT messages for the DAQ \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{dudaq_2files__20231205_2buffer_8c_a43c8c03988ffb9cea769fb76d336d009}{buffer\+\_\+add\+\_\+monitor}} (unsigned short \texorpdfstring{$\ast$}{*}bf, int bfsize, short id)
+\begin{DoxyCompactList}\small\item\em add monitor events into the output buffer \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_ac34f6a3c907435633dc89c1e8f30fc13}\label{dudaq_2files__20231205_2buffer_8c_ac34f6a3c907435633dc89c1e8f30fc13} 
+int {\bfseries print\+\_\+message} (\mbox{\hyperlink{struct_a_m_s_g}{AMSG}} \texorpdfstring{$\ast$}{*}msg)
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b}\label{dudaq_2files__20231205_2buffer_8c_a0b3ad6f4f8f4b807b90fcd5de25b485b} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+ev}
+\begin{DoxyCompactList}\small\item\em shared memory containing all event info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a9a8f7033ed411c72a64fa5cf17ea3484}\label{dudaq_2files__20231205_2buffer_8c_a9a8f7033ed411c72a64fa5cf17ea3484} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+ts}
+\begin{DoxyCompactList}\small\item\em shared memory containing all timestamp info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a243df20e2497f32e6fe4835b594b2d52}\label{dudaq_2files__20231205_2buffer_8c_a243df20e2497f32e6fe4835b594b2d52} 
+\mbox{\hyperlink{structshm__struct}{shm\+\_\+struct}} {\bfseries shm\+\_\+gps}
+\begin{DoxyCompactList}\small\item\em shared memory containing all GPS info, including read/write pointers \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_aab4f38b17989bb328781b37d2861a30a}\label{dudaq_2files__20231205_2buffer_8c_aab4f38b17989bb328781b37d2861a30a} 
+\mbox{\hyperlink{struct_t_s___d_a_t_a}{TS\+\_\+\+DATA}} \texorpdfstring{$\ast$}{*} {\bfseries timestampbuf}
+\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_ae10976f7e77b1c4bcb87aaabdee78121}\label{dudaq_2files__20231205_2buffer_8c_ae10976f7e77b1c4bcb87aaabdee78121} 
+int {\bfseries evread}
+\begin{DoxyCompactList}\small\item\em pointer to the last event read \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_acac741c0dd6b0e151ab4669236de50a6}\label{dudaq_2files__20231205_2buffer_8c_acac741c0dd6b0e151ab4669236de50a6} 
+\mbox{\hyperlink{struct_g_p_s___d_a_t_a}{GPS\+\_\+\+DATA}} \texorpdfstring{$\ast$}{*} {\bfseries gpsbuf}
+\begin{DoxyCompactList}\small\item\em buffer to hold GPS information \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a991f8889cfdcd9c7db60dbf94781604a}\label{dudaq_2files__20231205_2buffer_8c_a991f8889cfdcd9c7db60dbf94781604a} 
+int32\+\_\+t {\bfseries evgps}
+\begin{DoxyCompactList}\small\item\em pointer to next GPS info \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a7935548448144453a965ca585433be6a}\label{dudaq_2files__20231205_2buffer_8c_a7935548448144453a965ca585433be6a} 
+int32\+\_\+t {\bfseries firmware\+\_\+version}
+\begin{DoxyCompactList}\small\item\em version of the firmware of the scope \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a9710d9c5d4b501d35384db6ee928dc6f}\label{dudaq_2files__20231205_2buffer_8c_a9710d9c5d4b501d35384db6ee928dc6f} 
+float \texorpdfstring{$\ast$}{*} {\bfseries ch\+\_\+volt}
+\item 
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a28b4ca647ffdaa6bd4599b4c1768bfc7}\label{dudaq_2files__20231205_2buffer_8c_a28b4ca647ffdaa6bd4599b4c1768bfc7} 
+float \texorpdfstring{$\ast$}{*} {\bfseries ch\+\_\+cur}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+routines for handling of the memory buffers 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}
+
+
+\doxysubsection{Function Documentation}
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_a43c8c03988ffb9cea769fb76d336d009}\label{dudaq_2files__20231205_2buffer_8c_a43c8c03988ffb9cea769fb76d336d009} 
+\index{buffer.c@{buffer.c}!buffer\_add\_monitor@{buffer\_add\_monitor}}
+\index{buffer\_add\_monitor@{buffer\_add\_monitor}!buffer.c@{buffer.c}}
+\doxysubsubsection{\texorpdfstring{buffer\_add\_monitor()}{buffer\_add\_monitor()}}
+{\footnotesize\ttfamily int buffer\+\_\+add\+\_\+monitor (\begin{DoxyParamCaption}\item[{unsigned short \texorpdfstring{$\ast$}{*}}]{bf,  }\item[{int}]{bfsize,  }\item[{short}]{id }\end{DoxyParamCaption})}
+
+
+
+add monitor events into the output buffer 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bf} & buffer that holds the output message to sent to DAQ \\
+\hline
+{\em bfsize} & maximum length of the information to be stored in bf \\
+\hline
+{\em id} & local station identifier \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em n} & number of monitoring blocks copied
+\begin{DoxyItemize}
+\item If there is monitoring data available
+\begin{DoxyItemize}
+\item create message header
+\item add scope id, and firmware version
+\item add second counter
+\item add total trigger rate and trigger rate for each of the channels
+\item add temperature (GPS)
+\item add voltage and current (Charge controller) 
+\end{DoxyItemize}
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyAuthor}{Author}
+C. Timmermans 
+\end{DoxyAuthor}
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_ae48450a3bbf03edb76ed26b6fb3b272d}\label{dudaq_2files__20231205_2buffer_8c_ae48450a3bbf03edb76ed26b6fb3b272d} 
+\index{buffer.c@{buffer.c}!buffer\_add\_t2@{buffer\_add\_t2}}
+\index{buffer\_add\_t2@{buffer\_add\_t2}!buffer.c@{buffer.c}}
+\doxysubsubsection{\texorpdfstring{buffer\_add\_t2()}{buffer\_add\_t2()}}
+{\footnotesize\ttfamily int buffer\+\_\+add\+\_\+t2 (\begin{DoxyParamCaption}\item[{unsigned short \texorpdfstring{$\ast$}{*}}]{bf,  }\item[{int}]{bfsize,  }\item[{short}]{id }\end{DoxyParamCaption})}
+
+
+
+copies timestamps from all-\/event buffer into t2-\/list for DAQ. 
+
+steering file for the Detector Unit software
+
+
+\begin{DoxyParams}{Parameters}
+{\em bf} & buffer that holds the output message to sent to DAQ \\
+\hline
+{\em bfsize} & maximum length of the information to be stored in bf \\
+\hline
+{\em id} & local station identifier \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em n} & number of T2-\/timestamps in the list
+\begin{DoxyItemize}
+\item If all timestamps are sent, do nothing
+\item Create a message in buffer "{}bf"{}
+\item For all events in memory, until the second marker changes or until the output buffer is full
+\begin{DoxyItemize}
+\item get the subseconds
+\item get the trigger mask
+\item fill the T2-\/message with subseconds and trigger info
+\item increase the total buffer size used
+\item go to next position in message buffer
+\item go to next event in memory
+\end{DoxyItemize}
+\item add 1 to the GPS second counter
+\item write message length in first word of message 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyAuthor}{Author}
+C. Timmermans 
+\end{DoxyAuthor}
+\Hypertarget{dudaq_2files__20231205_2buffer_8c_ad88a35049377df2a04710c8dfeac462d}\label{dudaq_2files__20231205_2buffer_8c_ad88a35049377df2a04710c8dfeac462d} 
+\index{buffer.c@{buffer.c}!buffer\_add\_t3@{buffer\_add\_t3}}
+\index{buffer\_add\_t3@{buffer\_add\_t3}!buffer.c@{buffer.c}}
+\doxysubsubsection{\texorpdfstring{buffer\_add\_t3()}{buffer\_add\_t3()}}
+{\footnotesize\ttfamily int buffer\+\_\+add\+\_\+t3 (\begin{DoxyParamCaption}\item[{unsigned short \texorpdfstring{$\ast$}{*}}]{bf,  }\item[{int}]{bfsize,  }\item[{short}]{id }\end{DoxyParamCaption})}
+
+
+
+copies events that are ready into DU\+\_\+\+EVENT messages for the DAQ 
+
+
+\begin{DoxyParams}{Parameters}
+{\em bf} & buffer that holds the output message to sent to DAQ \\
+\hline
+{\em bfsize} & maximum length of the information to be stored in bf \\
+\hline
+{\em id} & local station identifier \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em n} & number of events copied
+\begin{DoxyItemize}
+\item If all requested T3 events are sent, do nothing
+\item Loop over all waiting events
+\begin{DoxyItemize}
+\item When the nanoseconds are not yet precisely calculated, perform this calculation
+\end{DoxyItemize}
+\item Skip events older than 5 seconds for which the time has not been calculated properly
+\item Calculate the size of the next event and check if it fits in the output message
+\item Fill the AERA standard event header
+\item Add the hardware supplied event header
+\item Add the GPS quant. corrections belonging to the event
+\item Add the hardware settings from the PPS message
+\item Add the ADC values
+\item Update the pointer in the T3 ringbuffer
+\item Add 1 to the number of T3 events sent 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyAuthor}{Author}
+C. Timmermans
+\end{DoxyAuthor}
+
+\begin{DoxyParams}{Parameters}
+{\em bf} & buffer that holds the output message to sent to DAQ \\
+\hline
+{\em bfsize} & maximum length of the information to be stored in bf \\
+\hline
+{\em id} & local station identifier \\
+\hline
+\end{DoxyParams}
+
+\begin{DoxyRetVals}{Return values}
+{\em n} & number of events copied
+\begin{DoxyItemize}
+\item If all requested T3 events are sent, do nothing
+\item Add event
+\item Update the pointer in the T3 ringbuffer
+\item Add 1 to the number of T3 events sent 
+\end{DoxyItemize}\\
+\hline
+\end{DoxyRetVals}
+\begin{DoxyAuthor}{Author}
+C. Timmermans 
+\end{DoxyAuthor}

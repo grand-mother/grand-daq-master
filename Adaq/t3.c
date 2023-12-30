@@ -32,12 +32,13 @@ typedef struct{
   unsigned int sec;
   unsigned int nsec;
   int trigflag;
+  int index;
   int used;
 }T2evts;
 
 T2evts t2evts[NEVT]; //storage of data directly from the shared memory. This is the local sorted storage!
-uint16_t t3list[3+3*MAXDU]; //identifiers of the T3 event
-uint16_t t3event=0;
+uint32_t t3list[3+2*MAXDU]; //identifiers of the T3 event
+uint32_t t3event=0;
 
 int32_t t2write = 0;
 uint32_t last_read_sec = 0;
@@ -78,8 +79,6 @@ int t3_compare(const void *a, const void *b)
 void t3_gett2()
 {
   AMSG *msg;
-  T2BODY *t2b;
-  T2SSEC *t2ss;
   uint32_t sec,stat;
   uint32_t prev_nsec,nsec;
   int32_t isub,nsub;
@@ -95,15 +94,14 @@ void t3_gett2()
   while(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] == 1){ // loop over the input
     msg = (AMSG *)(&(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)+1]));
     if(msg->tag == DU_T2){    // work on T2 messages only
-      t2b = (T2BODY *)msg->body;
-      stat = t2b->DU_id; // the indices of my array start at 0, stations at 1
-      sec = T0(t2b->t0);  // obtain the seconds
-      if(sec>2000000000) {
-        shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] = 0;
-        *shm_t2.next_read = (*shm_t2.next_read) + 1;
-        if( *shm_t2.next_read >= *shm_t2.nbuf) *shm_t2.next_read = 0;
-        continue;
-      }
+      stat = msg->body[0]; // the indices of my array start at 0, stations at 1
+      sec = msg->body[1];  // obtain the seconds
+      /*if(sec>2000000000) {
+       shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_read)] = 0;
+       *shm_t2.next_read = (*shm_t2.next_read) + 1;
+       if( *shm_t2.next_read >= *shm_t2.nbuf) *shm_t2.next_read = 0;
+       continue;
+       }*/
       if(sec != last_read_sec) last_read_sec = sec;
       if((sec>(t2evts[0].sec+100))&&t2write != 0) {
         printf("T3: Error in timing, large jump; LS=%d\n",stat);
@@ -111,25 +109,25 @@ void t3_gett2()
       prev_nsec = 0;      // needed to check if we loop over into next second
       nsub = (msg->length-5)/2;  // number of subseconds in this T2
       if(idebug)
-        printf("Received %d T2s %d %u %d\n",nsub,stat,sec,t2write);
+        printf("Length %d Received %d T2s %d %u %d\n",msg->length,nsub,stat,sec,t2write);
       for(isub=0;isub<nsub;isub++){
-        t2ss = &(t2b->t2ssec[isub]);
-        nsec = T2NSEC(t2ss)+(((t2ss->ADC)&0xf)<<2); //lower bits removed (not according to specs, we have 28 bits?)
-        if(idebug)
-          printf("T2s: %d %d\n",nsec,prev_nsec);
+        //printf("\t %09d 0x%x\n",msg->body[2+2*isub],msg->body[3+2*isub]);
+        nsec = msg->body[2+2*isub];
         if(nsec < prev_nsec) sec++;
         prev_nsec = nsec;
         if(t2write> 0){
           if(sec == t2evts[t2write-1].sec &&
              nsec == t2evts[t2write-1].nsec &&
-             stat == t2evts[t2write-1].stat 
+             stat == t2evts[t2write-1].stat
              )  continue;
         }
         t2evts[t2write].insertsec = tp.tv_sec;
         t2evts[t2write].insertmusec = tp.tv_usec;
         t2evts[t2write].sec = sec; // save data into array
         t2evts[t2write].nsec = nsec;
-        t2evts[t2write].trigflag = ((t2ss->ADC>>4)&0xf);
+        t2evts[t2write].trigflag = ((msg->body[3+2*isub]>>4)&0xf);
+        t2evts[t2write].index = (msg->body[3+2*isub]>>16);
+        //printf("T2: %u %u %x %d\n",t2evts[t2write].sec,t2evts[t2write].nsec,t2evts[t2write].trigflag,t2evts[t2write].index);
         irandom++; // for random writing of data
         if(t3_rand>0){
           if(irandom >=t3_rand){
@@ -171,11 +169,11 @@ void t3_gett2()
       t2evts[ind].sec = 0;
     }
     /**if((t2evts[ind].sec>t2evts[t2write-1].sec) &&(t2evts[ind].sec-t2evts[t2write-1].sec)>MAXSEC){
-      //if(idebug)
-	printf("T3: Cleanup1 %u %u %d\n",t2evts[ind].sec,t2evts[t2write-1].sec,ind);
-      t2evts[ind].insertsec = 0; //get rid of GPS issues
-      t2evts[ind].sec = 0; //get rid of GPS issues
-      }**/
+     //if(idebug)
+     printf("T3: Cleanup1 %u %u %d\n",t2evts[ind].sec,t2evts[t2write-1].sec,ind);
+     t2evts[ind].insertsec = 0; //get rid of GPS issues
+     t2evts[ind].sec = 0; //get rid of GPS issues
+     }**/
   }
   qsort(t2evts,t2write,sizeof(T2evts),t3_compare);
   // remove old data
@@ -183,12 +181,12 @@ void t3_gett2()
   sec = t2evts[0].insertsec-MAXSEC;//t2evts[0] == newest!
   if(idebug)
     printf("Timetest %d %d %d %d\n",
-	 sec,t2evts[0].insertsec,t2evts[ind].insertsec,ind);
+           sec,t2evts[0].insertsec,t2evts[ind].insertsec,ind);
   while(sec > t2evts[ind].insertsec &&ind>0) {
     ind--; //real cleanup!
   }
   //if(sec >t2evts[1].insertsec )
-    t2write = ind+1;
+  t2write = ind+1;
   //else t2write = ind;
   //printf("t2write =  %d\n",t2write);
 }
@@ -231,7 +229,7 @@ void t3_maket3()
   struct timezone tz;
   
   gettimeofday(&tp,&tz);
-
+  
   if(idebug)
     printf("Entering make t3 %d\n",t2write);
   for(ind=(t2write-1);ind>=0;ind--){
@@ -262,31 +260,31 @@ void t3_maket3()
       }
       if(tdif<0) tdif = t3_time+1;
       /*if(tdif <= ctimes[t2evts[i].unit][t2evts[ind].unit]) { // later when we have a field
-        if ((isten && (t2evts[i].trigflag&0x4)) || (isten==0 &&(t2evts[i].trigflag&0x4))==0){
-          eventindex[evsize] = i;
-          evsize++;
-          if(evsize>=MAXDU) {
-            printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
-            evsize = MAXDU-1;
-          }
-          if((ctimes[t2evts[i].unit][t2evts[ind].unit]<=TNEAR)
-             &&(t2evts[i].unit != t2evts[ind].unit)) evnear++;
-        }
-      } else if(tdif>TCOINC) break;*/
+       if ((isten && (t2evts[i].trigflag&0x4)) || (isten==0 &&(t2evts[i].trigflag&0x4))==0){
+       eventindex[evsize] = i;
+       evsize++;
+       if(evsize>=MAXDU) {
+       printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
+       evsize = MAXDU-1;
+       }
+       if((ctimes[t2evts[i].unit][t2evts[ind].unit]<=TNEAR)
+       &&(t2evts[i].unit != t2evts[ind].unit)) evnear++;
+       }
+       } else if(tdif>TCOINC) break;*/
       if(tdif<=t3_time) {
-	eventindex[evsize] = i;
-	evsize++;
-	if(evsize>=MAXDU) {
-	  printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
-	  evsize = MAXDU-1;
-	}
+        eventindex[evsize] = i;
+        evsize++;
+        if(evsize>=MAXDU) {
+          printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
+          evsize = MAXDU-1;
+        }
       }
       else break;
     }
     // trigger condition is easy
     //if((evsize>=NTRIG &&evnear>=NNEAR) || isten == 1 || israndom == 1) {
     if(evsize>=t3_stat || isten == 1 || israndom == 1) {
-      if(isten == 1) printf("Found a T10 with %d stations T=%u\n",evsize,t2evts[ind].sec);
+      //if(isten == 1) printf("Found a Minbias with %d stations T=%u\n",evsize,t2evts[ind].sec);
       //start creating the list to send
       t3list[0] = 3; // length before adding a station
       if(isten == 1) t3list[1] = DU_GET_MINBIAS_EVENT;
@@ -297,10 +295,10 @@ void t3_maket3()
       for(i=0;i<evsize;i++){
         t2evts[eventindex[i]].used = 1;
         t3stat = (T3STATION *)(&(t3list[ip]));
-        T3STATFILL(t3stat,t2evts[eventindex[i]].stat,t2evts[eventindex[i]].sec,
-                   ((t2evts[eventindex[i]].nsec)>>6)); //filling the station info
-        ip+=3;
-        t3list[0]+=3;
+        t3stat->DU_id =  t2evts[eventindex[i]].stat;
+        t3stat->index = t2evts[eventindex[i]].index;
+        ip+=2;
+        t3list[0]+=2;
       }
       // move the event to shared memory to be sent
       ntry = 0;
@@ -311,7 +309,8 @@ void t3_maket3()
       if(ntry >= 10 &&shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)] != 0 ){
         printf("T3: No buffer, loosing data\n");
       }else{
-        memcpy((void *)&(shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)+1]),(void *)t3list,2*t3list[0]);
+        //printf("Requesting T3 %d %d\n",t3event,*shm_t3.next_write);
+        memcpy((void *)&(shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)+1]),(void *)t3list,4*t3list[0]);
         shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)] = 3; // to be read by du and eb, thus will be 3 (=1+2)!!
         *shm_t3.next_write = *shm_t3.next_write + 1;
         if(*shm_t3.next_write >= *shm_t3.nbuf) *shm_t3.next_write = 0;
@@ -325,15 +324,15 @@ void t3_initialize()
 {
   int i,j;
   int Narray = sqrt(MAXDU);
-
+  
   for(i=0;i<MAXDU;i++){
     statlist[i] = 5100+i; //for now all hardcoded dummies
     posx[i] = 1000*(i%Narray);
     posy[i] = 1000*(i/Narray);
     for(j=0;j<=i;j++){
       ctimes[i][j] = 100+(int)(GIGA*
-        sqrt((posx[i]-posx[j])*(posx[i]-posx[j])+(posy[i]-posy[j])*(posy[i]-posy[j]))/3E8);
-       ctimes[j][i] = ctimes[i][j];
+                               sqrt((posx[i]-posx[j])*(posx[i]-posx[j])+(posy[i]-posy[j])*(posy[i]-posy[j]))/3E8);
+      ctimes[j][i] = ctimes[i][j];
     }
   }
 }

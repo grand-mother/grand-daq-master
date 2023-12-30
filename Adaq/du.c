@@ -22,38 +22,33 @@ extern int idebug;
 #define MAXLOG 8 //max 8 lines output (monitor!)
 char loglines[MAXLOG][80];
 
-#define SAMP_FREQ 500.0
-int getNotchFilterCoeffs(double nu_s, double r, int xtraPipe, int *a, int *b, int *aLen, int *bLen);
+void coeffs(float Fnotch, float r,unsigned int *values);
 
 #define Reg_Rate 0x1E0
 extern int running;
 extern int errno;
 
-void du_send();
-uint16_t du_read_initfile();
+void du_send(uint32_t *bf,int du);
+uint32_t du_read_initfile(int ls,uint32_t *bf);
 
-#define SOCKETS_BUFFER_SIZE  1048576//131072
-#define SOCKETS_TIMEOUT      100
 
 /*!
- \func du_interpret(uint16_t *buffer)
+ \func du_interpret(uint32_t *buffer)
  \brief interprets the data in the buffer
  \param buf pointer to the data to send
  Copies information in the buffer to either the event-shared memory
  or the t2 shared memory
  */
-void du_interpret(uint16_t *buffer)
+void du_interpret(uint32_t *buffer)
 {
   AMSG *msg;
-  T2BODY *t2b;
   int ntry;
   
   int32_t i=1;
-  while(i<buffer[0]-1){
+  while(i<buffer[0]-2){ // 2 tail words
     msg = (AMSG *)(&(buffer[i]));
-    t2b = (T2BODY *)msg->body;
     if(idebug)
-      printf("DU: received message %d First word %d %d %d\n",msg->tag,msg->body[0],msg->body[1],msg->body[2]);
+      printf("DU: received message %d First word %d %d %d Length: %d\n",msg->tag,msg->body[0],msg->body[1],msg->body[2],msg->length);
     switch(msg->tag){ //based on tag, data is moved to different servers
       case DU_T2:
         if(msg->length<T2SIZE){
@@ -67,7 +62,7 @@ void du_interpret(uint16_t *buffer)
           if(ntry >=10 && shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_write)] == 1){
             printf("DU: No buffer, loosing data\n");
           }else{
-            memcpy((void *)&(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_write)+1]),(void *)msg,2*msg->length);
+            memcpy((void *)&(shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_write)+1]),(void *)msg,INTSIZE*msg->length);
             shm_t2.Ubuf[(*shm_t2.size)*(*shm_t2.next_write)] = 1;
             // update shared memory pointer
             *shm_t2.next_write = *shm_t2.next_write + 1;
@@ -83,9 +78,11 @@ void du_interpret(uint16_t *buffer)
       case DU_EVENT:
         if(idebug)
           printf("Received an event\n");
-        uint16_t *DUinfo;
-        DUinfo = (uint16_t *)msg->body;
-        printf("DU: Found event %d (%d, %d)\n",DUinfo[EVT_ID],DUinfo[EVT_HARDWARE], *(uint32_t *)&DUinfo[EVT_SECOND]);
+        uint32_t *DUinfo;
+        DUinfo = (uint32_t *)msg->body;
+        //printf("DU: Found event L=%d ID = %d (%d, %u)\n",msg->length,DUinfo[EVT_EVT_ID],DUinfo[EVT_HARDWARE_ID], DUinfo[EVT_SECOND]);
+        //printf("DU: ADC = %08x %08x %08x %08x\n",DUinfo[EVT_HDR_LENGTH], DUinfo[EVT_HDR_LENGTH+1]
+        //       , DUinfo[EVT_HDR_LENGTH+2], DUinfo[EVT_HDR_LENGTH+3]);
       case DU_NO_EVENT:
         if(msg->length<EVSIZE){
           // wait until the shared memory is not full
@@ -97,7 +94,7 @@ void du_interpret(uint16_t *buffer)
           }
           // copy the event/monitor data
           if(ntry<100){
-            memcpy((void *)&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)+1]),(void *)msg,2*msg->length);
+            memcpy((void *)&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)+1]),(void *)msg,INTSIZE*msg->length);
             shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] = 1;
             *shm_eb.next_write = *shm_eb.next_write + 1;
             if(*shm_eb.next_write >= *shm_eb.nbuf) *shm_eb.next_write = 0;
@@ -128,13 +125,13 @@ int set_socketoptions(int sock)
   int option;
   struct timeval timeout;
   // set default socket options
-  option = 1;
+  option = SOCKETS_REUSEADDR_OPT;
   if(setsockopt (sock,SOL_SOCKET, SO_REUSEADDR,&option,
                  (socklen_t)(sizeof (int)) )<0) return(ERROR);
-  option = 0;
+  option = SOCKETS_KEEPALIVE_OPT;
   if(setsockopt (sock,SOL_SOCKET, SO_KEEPALIVE,&option,
                  (socklen_t)(sizeof (int)) ) < 0) return(ERROR);
-  option = 1;
+  option = SOCKETS_NODELAY_OPT;
   if(setsockopt (sock,IPPROTO_TCP, TCP_NODELAY, &option,
                  (socklen_t)(sizeof (int)) )<0) return(ERROR);
   option = SOCKETS_BUFFER_SIZE;
@@ -142,11 +139,11 @@ int set_socketoptions(int sock)
                  (socklen_t)(sizeof (int)) )<0) return(ERROR);
   if(setsockopt (sock,SOL_SOCKET, SO_RCVBUF,&option,
                  (socklen_t)(sizeof (int)) )<0) return(ERROR);
-  timeout.tv_usec = SOCKETS_TIMEOUT;//was 100000
+  timeout.tv_usec = SOCKETS_TIMEOUT;
   timeout.tv_sec = 0;
   if(setsockopt (sock,SOL_SOCKET, SO_RCVTIMEO,&timeout,
                  (socklen_t)(sizeof (struct timeval)) )<0) return(ERROR);
-  timeout.tv_usec = SOCKETS_TIMEOUT;//was 100000
+  timeout.tv_usec = SOCKETS_TIMEOUT;
   timeout.tv_sec = 0;
   if(setsockopt (sock,SOL_SOCKET, SO_SNDTIMEO,&timeout,
                  (socklen_t)(sizeof (struct timeval))  )<0) return(ERROR);
@@ -161,7 +158,7 @@ int set_socketoptions(int sock)
 void du_init_and_run(int il)
 {
   int length;
-  uint16_t du_cmd[CMDSIZE]; // for other commands
+  uint32_t du_cmd[CMDSIZE]; // for other commands
   
   du_cmd[2] = DU_INITIALIZE;
   du_cmd[3] =  DUinfo[il].DUid;
@@ -170,11 +167,11 @@ void du_init_and_run(int il)
     // First initialize
     du_cmd[4+length] = GRND1;
     du_cmd[5+length] = GRND2;
-    du_cmd[0] = 5+length;
+    du_cmd[0] = 6+length;
     du_cmd[1] = 3+length;
     du_send(du_cmd,il);
     // next start
-    du_cmd[0] = 5;
+    du_cmd[0] = 6;
     du_cmd[1] = 3;
     du_cmd[2] = DU_START;
     du_cmd[4] = GRND1;
@@ -198,7 +195,7 @@ void du_connect()
   struct tm *tlocal;
   ssize_t recvRet;
   socklen_t RDalength;
-  uint16_t buffer[2];
+  uint32_t buffer[2];
   char line[800];
 
   gettimeofday(&tnow,&tzone);
@@ -273,7 +270,7 @@ void du_read()
   int i,ntry;
   int bytesRead,nread;
   ssize_t recvRet,rsend;
-  uint16_t buffer[50000]; //temp!
+  uint32_t buffer[50000]; //temp!
   uint8_t *bf = (uint8_t *)buffer;
   struct timeval tnow;
   struct timezone tzone;
@@ -284,38 +281,48 @@ void du_read()
     RDalength = DUinfo[i].DUalength;
     if(DUinfo[i].DUsock < 0) continue;
     // first read length of buffer
-    while((recvRet = recvfrom(DUinfo[i].DUsock,buffer,2,0,
-                              (struct sockaddr*)&DUinfo[i].DUaddress,&RDalength))==2){
+    buffer[0] = 0;
+    while((recvRet = recvfrom(DUinfo[i].DUsock,buffer,INTSIZE,0,
+                              (struct sockaddr*)&DUinfo[i].DUaddress,&RDalength))==INTSIZE){
       RDalength = DUinfo[i].DUalength;
       if ((buffer[0] == 0) || (buffer[0]>EVSIZE)) {
         printf("DU: du_read: The buffer from station %d cannot be handled size=%d\n",DUinfo[i].DUid,buffer[0]);
-        shutdown(DUinfo[i].DUsock,SHUT_RDWR);
-        close(DUinfo[i].DUsock);
-        DUinfo[i].DUsock = -1;
-        DUinfo[i].LSTconnect = 0;
+        ntry = 0;
+        while((recvRet = recvfrom(DUinfo[i].DUsock,buffer,INTSIZE,0,
+                                  (struct sockaddr*)&DUinfo[i].DUaddress,&RDalength))==INTSIZE) {
+          if(ntry<10) printf("Data = 0x%08x %d\n",buffer[0],buffer[0]);
+          ntry++;
+          usleep(10);
+        }
+        //shutdown(DUinfo[i].DUsock,SHUT_RDWR);
+        //close(DUinfo[i].DUsock);
+        //DUinfo[i].DUsock = -1;
+        //DUinfo[i].LSTconnect = 0;
         continue;
       }
       // read remaining data
-      bytesRead = 2;
+      bytesRead = INTSIZE;
       ntry = 0;
-      //printf("Socket reading-before loop  %d %d\n",bytesRead,(2*buffer[0]+2));
-      while (bytesRead < (2*buffer[0]+2)) { //size is in shorts, including the first word!
-        nread = 2*buffer[0]+2-bytesRead;
+      //printf("Socket reading-before loop  %d %d\n",bytesRead,(INTSIZE*buffer[0]));
+      while (bytesRead < (INTSIZE*buffer[0])) { //size is in ints, including the first word!
+        nread = INTSIZE*buffer[0]-bytesRead;
         //if(nread>SOCKETS_BUFFER_SIZE/2) nread = SOCKETS_BUFFER_SIZE/2;
-        //printf("Socket reading %d %d %d\n",bytesRead,(2*buffer[0]+2),nread);
+        //printf("Socket reading %d %d %d\n",bytesRead,(INTSIZE*buffer[0]),nread);
+        errno = 0;
         recvRet = recvfrom(DUinfo[i].DUsock,&bf[bytesRead],
                            nread,0,(struct sockaddr*)&DUinfo[i].DUaddress,&RDalength);
+        //printf("After Socket reading %zd %d\n",recvRet,errno);
         RDalength = DUinfo[i].DUalength;
         if(errno == EAGAIN ) {
           if(recvRet>0) {
             bytesRead+=recvRet;
             ntry = 0;
           }else{
-	    ntry++;
-	    usleep(10);
-	  }
+            ntry++;
+            usleep(10);
+          }
           if(ntry == 20) {
-	    printf("Socket read error %d %d\n",2*buffer[0]+2,bytesRead);
+            printf("Socket read error %d %d\n",2*buffer[0],bytesRead);
             buffer[0] = 0;
             shutdown(DUinfo[i].DUsock,SHUT_RDWR);
             close(DUinfo[i].DUsock);
@@ -332,19 +339,19 @@ void du_read()
           DUinfo[i].LSTconnect = 0;
           break;
         }else {
-	  if(recvRet>0){
-	    bytesRead += recvRet;
-	    ntry = 0;
-	  }else{
-	    ntry++;
-	    usleep(10);
-	  }
+          if(recvRet>0){
+            bytesRead += recvRet;
+            ntry = 0;
+          }else{
+            ntry++;
+          }
+          usleep(10);
         }
       } // while read data
-      if(buffer[0] > 0 &&bytesRead == 2*(buffer[0]+1)&&recvRet>0) {
+      if(buffer[0] > 0 &&bytesRead == INTSIZE*(buffer[0])&&recvRet>0) {
         du_interpret(buffer);
       }else{
-	printf("DU Error in Receive %d %d %ld\n",bytesRead,2*buffer[0]+2,recvRet);
+        printf("DU Error in Receive %d %d %ld\n",bytesRead,2*buffer[0],recvRet);
       }
       DUinfo[i].LSTconnect = tnow.tv_sec;
     }
@@ -357,14 +364,14 @@ void du_read()
     }
     // send an ALIVE message if the latest event was more than 1 sec ago!
     if((tnow.tv_sec-DUinfo[i].LSTconnect) > 1){
-      buffer[0] = 5;
+      buffer[0] = 6;
       buffer[1] = 3;
       buffer[2] = ALIVE;
       buffer[3] = DUinfo[i].DUid;
       buffer[4] = GRND1;
       buffer[5] = GRND2;
       //printf("Sending ALIVE\n");
-      rsend = sendto(DUinfo[i].DUsock,buffer,2*buffer[0]+2, 0,(struct sockaddr*)&DUinfo[i].DUaddress,
+      rsend = sendto(DUinfo[i].DUsock,buffer,INTSIZE*buffer[0], 0,(struct sockaddr*)&DUinfo[i].DUaddress,
                      DUinfo[i].DUalength);
       if(rsend<0 && errno != EAGAIN ) {
         shutdown(DUinfo[i].DUsock,SHUT_RDWR);
@@ -379,10 +386,10 @@ void du_read()
 }
 
 /*!
- \func void du_send(uint16_t *bf,int ls)
+ \func void du_send(uint32_t *bf,int ls)
  \brief write data to socket
  */
-void du_send(uint16_t *bf,int du)
+void du_send(uint32_t *bf,int du)
 {
   ssize_t rsend;
   int sentbytes,length;
@@ -393,7 +400,7 @@ void du_send(uint16_t *bf,int du)
   gettimeofday(&tnow,&tzone);
   
   sentbytes = 0;
-  length = 2*bf[0]+2; // also the first word; sigh...
+  length = INTSIZE*bf[0];
   
   ntry = 0;
   while(sentbytes<length){
@@ -421,21 +428,21 @@ void du_send(uint16_t *bf,int du)
 }
 
 /*!
- \func uint16_t du_read_initfile(int ls,uint16_t *bf)
+ \func uint32_t du_read_initfile(int ls,uint32_t *bf)
  \brief reads the configuration file. Also calculates the filter parameters from the input file!
  note: does not check the size of the buffer (bf)!
  */
-uint16_t du_read_initfile(int ls,uint16_t *bf)
+uint32_t du_read_initfile(int ls,uint32_t *bf)
 {
 #define XTRA_PIPE 4
-  uint16_t rcode = 0;
+  uint32_t rcode = 0;
   FILE *fp;
   char line[200];
   char fname[200];
   int axi,reg,val;
   int i;
   double freq,width;
-  int a[10],b[10],aLen,bLen;
+  unsigned int a[5];
   
   sprintf(fname,"conf/DU/grand_%03d",ls);
   fp = fopen(fname,"r");
@@ -450,42 +457,27 @@ uint16_t du_read_initfile(int ls,uint16_t *bf)
     if(line[0]==0 || line[0] == '#') continue;
     if(sscanf(line,"%d 0x%x 0x%x",&axi,&reg,&val) == 3){
       if(axi < 32 || reg == Reg_Rate){ // normal registers
-        bf[rcode++] = axi;
-        bf[rcode++] = reg;
+        bf[rcode++] = (reg<<16)+(axi&0xffff);
         bf[rcode++] = val;
       }
     }else{// filter
       if(sscanf(line,"%d 0x%x %lg %lg",&axi,&reg,&freq,&width) == 4){
-        getNotchFilterCoeffs(freq/SAMP_FREQ, width, XTRA_PIPE, a, b, &aLen, &bLen);
-        bf[rcode++] = axi;
-        bf[rcode++] = reg;
-        bf[rcode++] = a[1]&0xffff;
-        bf[rcode++] = axi;
-        bf[rcode++] = reg+2;
-        bf[rcode++] = a[2]&0xffff;
-        bf[rcode++] = axi+1;
-        bf[rcode++] = reg+4;
-        bf[rcode++] = b[1]&0xffff;
-        bf[rcode++] = axi+1;
-        bf[rcode++] = reg+6;
-        bf[rcode++] = b[2]&0xffff;
-        bf[rcode++] = axi+2;
-        bf[rcode++] = reg+8;
-        bf[rcode++] = b[3]&0xffff;
-        bf[rcode++] = axi+2;
-        bf[rcode++] = reg+10;
-        bf[rcode++] = b[4]&0xffff;
-        bf[rcode++] = axi+3;
-        bf[rcode++] = reg+12;
-        bf[rcode++] = b[5]&0xffff;
-        bf[rcode++] = axi+3;
-        bf[rcode++] = reg+14;
-        bf[rcode++] = b[6]&0xffff;
+        coeffs(freq, width,a);
+        bf[rcode++] = (reg<<16)+(axi&0xffff);
+        bf[rcode++] = a[0];
+        bf[rcode++] = ((reg+4)<<16)+((axi+1)&0xffff);;
+        bf[rcode++] = a[1];
+        bf[rcode++] = ((reg+8)<<16)+((axi+2)&0xffff);;
+        bf[rcode++] = a[2];
+        bf[rcode++] = ((reg+12)<<16)+((axi+3)&0xffff);;
+        bf[rcode++] = a[3];
+        bf[rcode++] = ((reg+16)<<16)+((axi+4)&0xffff);;
+        bf[rcode++] = a[4];
       }
     }
   }
   fclose(fp);
-  printf("code After initfile: %d",rcode);
+  printf("code After initfile: %d\n",rcode);
   return(rcode);
 }
 
@@ -497,32 +489,29 @@ void du_write()
 {
   AMSG *msg;
   T3BODY *T3info;
-  uint16_t get_t3event[9]={8,6,DU_GETEVENT,0,0,0,0,GRND1,GRND2}; //last word will be magic at some point
-  uint16_t du_cmd[CMDSIZE]; // for other commands
+  uint32_t get_t3event[9]={9,6,DU_GETEVENT,0,0,0,0,GRND1,GRND2}; //last word will be magic at some point
+  uint32_t du_cmd[CMDSIZE]; // for other commands
   int n_t3_du,it3;
   unsigned int ssec;
   int il,length;
-  du_geteventbody *evtinfo= (du_geteventbody *)(&(get_t3event[3]));
   
   // read t3 request from memory and send to DU
   while((shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_read)])  !=  0){ // loop over the T3 input
     if(((shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_read)]) &1) ==  1) {
       msg = (AMSG *)(&(shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_read)+1]));
       T3info = (T3BODY *)(&(msg->body[0])); //set the T3 info pointer
-      evtinfo->event_nr = T3info->event_nr; //get event number from T3
       n_t3_du = (msg->length-3)/T3STATIONSIZE; // msg == length+tag+eventnr+T3stations
       for(it3=0;it3<n_t3_du;it3++){ // loop over all stations in T3 list
-        if(idebug) printf("DU: Need to request a T3 %d %d\n",T3info->t3station[it3].DU_id,T3info->t3station[it3].sec);
+        //printf("DU: Need to request a T3 %d %d %d\n",*shm_t3.next_read,
+        //       T3info->t3station[it3].DU_id,T3info->t3station[it3].index);
         for(il=0;il<tot_du;il++){ //loop over all DU in the DAQ
           if(T3info->t3station[it3].DU_id== 0 || T3info->t3station[it3].DU_id == DUinfo[il].DUid){
             // request event from station
             get_t3event[2] =  msg->tag;
-            evtinfo->DU_id = DUinfo[il].DUid;                 // translate t3list into du_getevent
-            evtinfo->sec = T3info->t3station[it3].sec;
-            evtinfo->NS1 = T3info->t3station[it3].NS1;
-            evtinfo->NS2 = T3info->t3station[it3].NS2;
-            evtinfo->NS3 = T3info->t3station[it3].NS3;
-            //printf("DU: Requesting a T3 %d %d\n",evtinfo->DU_id,evtinfo->sec);
+            get_t3event[3] =  DUinfo[il].DUid;
+            get_t3event[4] =  T3info->event_nr;
+            get_t3event[5] =  T3info->t3station[it3].index;
+            //printf("DU: Requesting a T3 %d %d %d\n",get_t3event[3],get_t3event[4],get_t3event[5]);
             du_send(get_t3event,il);
           }
         }
@@ -541,7 +530,7 @@ void du_write()
       if(msg->tag == DU_START) running = 1;
       if(msg->tag == DU_STOP) running = 0;
       if(msg->tag == DU_STOP || msg->tag == DU_START){
-        du_cmd[0] = 5;
+        du_cmd[0] = 6;
         du_cmd[1] = 3;
         du_cmd[2] = msg->tag;
         du_cmd[4] = GRND1;
@@ -560,8 +549,11 @@ void du_write()
             if(length>0){
               du_cmd[4+length] = GRND1;
               du_cmd[5+length] = GRND2;
-              du_cmd[0] = 5+length;
+              du_cmd[0] = 6+length;
               du_cmd[1] = 3+length;
+              //for(int i=0;i<du_cmd[0];i++){
+              //  printf("%d %08x %d\n",i,du_cmd[i],du_cmd[i]);
+              //}
               du_send(du_cmd,il);
             }
           }
@@ -603,7 +595,7 @@ void du_main()
   fp_log = fopen(fname,"w");
   du_connect();
   while(1) {
-    usleep(1000);
+    usleep(100);
     fseek(fp_log,0,SEEK_SET);
     du_read();
     du_write();

@@ -1,0 +1,242 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/myfiles/amsg.h File Reference}
+\hypertarget{dudaq_2myfiles_2amsg_8h}{}\label{dudaq_2myfiles_2amsg_8h}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/myfiles/amsg.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/myfiles/amsg.h}}
+
+
+General definitions used in the AERA DAQ.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_a_m_s_g}{AMSG}}
+\item 
+struct \mbox{\hyperlink{struct_t2_s_s_e_c}{T2\+SSEC}}
+\item 
+struct \mbox{\hyperlink{struct_t2_b_o_d_y}{T2\+BODY}}
+\item 
+struct \mbox{\hyperlink{struct_t3_s_t_a_t_i_o_n}{T3\+STATION}}
+\item 
+struct \mbox{\hyperlink{struct_t3_b_o_d_y}{T3\+BODY}}
+\item 
+struct \mbox{\hyperlink{struct_e_v_e_n_t_b_o_d_y}{EVENTBODY}}
+\item 
+struct \mbox{\hyperlink{structdu__geteventbody}{du\+\_\+geteventbody}}
+\item 
+struct \mbox{\hyperlink{structls__no__eventbody}{ls\+\_\+no\+\_\+eventbody}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a60048da1a819f66bf1e01b6936653738}\label{dudaq_2myfiles_2amsg_8h_a60048da1a819f66bf1e01b6936653738} 
+\#define {\bfseries DU\+\_\+\+BOOT}~0
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ada52376adbc96304382d39bb49347760}\label{dudaq_2myfiles_2amsg_8h_ada52376adbc96304382d39bb49347760} 
+\#define {\bfseries DU\+\_\+\+UPLOAD}~1
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ad05e6bf167729a806b757668641d2de2}\label{dudaq_2myfiles_2amsg_8h_ad05e6bf167729a806b757668641d2de2} 
+\#define {\bfseries DU\+\_\+\+RESET}~2
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a2d0574373f1d9614d3d9c852cec615a5}\label{dudaq_2myfiles_2amsg_8h_a2d0574373f1d9614d3d9c852cec615a5} 
+\#define {\bfseries DU\+\_\+\+INITIALIZE}~3
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a6b4d021acd71f38f3204ff76188bf85d}\label{dudaq_2myfiles_2amsg_8h_a6b4d021acd71f38f3204ff76188bf85d} 
+\#define {\bfseries DU\+\_\+\+SET}~4
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_aeff613d749a6204a8188d7a1ec9714d9}\label{dudaq_2myfiles_2amsg_8h_aeff613d749a6204a8188d7a1ec9714d9} 
+\#define {\bfseries DU\+\_\+\+GET}~5
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a0df1726ee63ab11f26b5b04a9f5bdcbb}\label{dudaq_2myfiles_2amsg_8h_a0df1726ee63ab11f26b5b04a9f5bdcbb} 
+\#define {\bfseries DU\+\_\+\+MONITOR}~6
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a97a7617b69455409932863e20e78a6fe}\label{dudaq_2myfiles_2amsg_8h_a97a7617b69455409932863e20e78a6fe} 
+\#define {\bfseries DU\+\_\+\+START}~7
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a0812a3f8d67c39c5939e83ae74d72460}\label{dudaq_2myfiles_2amsg_8h_a0812a3f8d67c39c5939e83ae74d72460} 
+\#define {\bfseries DU\+\_\+\+STOP}~8
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a3059d2ff66b13663c253bc9925346c57}\label{dudaq_2myfiles_2amsg_8h_a3059d2ff66b13663c253bc9925346c57} 
+\#define {\bfseries DU\+\_\+\+T2}~9
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a17dd7bd2c5c123c0a5623ec7106bde92}\label{dudaq_2myfiles_2amsg_8h_a17dd7bd2c5c123c0a5623ec7106bde92} 
+\#define {\bfseries DU\+\_\+\+GETEVENT}~10
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a918dcf51399c1df12c746f602297334d}\label{dudaq_2myfiles_2amsg_8h_a918dcf51399c1df12c746f602297334d} 
+\#define {\bfseries DU\+\_\+\+NO\+\_\+\+EVENT}~11
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_adfcb7c11103e8b810b61226761d5d388}\label{dudaq_2myfiles_2amsg_8h_adfcb7c11103e8b810b61226761d5d388} 
+\#define {\bfseries DU\+\_\+\+EVENT}~12
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a7798ac7f6e39ca384cd2969b9ccc2030}\label{dudaq_2myfiles_2amsg_8h_a7798ac7f6e39ca384cd2969b9ccc2030} 
+\#define {\bfseries DU\+\_\+\+GETMEM}~13
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a0a694c638d3aa987c9d26c4f39785f35}\label{dudaq_2myfiles_2amsg_8h_a0a694c638d3aa987c9d26c4f39785f35} 
+\#define {\bfseries DU\+\_\+\+SETMEM}~14
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a7ea6b5785c78453c02a1ab69d43a4689}\label{dudaq_2myfiles_2amsg_8h_a7ea6b5785c78453c02a1ab69d43a4689} 
+\#define {\bfseries DU\+\_\+\+SETBIT}~15
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ae656482ec6bec464601200e1dcd4ccf3}\label{dudaq_2myfiles_2amsg_8h_ae656482ec6bec464601200e1dcd4ccf3} 
+\#define {\bfseries DU\+\_\+\+CLRBIT}~16
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_aa61856bb25b463badf9057d4c38abf16}\label{dudaq_2myfiles_2amsg_8h_aa61856bb25b463badf9057d4c38abf16} 
+\#define {\bfseries DU\+\_\+\+GETFILE}~17
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a732a8d1243daf6d7441f9fc83a3e143f}\label{dudaq_2myfiles_2amsg_8h_a732a8d1243daf6d7441f9fc83a3e143f} 
+\#define {\bfseries DU\+\_\+\+SENDFILE}~18
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_abca5864aaf9061591ca95bf60f44fba4}\label{dudaq_2myfiles_2amsg_8h_abca5864aaf9061591ca95bf60f44fba4} 
+\#define {\bfseries DU\+\_\+\+EXEC}~19
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_afce4959b958bd9c958e2d2d842b50679}\label{dudaq_2myfiles_2amsg_8h_afce4959b958bd9c958e2d2d842b50679} 
+\#define {\bfseries DU\+\_\+\+CONNECT}~20
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_adc8a6812659084e0c0e7fc4e415082ce}\label{dudaq_2myfiles_2amsg_8h_adc8a6812659084e0c0e7fc4e415082ce} 
+\#define {\bfseries DU\+\_\+\+LISTEN}~21
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8a0f71d38a7f4e873c3f5a9284e7073c}\label{dudaq_2myfiles_2amsg_8h_a8a0f71d38a7f4e873c3f5a9284e7073c} 
+\#define {\bfseries DU\+\_\+\+SCRIPT}~22
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a14716b9f261c1edcdd34c50c7dd81ce6}\label{dudaq_2myfiles_2amsg_8h_a14716b9f261c1edcdd34c50c7dd81ce6} 
+\#define {\bfseries DU\+\_\+\+GET\+\_\+\+MINBIAS\+\_\+\+EVENT}~29
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a3c50f6cdca3e9fb90e35e390844faa9e}\label{dudaq_2myfiles_2amsg_8h_a3c50f6cdca3e9fb90e35e390844faa9e} 
+\#define {\bfseries DU\+\_\+\+GET\+\_\+\+RANDOM\+\_\+\+EVENT}~32
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_acf5a614093f6362cb5454a3aa9a2fa24}\label{dudaq_2myfiles_2amsg_8h_acf5a614093f6362cb5454a3aa9a2fa24} 
+\#define {\bfseries T3\+\_\+\+EVENT\+\_\+\+REQUEST\+\_\+\+LIST}~201
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a3542cd108a842589af77f804d45fc9f8}\label{dudaq_2myfiles_2amsg_8h_a3542cd108a842589af77f804d45fc9f8} 
+\#define {\bfseries GUI\+\_\+\+UPDATE\+\_\+\+DB}~401
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_acc81fa0c658a5f4e1a1dae4e78d1ac9a}\label{dudaq_2myfiles_2amsg_8h_acc81fa0c658a5f4e1a1dae4e78d1ac9a} 
+\#define {\bfseries GUI\+\_\+\+INITIALIZE}~402
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a394e3c445eaa5cff11ed232b39f7ab2f}\label{dudaq_2myfiles_2amsg_8h_a394e3c445eaa5cff11ed232b39f7ab2f} 
+\#define {\bfseries GUI\+\_\+\+START\+\_\+\+RUN}~403
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a47c695adf43ed52cddcbcd4268de69d7}\label{dudaq_2myfiles_2amsg_8h_a47c695adf43ed52cddcbcd4268de69d7} 
+\#define {\bfseries GUI\+\_\+\+STOP\+\_\+\+RUN}~404
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a223f24c9bc40244aa695fe8a38578398}\label{dudaq_2myfiles_2amsg_8h_a223f24c9bc40244aa695fe8a38578398} 
+\#define {\bfseries GUI\+\_\+\+DELETE\+\_\+\+RUN}~406
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8b8a7fb489f54f43660fcd20820116ea}\label{dudaq_2myfiles_2amsg_8h_a8b8a7fb489f54f43660fcd20820116ea} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SETATTENUATION}~450
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ac4d9c5b98bb138624f5d63d7d3daf021}\label{dudaq_2myfiles_2amsg_8h_ac4d9c5b98bb138624f5d63d7d3daf021} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SWITCHIO}~451
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8e0607d41e7c77354029560c985108c1}\label{dudaq_2myfiles_2amsg_8h_a8e0607d41e7c77354029560c985108c1} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SETMODE}~452
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a815d56a67abc1beb7a3227ca80d6a924}\label{dudaq_2myfiles_2amsg_8h_a815d56a67abc1beb7a3227ca80d6a924} 
+\#define {\bfseries GRND1}~0x5247
+\begin{DoxyCompactList}\small\item\em End word1 for a message (GR) \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a670a5d7016643c339da8d4b434d047f3}\label{dudaq_2myfiles_2amsg_8h_a670a5d7016643c339da8d4b434d047f3} 
+\#define {\bfseries GRND2}~0x444E
+\begin{DoxyCompactList}\small\item\em End word 2 for a message (ND) \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ad8beef706da0344be19d59438fcdab6d}\label{dudaq_2myfiles_2amsg_8h_ad8beef706da0344be19d59438fcdab6d} 
+\#define {\bfseries ALIVE}~9998
+\begin{DoxyCompactList}\small\item\em Alive command sent by central DAQ. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_aa8afb4bb746d3ec3e77e0db892da3649}\label{dudaq_2myfiles_2amsg_8h_aa8afb4bb746d3ec3e77e0db892da3649} 
+\#define {\bfseries ALIVE\+\_\+\+ACK}~9999
+\begin{DoxyCompactList}\small\item\em Acknowledge alive, sent by DU. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ac9491384e7b09b4130fd756075f6aef0}\label{dudaq_2myfiles_2amsg_8h_ac9491384e7b09b4130fd756075f6aef0} 
+\#define {\bfseries DU\+\_\+\+HWNL}~1
+\begin{DoxyCompactList}\small\item\em Dutch hardware. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a78d7d81cdd39806bdaaf6ee987b491c5}\label{dudaq_2myfiles_2amsg_8h_a78d7d81cdd39806bdaaf6ee987b491c5} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+LENGTH}~0
+\begin{DoxyCompactList}\small\item\em offset for message length wrt start of msg \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_abb5e5e3258dc220fa384110c4eb61135}\label{dudaq_2myfiles_2amsg_8h_abb5e5e3258dc220fa384110c4eb61135} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+TAG}~1
+\begin{DoxyCompactList}\small\item\em offset for message tag wrt start of msg \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a38e9e66c23211c082f298a284f4e3194}\label{dudaq_2myfiles_2amsg_8h_a38e9e66c23211c082f298a284f4e3194} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+BODY}~2
+\begin{DoxyCompactList}\small\item\em offset for message body wrt start of msg \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a089ce79564a89098b93cef6af2a0036c}\label{dudaq_2myfiles_2amsg_8h_a089ce79564a89098b93cef6af2a0036c} 
+\#define {\bfseries DUPOS}(a)~(a\&0xff)
+\begin{DoxyCompactList}\small\item\em detector unit position from DU\+\_\+id \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ae2587362e030a1fa2e6559b208bd07d1}\label{dudaq_2myfiles_2amsg_8h_ae2587362e030a1fa2e6559b208bd07d1} 
+\#define {\bfseries DUHWTYPE}(a)~((a$>$$>$8)\&0x7)
+\begin{DoxyCompactList}\small\item\em hardware type from DU\+\_\+id \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ab9ea6fe72e00e071eed6e344336ec6c1}\label{dudaq_2myfiles_2amsg_8h_ab9ea6fe72e00e071eed6e344336ec6c1} 
+\#define {\bfseries DUHWVERSION}(a)~((a$>$$>$11)\&0x1f)
+\begin{DoxyCompactList}\small\item\em hardware version from DU\+\_\+id \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ab4e1ef50542729ca5bb32e3deba67600}\label{dudaq_2myfiles_2amsg_8h_ab4e1ef50542729ca5bb32e3deba67600} 
+\#define {\bfseries T2\+FILL}(a,  b,  c)~\{a-\/$>$NS1=(b\&0xff0000)$>$$>$16;a-\/$>$NS2=(b\&0xff00)$>$$>$8;a-\/$>$NS3=(b\&0xff);a-\/$>$ADC=c\&0xff;\}
+\begin{DoxyCompactList}\small\item\em macro to fill T2 block pointed to by a with ns b and ADC value c \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_aeab0c9515f8cde2ae1f6eb99642d7664}\label{dudaq_2myfiles_2amsg_8h_aeab0c9515f8cde2ae1f6eb99642d7664} 
+\#define {\bfseries T2\+NSEC}(a)~((((unsigned int)(a-\/$>$NS3))$<$$<$6)+(((unsigned int)(a-\/$>$NS2))$<$$<$14)+(((unsigned int)(a-\/$>$NS1))$<$$<$22))
+\begin{DoxyCompactList}\small\item\em macro to obtain the ns from the T2 block \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a411ca550d50555d045c5ff345fd4fbc6}\label{dudaq_2myfiles_2amsg_8h_a411ca550d50555d045c5ff345fd4fbc6} 
+\#define {\bfseries T2\+ADC}(a)~(a-\/$>$ADC)
+\begin{DoxyCompactList}\small\item\em macro to obtain the ADC value from the T2 block \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a613d6e9e6698f79a59b9f763bc5eee84}\label{dudaq_2myfiles_2amsg_8h_a613d6e9e6698f79a59b9f763bc5eee84} 
+\#define {\bfseries T0}(a)~((a\mbox{[}1\mbox{]}$<$$<$16)+a\mbox{[}0\mbox{]})
+\begin{DoxyCompactList}\small\item\em get a time from 2 shorts \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a31c5b2f6827fef067b0301fe4dd31e72}\label{dudaq_2myfiles_2amsg_8h_a31c5b2f6827fef067b0301fe4dd31e72} 
+\#define {\bfseries T3\+STATIONSIZE}~3
+\begin{DoxyCompactList}\small\item\em size of T3 request message \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ae5812c6cf9baa3e327cb7b3a85e6aa10}\label{dudaq_2myfiles_2amsg_8h_ae5812c6cf9baa3e327cb7b3a85e6aa10} 
+\#define {\bfseries T3\+STATFILL}(a,  b,  c,  d)~\{a-\/$>$DU\+\_\+id=b;a-\/$>$sec=c\&0xff;a-\/$>$NS1=(d\&0xff0000)$>$$>$16;a-\/$>$NS2=(d\&0xff00)$>$$>$8;a-\/$>$NS3=(d\&0xff);\}
+\begin{DoxyCompactList}\small\item\em fill T3 request message (a) with ID (b), second (c) and subsecond(d) \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a4e382f32fef7dd4dc11801122390ef86}\label{dudaq_2myfiles_2amsg_8h_a4e382f32fef7dd4dc11801122390ef86} 
+\#define {\bfseries USE\+\_\+\+EVENTBODY\+\_\+\+VERSION}
+\begin{DoxyCompactList}\small\item\em An eventbody version was added to the event body. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a62c4a4fda8971c3a91ab82856d5570cf}\label{dudaq_2myfiles_2amsg_8h_a62c4a4fda8971c3a91ab82856d5570cf} 
+\#define {\bfseries EVENTBODY\+\_\+\+VERSION}~3
+\begin{DoxyCompactList}\small\item\em The version number is 3. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a46b50a7baaeb5bc99ed7101ae44ae33e}\label{dudaq_2myfiles_2amsg_8h_a46b50a7baaeb5bc99ed7101ae44ae33e} 
+\#define {\bfseries MIN\+\_\+\+EVHEADER\+\_\+\+LENGTH}~12
+\begin{DoxyCompactList}\small\item\em The minimal length of the event header. \end{DoxyCompactList}\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8d8e69d56e21c16beb3ab96fe30b8395}\label{dudaq_2myfiles_2amsg_8h_a8d8e69d56e21c16beb3ab96fe30b8395} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+LENGTH}~0
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a433b2a24438ec8446a144548874dddc5}\label{dudaq_2myfiles_2amsg_8h_a433b2a24438ec8446a144548874dddc5} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+EVENT\+\_\+\+NR}~1
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a585ccca53675312e417837c3e0f3cbba}\label{dudaq_2myfiles_2amsg_8h_a585ccca53675312e417837c3e0f3cbba} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+DU\+\_\+\+ID}~2
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a0ff276eab74afcd1f6d260e928344489}\label{dudaq_2myfiles_2amsg_8h_a0ff276eab74afcd1f6d260e928344489} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+HDR\+\_\+\+LENGTH}~3
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a4824b5b26b446e8b25daf4d3eb4b41b8}\label{dudaq_2myfiles_2amsg_8h_a4824b5b26b446e8b25daf4d3eb4b41b8} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+GPSSEC}~4
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a64eb44e289d96a0478cafcaae1d35fff}\label{dudaq_2myfiles_2amsg_8h_a64eb44e289d96a0478cafcaae1d35fff} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+GPSNSEC}~6
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8a265a61e71dd82585aa49aa53136d77}\label{dudaq_2myfiles_2amsg_8h_a8a265a61e71dd82585aa49aa53136d77} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+TRIG\+\_\+\+FLAG}~8
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_afeef4f5afda306bbe7d50dafb3b902c8}\label{dudaq_2myfiles_2amsg_8h_afeef4f5afda306bbe7d50dafb3b902c8} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+TRIG\+\_\+\+POS}~9
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_ab69ff30a62cafd3dff1d7e374994c13f}\label{dudaq_2myfiles_2amsg_8h_ab69ff30a62cafd3dff1d7e374994c13f} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+SAMP\+\_\+\+FREQ}~10
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a5f40d69cd536fa756fea93319edf1ae0}\label{dudaq_2myfiles_2amsg_8h_a5f40d69cd536fa756fea93319edf1ae0} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+CHAN\+\_\+\+MASK}~11
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a136479c12ddfb6253bce1220b9816460}\label{dudaq_2myfiles_2amsg_8h_a136479c12ddfb6253bce1220b9816460} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+ADC\+\_\+\+RES}~12
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a11dd424234ad36903092a132a32b58b2}\label{dudaq_2myfiles_2amsg_8h_a11dd424234ad36903092a132a32b58b2} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+TRACELENGTH}~13
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a649edc81ca70789e1ecc302146cc9a4e}\label{dudaq_2myfiles_2amsg_8h_a649edc81ca70789e1ecc302146cc9a4e} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+VERSION}~14
+\item 
+\Hypertarget{dudaq_2myfiles_2amsg_8h_a8ebedeeb621c152df9b30d89f3f08011}\label{dudaq_2myfiles_2amsg_8h_a8ebedeeb621c152df9b30d89f3f08011} 
+\#define {\bfseries EB\+\_\+\+OFFSET\+\_\+\+ADCBUFFER}~15
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+General definitions used in the AERA DAQ. 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}

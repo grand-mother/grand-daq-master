@@ -1,0 +1,275 @@
+\doxysection{scope.\+h}
+\hypertarget{dudaq_2files_2scope_8h_source}{}\label{dudaq_2files_2scope_8h_source}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/scope.h}}
+\mbox{\hyperlink{dudaq_2files_2scope_8h}{Go to the documentation of this file.}}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{00001\ }
+\DoxyCodeLine{00004\ }
+\DoxyCodeLine{00005\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00006\ \textcolor{comment}{\ *\ Header\ file\ for\ GP300\ scope\ -\/\ DMA\ version}}
+\DoxyCodeLine{00007\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00008\ \textcolor{comment}{\ *\ C.\ Timmermans/N.\ Cucu\ Laurenciu}}
+\DoxyCodeLine{00009\ \textcolor{comment}{\ *\ c.timmermans@science.ru.nl}}
+\DoxyCodeLine{00010\ \textcolor{comment}{\ *}}
+\DoxyCodeLine{00011\ \textcolor{comment}{\ *\ NOT\ backward\ compatible\ with\ older\ versions!}}
+\DoxyCodeLine{00012\ \textcolor{comment}{\ *>}}
+\DoxyCodeLine{00013\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00014\ }
+\DoxyCodeLine{00015\ \textcolor{preprocessor}{\#include\ <stdint.h>}}
+\DoxyCodeLine{00016\ }
+\DoxyCodeLine{00017\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00018\ \textcolor{comment}{/*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ define\ mmap\ locations\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00019\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00020\ \textcolor{preprocessor}{\#define\ DDR\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x20000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ DDR\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00021\ \textcolor{preprocessor}{\#define\ CDMA\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xA0000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ CDMA\ regs\ configuration\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00022\ \textcolor{preprocessor}{\#define\ SG\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xA0008000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ scatter-\/gather\ configuration\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00023\ \textcolor{preprocessor}{\#define\ RAM1\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC0000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM1\ -\/\ event\ header\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00024\ \textcolor{preprocessor}{\#define\ RAM2\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC2000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM2\ -\/\ CH1\ RAM\ pre\ \ (preTrigger+Overlap)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00025\ \textcolor{preprocessor}{\#define\ RAM3\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC4000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM3\ -\/\ CH2\ RAM\ pre\ \ (preTrigger+Overlap)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00026\ \textcolor{preprocessor}{\#define\ RAM4\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC6000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM4\ -\/\ CH3\ RAM\ pre\ \ (preTrigger+Overlap)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00027\ \textcolor{preprocessor}{\#define\ RAM5\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xC8000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM5\ -\/\ CH1\ RAM\ post\ (postTrigger)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00028\ \textcolor{preprocessor}{\#define\ RAM6\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xCA000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM6\ -\/\ CH2\ RAM\ post\ (postTrigger)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00029\ \textcolor{preprocessor}{\#define\ RAM7\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xCC000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM7\ -\/\ CH3\ RAM\ post\ (postTrigger)\ data\ samples\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00030\ \textcolor{preprocessor}{\#define\ RAM8\_BASE\_ADDR\ \ \ \ \ \ \ \ \ \ \ \ \ \ 0xCE000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ RAM8\ -\/\ PPS\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00031\ }
+\DoxyCodeLine{00032\ \textcolor{preprocessor}{\#define\ TDAQDUregs\_BASE\_ADDR\ \ \ \ \ \ \ \ 0x80000000\ \ \ \ \ \ }\textcolor{comment}{/*\ base\ address\ DU\ registers\ (FPGA)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00033\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00034\ \textcolor{comment}{/*\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ define\ mmap\ size\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00035\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00036\ \textcolor{preprocessor}{\#define\ NUM\_OF\_DESCRIPTORS\ \ \ \ \ \ \ \ \ \ 8\ \ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ number\ of\ transfer\ descriptors\ (1\ for\ header\ +\ 4\ channels\ *\ 2\ for\ data)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00037\ \textcolor{preprocessor}{\#define\ DESCRIPTOR\_SIZE\ \ \ \ \ \ \ \ \ \ \ \ \ 64\ \ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ transfer\ descriptors\ are\ aligned\ on\ 16\ 32-\/bit\ word\ alignment.\ =>\ 16*4=64B\ per\ transfer\ descriptor\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00038\ }
+\DoxyCodeLine{00039\ \textcolor{preprocessor}{\#define\ DDR\_MAP\_SIZE\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x20000000\ \ \ \ \ }\textcolor{comment}{/*\ 512MB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00040\ \textcolor{preprocessor}{\#define\ RAM\_DATA\_MAP\_SIZE\ \ \ \ \ \ \ \ \ \ \ 16384\ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ 16KB\ for\ all\ data\ RAMs\ (RAM2\ -\/\ RAM7)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00041\ \textcolor{preprocessor}{\#define\ RAM\_HEADER\_MAP\_SIZE\ \ \ \ \ \ \ \ \ 1024\ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ for\ the\ event\ header\ RAM\ (RAM1)\ and\ PPS\ RAM\ (RAM8)\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00042\ \textcolor{preprocessor}{\#define\ CDMA\_MAP\_SIZE\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 128\ \ \ \ \ \ \ \ \ \ \ \ }\textcolor{comment}{/*\ 11\ 32-\/bit\ registers,\ memory\ alignment\ on\ 128-\/byte\ boundaries\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00043\ \textcolor{preprocessor}{\#define\ SG\_MAP\_SIZE\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ (DESCRIPTOR\_SIZE*NUM\_OF\_DESCRIPTORS)\ }\textcolor{comment}{/*\ 576B\ but\ will\ allocate\ the\ minimum\ page\ size\ (4096B)?\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00044\ }
+\DoxyCodeLine{00045\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00046\ \textcolor{comment}{/*\ \ \ \ \ \ \ \ \ \ \ \ \ define\ CDMA\ registers\ locations\ \&\ configs\ \ \ \ \ \ \ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00047\ \textcolor{comment}{/*********************************************************************/}}
+\DoxyCodeLine{00048\ \textcolor{comment}{//\ -\/-\/\ address\ offsets\ for\ CDMA\ registers\ (DMA\ in\ Scatter-\/Gather\ Mode)}}
+\DoxyCodeLine{00049\ \textcolor{preprocessor}{\#define\ CDMA\_CR\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000000\ \ \ \ \ \ }\textcolor{comment}{/*\ Control\ register\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00050\ \textcolor{preprocessor}{\#define\ CDMA\_SR\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000004\ \ \ \ \ \ }\textcolor{comment}{/*\ Status\ register\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00051\ \textcolor{preprocessor}{\#define\ CDMA\_CURDESC\_PNTR\ \ \ \ \ \ \ \ \ \ \ 0x00000008\ \ \ \ \ \ }\textcolor{comment}{/*\ Current\ descriptor\ pointer\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00052\ \textcolor{preprocessor}{\#define\ CDMA\_CURDESC\_PNTR\_MSB\ \ \ \ \ \ \ 0x0000000C\ \ \ \ \ \ }\textcolor{comment}{/*\ Current\ descriptor\ pointer\ MSB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00053\ \textcolor{preprocessor}{\#define\ CDMA\_TAILDESC\_PNTR\ \ \ \ \ \ \ \ \ \ 0x00000010\ \ \ \ \ \ }\textcolor{comment}{/*\ Tail\ descriptor\ pointer\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00054\ \textcolor{preprocessor}{\#define\ CDMA\_TAILDESC\_PNTR\_MSB\ \ \ \ \ \ 0x00000014\ \ \ \ \ \ }\textcolor{comment}{/*\ Tail\ descriptor\ pointer\ MSB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00055\ }
+\DoxyCodeLine{00056\ \textcolor{comment}{//\ -\/-\/\ address\ offsets\ for\ scatter-\/gather\ transfer\ descriptors\ registers}}
+\DoxyCodeLine{00057\ \textcolor{preprocessor}{\#define\ SG\_NXTDESC\_PNTR\ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000000\ \ \ \ \ \ }\textcolor{comment}{/*\ Next\ descriptor\ pointer\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00058\ \textcolor{preprocessor}{\#define\ SG\_NXTDESC\_PNTR\_MSB\ \ \ \ \ \ \ \ \ 0x00000004\ \ \ \ \ \ }\textcolor{comment}{/*\ Next\ descriptor\ pointer\ MSB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00059\ \textcolor{preprocessor}{\#define\ SG\_SA\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000008\ \ \ \ \ \ }\textcolor{comment}{/*\ Source\ address\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00060\ \textcolor{preprocessor}{\#define\ SG\_SA\_MSB\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0000000C\ \ \ \ \ \ }\textcolor{comment}{/*\ Source\ address\ MSB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00061\ \textcolor{preprocessor}{\#define\ SG\_DA\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000010\ \ \ \ \ \ }\textcolor{comment}{/*\ Destination\ address\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00062\ \textcolor{preprocessor}{\#define\ SG\_DA\_MSB\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000014\ \ \ \ \ \ }\textcolor{comment}{/*\ Destination\ address\ MSB\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00063\ \textcolor{preprocessor}{\#define\ SG\_CONTROL\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x00000018\ \ \ \ \ \ }\textcolor{comment}{/*\ Transfer\ control\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00064\ \textcolor{preprocessor}{\#define\ SG\_STATUS\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ 0x0000001C\ \ \ \ \ \ }\textcolor{comment}{/*\ Transfer\ status\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00065\ }
+\DoxyCodeLine{00066\ \textcolor{comment}{//\ -\/-\/\ configuration\ for\ CDMA\_CR\ register}}
+\DoxyCodeLine{00067\ \textcolor{preprocessor}{\#define\ IRQ\_MASK\_AND\_SG\ \ \ \ \ \ \ \ \ \ \ \ \ 0x02027008\ \ \ \ \ }\textcolor{comment}{/*\ IRQDelay=0x02\ (125*SGclock*IRQDelay);\ IRQThreshold=0x02;\ IOC\_IrqEn=1;\ SGMmode=1\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00068\ \textcolor{preprocessor}{\#define\ IRQ\_MASK\_AND\_SG\_evt\ \ \ \ \ \ \ 0x02077008\ \ \ }\textcolor{comment}{/*\ IRQDelay=0x02\ (125*SGclock*IRQDelay);\ IRQThreshold=0x07;\ IOC\_IrqEn=1;\ SGMmode=1\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00069\ \textcolor{preprocessor}{\#define\ IRQ\_MASK\_AND\_SG\_pps\ \ \ \ \ \ \ 0x02017008\ \ \ }\textcolor{comment}{/*\ IRQDelay=0x02\ (125*SGclock*IRQDelay);\ IRQThreshold=0x01;\ IOC\_IrqEn=1;\ SGMmode=1\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00070\ \textcolor{preprocessor}{\#define\ IRQ\_MASK\_AND\_SG\_evtpps\ \ \ \ 0x02087008\ \ \ }\textcolor{comment}{/*\ IRQDelay=0x02\ (125*SGclock*IRQDelay);\ IRQThreshold=0x08;\ IOC\_IrqEn=1;\ SGMmode=1\ */}\textcolor{preprocessor}{}}
+\DoxyCodeLine{00071\ }
+\DoxyCodeLine{00072\ }
+\DoxyCodeLine{00073\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00074\ \textcolor{preprocessor}{\#define\ SAMPLING\_FREQ\ 500\ }}
+\DoxyCodeLine{00075\ \textcolor{preprocessor}{\#define\ ADC\_RESOLUTION\ 14}}
+\DoxyCodeLine{00076\ }
+\DoxyCodeLine{00077\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00078\ }
+\DoxyCodeLine{00079\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00080\ \textcolor{comment}{/*\ Maxima\ /\ minima\ */}}
+\DoxyCodeLine{00081\ }
+\DoxyCodeLine{00082\ \textcolor{comment}{/*\ Maximum\ ADC\ size\ =\ 4\ channels\ *\ max\_samples/ch\ *\ 2\ bytes/sample\ */}}
+\DoxyCodeLine{00083\ \textcolor{comment}{/*\ Maximum\ event\ size\ =\ header\ +\ ADC\ data\ +\ message\ end\ \ \ \ \ \ \ */}}
+\DoxyCodeLine{00084\ \textcolor{preprocessor}{\#define\ DATA\_MAX\_SAMP\ \ \ 8192\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00085\ }
+\DoxyCodeLine{00086\ \textcolor{preprocessor}{\#define\ MAX\_READOUT\ \ \ \ \ (256\ +\ DATA\_MAX\_SAMP*4)\ }}
+\DoxyCodeLine{00087\ }
+\DoxyCodeLine{00088\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00089\ \textcolor{preprocessor}{\#define\ TDAQ\_BASE\ \ \ \ \ \ \ \ \ \ \ \ \ 0x80000000}}
+\DoxyCodeLine{00090\ \textcolor{comment}{/*\ Register\ Definitions*/}}
+\DoxyCodeLine{00091\ \textcolor{preprocessor}{\#define\ Reg\_HVL\ \ \ \ \ \ \ \ \ \ \ \ 0x0000}}
+\DoxyCodeLine{00092\ \textcolor{preprocessor}{\#define\ Reg\_HTL\ \ \ \ \ \ \ \ \ \ \ \ 0x0004}}
+\DoxyCodeLine{00093\ \textcolor{preprocessor}{\#define\ Reg\_HTLH\_GPS\ \ \ \ \ \ \ 0x0008}}
+\DoxyCodeLine{00094\ \textcolor{preprocessor}{\#define\ Reg\_HTLL\_GPS\ \ \ \ \ \ \ 0x000C}}
+\DoxyCodeLine{00095\ \textcolor{preprocessor}{\#define\ Reg\_MNG\ \ \ \ \ \ \ \ \ \ \ \ 0x004C}}
+\DoxyCodeLine{00096\ \textcolor{preprocessor}{\#define\ Reg\_DMA\ \ \ \ \ \ \ \ \ \ \ \ 0x0050}}
+\DoxyCodeLine{00097\ \textcolor{preprocessor}{\#define\ Reg\_AGC12\ \ \ \ \ \ \ \ \ \ 0x0054}}
+\DoxyCodeLine{00098\ \textcolor{preprocessor}{\#define\ Reg\_AGC34\ \ \ \ \ \ \ \ \ \ 0x0058}}
+\DoxyCodeLine{00099\ \textcolor{preprocessor}{\#define\ Reg\_RW\ \ \ \ \ \ \ \ \ \ \ \ \ 0x0010}}
+\DoxyCodeLine{00100\ \textcolor{preprocessor}{\#define\ Reg\_RS\ \ \ \ \ \ \ \ \ \ \ \ \ 0x0014}}
+\DoxyCodeLine{00101\ \textcolor{preprocessor}{\#define\ Reg\_TS\ \ \ \ \ \ \ \ \ \ \ \ \ 0x0018}}
+\DoxyCodeLine{00102\ \textcolor{preprocessor}{\#define\ Reg\_CH1SNTH\ \ \ \ \ \ \ \ 0x001C}}
+\DoxyCodeLine{00103\ \textcolor{preprocessor}{\#define\ Reg\_CH1TP\ \ \ \ \ \ \ \ \ \ 0x0020}}
+\DoxyCodeLine{00104\ \textcolor{preprocessor}{\#define\ Reg\_CH2SNTH\ \ \ \ \ \ \ \ 0x0028}}
+\DoxyCodeLine{00105\ \textcolor{preprocessor}{\#define\ Reg\_CH2TP\ \ \ \ \ \ \ \ \ \ 0x002C}}
+\DoxyCodeLine{00106\ \textcolor{preprocessor}{\#define\ Reg\_CH3SNTH\ \ \ \ \ \ \ \ 0x0034}}
+\DoxyCodeLine{00107\ \textcolor{preprocessor}{\#define\ Reg\_CH3TP\ \ \ \ \ \ \ \ \ \ 0x0038}}
+\DoxyCodeLine{00108\ \textcolor{preprocessor}{\#define\ Reg\_BSC12\ \ \ \ \ \ \ \ \ \ 0x005C}}
+\DoxyCodeLine{00109\ \textcolor{preprocessor}{\#define\ Reg\_BSC34\ \ \ \ \ \ \ \ \ \ 0x0060}}
+\DoxyCodeLine{00110\ \textcolor{preprocessor}{\#define\ Reg\_CH1NF1P1\ \ \ \ \ \ \ 0x0064}}
+\DoxyCodeLine{00111\ \textcolor{preprocessor}{\#define\ Reg\_CH1NF2P1\ \ \ \ \ \ \ 0x007C}}
+\DoxyCodeLine{00112\ \textcolor{preprocessor}{\#define\ Reg\_CH1NF3P1\ \ \ \ \ \ \ 0x0094}}
+\DoxyCodeLine{00113\ \textcolor{preprocessor}{\#define\ Reg\_CH1NF4P1\ \ \ \ \ \ \ 0x00AC}}
+\DoxyCodeLine{00114\ \textcolor{preprocessor}{\#define\ Reg\_CH2NF1P1\ \ \ \ \ \ \ 0x00C4}}
+\DoxyCodeLine{00115\ \textcolor{preprocessor}{\#define\ Reg\_CH2NF2P1\ \ \ \ \ \ \ 0x00DC}}
+\DoxyCodeLine{00116\ \textcolor{preprocessor}{\#define\ Reg\_CH2NF3P1\ \ \ \ \ \ \ 0x00F4}}
+\DoxyCodeLine{00117\ \textcolor{preprocessor}{\#define\ Reg\_CH2NF4P1\ \ \ \ \ \ \ 0x010C}}
+\DoxyCodeLine{00118\ \textcolor{preprocessor}{\#define\ Reg\_CH3NF1P1\ \ \ \ \ \ \ 0x0124}}
+\DoxyCodeLine{00119\ \textcolor{preprocessor}{\#define\ Reg\_CH3NF2P1\ \ \ \ \ \ \ 0x013C}}
+\DoxyCodeLine{00120\ \textcolor{preprocessor}{\#define\ Reg\_CH3NF3P1\ \ \ \ \ \ \ 0x0154}}
+\DoxyCodeLine{00121\ \textcolor{preprocessor}{\#define\ Reg\_CH3NF4P1\ \ \ \ \ \ \ 0x016C}}
+\DoxyCodeLine{00122\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00123\ }
+\DoxyCodeLine{00124\ }
+\DoxyCodeLine{00125\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00126\ \textcolor{comment}{/*\ PPS\ definition\ */}}
+\DoxyCodeLine{00127\ \textcolor{preprocessor}{\#define\ MAGIC\_PPS\ \ \ \ \ 0xFACE}}
+\DoxyCodeLine{00128\ \textcolor{preprocessor}{\#define\ WCNT\_PPS\ \ \ \ \ \ \ \ 22\ }\textcolor{comment}{//\ length\ in\ 32\ bit\ words!}}
+\DoxyCodeLine{00129\ \textcolor{preprocessor}{\#define\ PPS\_LENGTH\ \ \ \ \ \ 0}}
+\DoxyCodeLine{00130\ \textcolor{preprocessor}{\#define\ PPS\_ID\ \ \ \ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00131\ \textcolor{preprocessor}{\#define\ PPS\_CTP\ \ \ \ \ \ \ \ \ 2}}
+\DoxyCodeLine{00132\ \textcolor{preprocessor}{\#define\ PPS\_WEEKTIME\ \ \ \ 3}}
+\DoxyCodeLine{00133\ \textcolor{preprocessor}{\#define\ PPS\_WEEKOFFSET\ \ 4}}
+\DoxyCodeLine{00134\ \textcolor{preprocessor}{\#define\ PPS\_SECMINHOUR\ \ 5}}
+\DoxyCodeLine{00135\ \textcolor{preprocessor}{\#define\ PPS\_DAYMONTH\ \ \ \ 6}}
+\DoxyCodeLine{00136\ \textcolor{preprocessor}{\#define\ PPS\_YEAR\ \ \ \ \ \ \ \ 7}}
+\DoxyCodeLine{00137\ \textcolor{preprocessor}{\#define\ PPS\_GPSMODE\ \ \ \ \ 8}}
+\DoxyCodeLine{00138\ \textcolor{preprocessor}{\#define\ PPS\_GPSSTATUS\ \ \ 9}}
+\DoxyCodeLine{00139\ \textcolor{preprocessor}{\#define\ PPS\_OFFSET\ \ \ \ \ \ 10}}
+\DoxyCodeLine{00140\ \textcolor{preprocessor}{\#define\ PPS\_TEMPERATURE\ 11}}
+\DoxyCodeLine{00141\ \textcolor{preprocessor}{\#define\ PPS\_LATITUDE\ \ \ \ 12}}
+\DoxyCodeLine{00142\ \textcolor{preprocessor}{\#define\ PPS\_LONGITUDE\ \ \ 14}}
+\DoxyCodeLine{00143\ \textcolor{preprocessor}{\#define\ PPS\_ALTITUDE\ \ \ \ 16}}
+\DoxyCodeLine{00144\ \textcolor{preprocessor}{\#define\ PPS\_ATM\_TP\ \ \ \ \ \ 18}}
+\DoxyCodeLine{00145\ \textcolor{preprocessor}{\#define\ PPS\_HM\_AX\ \ \ \ \ \ \ 19}}
+\DoxyCodeLine{00146\ \textcolor{preprocessor}{\#define\ PPS\_AY\_AZ\ \ \ \ \ \ \ 20}}
+\DoxyCodeLine{00147\ \textcolor{preprocessor}{\#define\ PPS\_BATTERY\ \ \ \ \ 21}}
+\DoxyCodeLine{00148\ }
+\DoxyCodeLine{00149\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00150\ \textcolor{comment}{/*\ Event\ definition\ */}}
+\DoxyCodeLine{00151\ \textcolor{preprocessor}{\#define\ MAGIC\_EVT\ \ \ \ \ \ \ \ \ 0xADC0}}
+\DoxyCodeLine{00152\ \textcolor{preprocessor}{\#define\ EVT\_HDR\_LENGTH\ \ \ \ 146}}
+\DoxyCodeLine{00153\ \textcolor{preprocessor}{\#define\ EVT\_LENGTH\ \ \ \ \ \ \ \ 0\ }\textcolor{comment}{//\ nr\ of\ int32\ words}}
+\DoxyCodeLine{00154\ \textcolor{preprocessor}{\#define\ EVT\_VERSION\ \ \ \ \ \ \ 1}}
+\DoxyCodeLine{00155\ \textcolor{preprocessor}{\#define\ EVT\_STATION\_ID\ \ \ \ 2}}
+\DoxyCodeLine{00156\ \textcolor{preprocessor}{\#define\ EVT\_HARDWARE\_ID\ \ \ 3}}
+\DoxyCodeLine{00157\ \textcolor{preprocessor}{\#define\ EVT\_EVT\_ID\ \ \ \ \ \ \ \ 4}}
+\DoxyCodeLine{00158\ \textcolor{preprocessor}{\#define\ EVT\_CTP\ \ \ \ \ \ \ \ \ \ \ 5}}
+\DoxyCodeLine{00159\ \textcolor{preprocessor}{\#define\ EVT\_CTD\ \ \ \ \ \ \ \ \ \ \ 6}}
+\DoxyCodeLine{00160\ \textcolor{preprocessor}{\#define\ EVT\_ADCINFO\ \ \ \ \ \ \ 7}}
+\DoxyCodeLine{00161\ \textcolor{preprocessor}{\#define\ EVT\_SECOND\ \ \ \ \ \ \ \ 8}}
+\DoxyCodeLine{00162\ \textcolor{preprocessor}{\#define\ EVT\_NANOSEC\ \ \ \ \ \ \ 9}}
+\DoxyCodeLine{00163\ \textcolor{preprocessor}{\#define\ EVT\_TRIGGER\_POS\ \ \ 10}}
+\DoxyCodeLine{00164\ \textcolor{preprocessor}{\#define\ EVT\_TRIGGER\_STAT\ \ 11}}
+\DoxyCodeLine{00165\ \textcolor{preprocessor}{\#define\ EVT\_STATISTICS\ \ \ \ 12}}
+\DoxyCodeLine{00166\ \textcolor{preprocessor}{\#define\ EVT\_PPS\_ID\ \ \ \ \ \ \ \ 13}}
+\DoxyCodeLine{00167\ \textcolor{preprocessor}{\#define\ EVT\_SPARE1\ \ \ \ \ \ \ \ 14}}
+\DoxyCodeLine{00168\ \textcolor{preprocessor}{\#define\ EVT\_SPARE2\ \ \ \ \ \ \ \ 15}}
+\DoxyCodeLine{00169\ \textcolor{preprocessor}{\#define\ EVT\_SPARE3\ \ \ \ \ \ \ \ 16}}
+\DoxyCodeLine{00170\ \textcolor{preprocessor}{\#define\ EVT\_ATM\_TP\ \ \ \ \ \ \ \ 17}}
+\DoxyCodeLine{00171\ \textcolor{preprocessor}{\#define\ EVT\_HM\_AX\ \ \ \ \ \ \ \ \ 18}}
+\DoxyCodeLine{00172\ \textcolor{preprocessor}{\#define\ EVT\_AY\_AZ\ \ \ \ \ \ \ \ \ 19}}
+\DoxyCodeLine{00173\ \textcolor{preprocessor}{\#define\ EVT\_BATTERY\ \ \ \ \ \ \ 20}}
+\DoxyCodeLine{00174\ \textcolor{preprocessor}{\#define\ EVT\_WEEKTIME\ \ \ \ \ \ 21}}
+\DoxyCodeLine{00175\ \textcolor{preprocessor}{\#define\ EVT\_WEEKOFFSET\ \ \ \ 22}}
+\DoxyCodeLine{00176\ \textcolor{preprocessor}{\#define\ EVT\_SECMINHOUR\ \ \ \ 23}}
+\DoxyCodeLine{00177\ \textcolor{preprocessor}{\#define\ EVT\_DAYMONTH\ \ \ \ \ \ 24}}
+\DoxyCodeLine{00178\ \textcolor{preprocessor}{\#define\ EVT\_YEAR\ \ \ \ \ \ \ \ \ \ 25}}
+\DoxyCodeLine{00179\ \textcolor{preprocessor}{\#define\ EVT\_GPSMODE\ \ \ \ \ \ \ 26}}
+\DoxyCodeLine{00180\ \textcolor{preprocessor}{\#define\ EVT\_GPSSTATUS\ \ \ \ \ 27}}
+\DoxyCodeLine{00181\ \textcolor{preprocessor}{\#define\ EVT\_OFFSET\ \ \ \ \ \ \ \ 28}}
+\DoxyCodeLine{00182\ \textcolor{preprocessor}{\#define\ EVT\_TEMPERATURE\ \ \ 29}}
+\DoxyCodeLine{00183\ \textcolor{preprocessor}{\#define\ EVT\_LATITUDE\ \ \ \ \ \ 30}}
+\DoxyCodeLine{00184\ \textcolor{preprocessor}{\#define\ EVT\_LONGITUDE\ \ \ \ \ 32}}
+\DoxyCodeLine{00185\ \textcolor{preprocessor}{\#define\ EVT\_ALTITUDE\ \ \ \ \ \ 34}}
+\DoxyCodeLine{00186\ \textcolor{preprocessor}{\#define\ EVT\_TRACELENGTH\ \ \ 36}}
+\DoxyCodeLine{00187\ \textcolor{preprocessor}{\#define\ EVT\_INP\_SELECT\ \ \ \ 37}}
+\DoxyCodeLine{00188\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_SELECT\ \ \ 38}}
+\DoxyCodeLine{00189\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C1\ \ \ \ \ \ 39}}
+\DoxyCodeLine{00190\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C2\ \ \ \ \ \ 40}}
+\DoxyCodeLine{00191\ \textcolor{preprocessor}{\#define\ EVT\_THRES\_C3\ \ \ \ \ \ 41}}
+\DoxyCodeLine{00192\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C1\ \ \ \ \ \ \ 43}}
+\DoxyCodeLine{00193\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C2\ \ \ \ \ \ \ 45}}
+\DoxyCodeLine{00194\ \textcolor{preprocessor}{\#define\ EVT\_TRIG\_C3\ \ \ \ \ \ \ 47}}
+\DoxyCodeLine{00195\ \textcolor{preprocessor}{\#define\ EVT\_GAIN\_AB\ \ \ \ \ \ \ 51}}
+\DoxyCodeLine{00196\ \textcolor{preprocessor}{\#define\ EVT\_GAIN\_CD\ \ \ \ \ \ \ 52}}
+\DoxyCodeLine{00197\ \textcolor{preprocessor}{\#define\ EVT\_BASELINE\_12\ \ \ 53}}
+\DoxyCodeLine{00198\ \textcolor{preprocessor}{\#define\ EVT\_BASELINE\_3\ \ \ \ 54}}
+\DoxyCodeLine{00199\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F1\ \ \ 63}}
+\DoxyCodeLine{00200\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F2\ \ \ 68}}
+\DoxyCodeLine{00201\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F3\ \ \ 73}}
+\DoxyCodeLine{00202\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C1\_F4\ \ \ 78}}
+\DoxyCodeLine{00203\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F1\ \ \ 83}}
+\DoxyCodeLine{00204\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F2\ \ \ 88}}
+\DoxyCodeLine{00205\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F3\ \ \ 93}}
+\DoxyCodeLine{00206\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C2\_F4\ \ \ 98}}
+\DoxyCodeLine{00207\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F1\ \ \ 103}}
+\DoxyCodeLine{00208\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F2\ \ \ 108}}
+\DoxyCodeLine{00209\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F3\ \ \ 113}}
+\DoxyCodeLine{00210\ \textcolor{preprocessor}{\#define\ EVT\_NOTCH\_C3\_F4\ \ \ 118}}
+\DoxyCodeLine{00211\ \textcolor{preprocessor}{\#define\ EVT\_TOT\_SAMPLEP\ \ \ 143}}
+\DoxyCodeLine{00212\ \textcolor{preprocessor}{\#define\ EVT\_CH12\_SAMPLEP\ \ 144}}
+\DoxyCodeLine{00213\ \textcolor{preprocessor}{\#define\ EVT\_CH3\_SAMPLEP\ \ \ 145}}
+\DoxyCodeLine{00214\ \textcolor{preprocessor}{\#define\ EVT\_START\_ADC\ \ \ \ \ 146}}
+\DoxyCodeLine{00215\ }
+\DoxyCodeLine{00216\ \textcolor{comment}{/*-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/-\/*/}}
+\DoxyCodeLine{00217\ }
+\DoxyCodeLine{00218\ \textcolor{comment}{/*}}
+\DoxyCodeLine{00219\ \textcolor{comment}{\ \ buffer\ definitions\ for\ the\ scope\ readout\ process.}}
+\DoxyCodeLine{00220\ \textcolor{comment}{\ */}}
+\DoxyCodeLine{00221\ }
+\DoxyCodeLine{00222\ \textcolor{preprocessor}{\#define\ BUFSIZE\ 3000\ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00223\ }
+\DoxyCodeLine{00224\ \textcolor{preprocessor}{\#define\ GPSSIZE\ 35\ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00225\ \textcolor{preprocessor}{\#define\ MAXT3\ 50\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00226\ }
+\DoxyCodeLine{00227\ \textcolor{comment}{//\ next:\ what\ did\ we\ read\ from\ the\ scope?}}
+\DoxyCodeLine{00228\ }
+\DoxyCodeLine{00229\ \textcolor{preprocessor}{\#define\ SCOPE\_EVENT\ 2\ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00230\ \textcolor{preprocessor}{\#define\ SCOPE\_GPS\ \ \ 3\ \ \ \ \ \ \ \ \ \ }}
+\DoxyCodeLine{00231\ }
+\DoxyCodeLine{00232\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00233\ \{}
+\DoxyCodeLine{00234\ \ \ uint32\_t\ ts\_seconds;}
+\DoxyCodeLine{00235\ \ \ uint32\_t\ ts\_nanoseconds;}
+\DoxyCodeLine{00236\ \ \ uint16\_t\ event\_nr;}
+\DoxyCodeLine{00237\ \ \ uint16\_t\ trigmask;}
+\DoxyCodeLine{00238\ \}\mbox{\hyperlink{struct_t_s___d_a_t_a}{TS\_DATA}};\ \textcolor{comment}{//timestamps}}
+\DoxyCodeLine{00239\ }
+\DoxyCodeLine{00240\ \textcolor{keyword}{typedef}\ \textcolor{keyword}{struct}}
+\DoxyCodeLine{00241\ \{}
+\DoxyCodeLine{00242\ \ \ uint32\_t\ ts\_seconds;\ \ \ \ \ \ }
+\DoxyCodeLine{00243\ \ \ uint16\_t\ data[WCNT\_PPS];\ \ }
+\DoxyCodeLine{00244\ \}\ \mbox{\hyperlink{struct_g_p_s___d_a_t_a}{GPS\_DATA}};}
+\DoxyCodeLine{00245\ }
+\DoxyCodeLine{00246\ }
+\DoxyCodeLine{00247\ \textcolor{comment}{//\ the\ routines}}
+\DoxyCodeLine{00248\ }
+\DoxyCodeLine{00249\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a228b4562d5b4fdd5a558f29c6669ddf2}{scope\_raw\_write}}(uint32\_t\ reg\_addr,\ uint32\_t\ value);}
+\DoxyCodeLine{00250\ uint32\_t\ scope\_raw\_read(uint32\_t\ reg\_addr);}
+\DoxyCodeLine{00251\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{dudaq_2files_2scope_8h_a1c895b654148a7385f85dc09b332b24b}{scope\_flush}}();}
+\DoxyCodeLine{00252\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a9247308a7c4c77218798d40126e1b2be}{scope\_open}}();}
+\DoxyCodeLine{00253\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a02756ee62fea9a11b9f89c44e12a0a65}{scope\_close}}();}
+\DoxyCodeLine{00254\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a506afe9b825fb1fed5acde2bc76e8d68}{scope\_reset}}();}
+\DoxyCodeLine{00255\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_ae6ea501f53ade3c79f11f9b3935e8aa9}{scope\_start\_run}}();}
+\DoxyCodeLine{00256\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_ab6ad70489062a18bc3f394452758e035}{scope\_stop\_run}}();}
+\DoxyCodeLine{00257\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a3a603e895e867e66d6d647770e1952a5}{scope\_set\_parameters}}(uint32\_t\ reg\_addr,\ uint32\_t\ value,uint32\_t\ to\_shadow);}
+\DoxyCodeLine{00258\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a59a93c7f3678aa0c67ed09095a66eac9}{scope\_reboot}}();}
+\DoxyCodeLine{00259\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a122e3e973152efd5f53c81623ecf274d}{scope\_copy\_shadow}}();}
+\DoxyCodeLine{00260\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a333fc3568af7db9af3b96e520a554d62}{scope\_init\_shadow}}();}
+\DoxyCodeLine{00261\ \textcolor{keywordtype}{void}\ \mbox{\hyperlink{_d_u_2scope_8h_a34f554820dbaa982450d7584532e11f2}{scope\_initialize}}();}
+\DoxyCodeLine{00262\ \textcolor{keywordtype}{void}\ scope\_create\_memory();}
+\DoxyCodeLine{00263\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a2453dfed8e67d3ac98336be9eb83bcce}{scope\_read\_event}}(int32\_t\ ioff);}
+\DoxyCodeLine{00264\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a1a73de65cf7a0d593a14b370e1bd2afd}{scope\_read\_pps}}();}
+\DoxyCodeLine{00265\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a292fcdfa610afd0cfe60482be5be96e8}{scope\_read}}(\textcolor{keywordtype}{int}\ ioff);}
+\DoxyCodeLine{00266\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_af00f0aa0824921216fd93fc510607ce4}{scope\_no\_run\_read}}();}
+\DoxyCodeLine{00267\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a989d5bdd1c94c8749904417e8e982014}{scope\_run\_read}}();}
+\DoxyCodeLine{00268\ \textcolor{keywordtype}{void}\ scope\_event\_to\_shm(uint16\_t\ evnr,uint16\_t\ trflag,uint16\_t\ sec,uint32\_t\ ssec);}
+\DoxyCodeLine{00269\ \textcolor{keywordtype}{int}\ \mbox{\hyperlink{_d_u_2scope_8h_a3de677de3a1a8f7da6fa34416920c787}{scope\_calc\_t3nsec}}(uint16\_t\ *pps);}
+\DoxyCodeLine{00270\ \textcolor{comment}{//}}
+\DoxyCodeLine{00271\ }
+
+\end{DoxyCode}

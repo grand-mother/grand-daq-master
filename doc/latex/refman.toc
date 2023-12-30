@@ -1,0 +1,89 @@
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{\numberline {1}grand-\/daq-\/master}{1}{chapter.1}%
+\contentsline {chapter}{\numberline {2}Data Structure Index}{3}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Data Structures}{3}{section.2.1}%
+\contentsline {chapter}{\numberline {3}File Index}{5}{chapter.3}%
+\contentsline {section}{\numberline {3.1}File List}{5}{section.3.1}%
+\contentsline {chapter}{\numberline {4}Data Structure Documentation}{7}{chapter.4}%
+\contentsline {section}{\numberline {4.1}AMSG Struct Reference}{7}{section.4.1}%
+\contentsline {section}{\numberline {4.2}DUInfo Struct Reference}{7}{section.4.2}%
+\contentsline {section}{\numberline {4.3}EVHDR Struct Reference}{8}{section.4.3}%
+\contentsline {section}{\numberline {4.4}FILEHDR Struct Reference}{8}{section.4.4}%
+\contentsline {section}{\numberline {4.5}GPS\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}DATA Struct Reference}{8}{section.4.5}%
+\contentsline {section}{\numberline {4.6}shm\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}struct Struct Reference}{9}{section.4.6}%
+\contentsline {subsection}{\numberline {4.6.1}Field Documentation}{9}{subsection.4.6.1}%
+\contentsline {subsubsection}{\numberline {4.6.1.1}buf}{9}{subsubsection.4.6.1.1}%
+\contentsline {subsubsection}{\numberline {4.6.1.2}nbuf}{9}{subsubsection.4.6.1.2}%
+\contentsline {subsubsection}{\numberline {4.6.1.3}next\_read}{9}{subsubsection.4.6.1.3}%
+\contentsline {subsubsection}{\numberline {4.6.1.4}next\_readb}{9}{subsubsection.4.6.1.4}%
+\contentsline {subsubsection}{\numberline {4.6.1.5}next\_write}{9}{subsubsection.4.6.1.5}%
+\contentsline {subsubsection}{\numberline {4.6.1.6}shmid}{10}{subsubsection.4.6.1.6}%
+\contentsline {subsubsection}{\numberline {4.6.1.7}size}{10}{subsubsection.4.6.1.7}%
+\contentsline {subsubsection}{\numberline {4.6.1.8}Ubuf}{10}{subsubsection.4.6.1.8}%
+\contentsline {section}{\numberline {4.7}T2evts Struct Reference}{10}{section.4.7}%
+\contentsline {section}{\numberline {4.8}T3\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}BODY Struct Reference}{11}{section.4.8}%
+\contentsline {section}{\numberline {4.9}T3\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}STATION Struct Reference}{11}{section.4.9}%
+\contentsline {section}{\numberline {4.10}TS\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}DATA Struct Reference}{11}{section.4.10}%
+\contentsline {chapter}{\numberline {5}File Documentation}{13}{chapter.5}%
+\contentsline {section}{\numberline {5.1}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Adaq/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Adaq.c File Reference}{13}{section.5.1}%
+\contentsline {subsection}{\numberline {5.1.1}Detailed Description}{14}{subsection.5.1.1}%
+\contentsline {subsection}{\numberline {5.1.2}Function Documentation}{14}{subsection.5.1.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.1}ad\_check\_processes()}{14}{subsubsection.5.1.2.1}%
+\contentsline {subsubsection}{\numberline {5.1.2.2}ad\_init\_param()}{14}{subsubsection.5.1.2.2}%
+\contentsline {subsubsection}{\numberline {5.1.2.3}ad\_initialize()}{15}{subsubsection.5.1.2.3}%
+\contentsline {subsubsection}{\numberline {5.1.2.4}ad\_spawn\_du()}{15}{subsubsection.5.1.2.4}%
+\contentsline {subsubsection}{\numberline {5.1.2.5}ad\_spawn\_eb()}{15}{subsubsection.5.1.2.5}%
+\contentsline {subsubsection}{\numberline {5.1.2.6}ad\_spawn\_gui()}{15}{subsubsection.5.1.2.6}%
+\contentsline {subsubsection}{\numberline {5.1.2.7}ad\_spawn\_t3()}{15}{subsubsection.5.1.2.7}%
+\contentsline {subsubsection}{\numberline {5.1.2.8}ad\_spawn\_ui()}{15}{subsubsection.5.1.2.8}%
+\contentsline {subsubsection}{\numberline {5.1.2.9}clean\_stop()}{15}{subsubsection.5.1.2.9}%
+\contentsline {subsubsection}{\numberline {5.1.2.10}du\_main()}{16}{subsubsection.5.1.2.10}%
+\contentsline {subsubsection}{\numberline {5.1.2.11}eb\_main()}{16}{subsubsection.5.1.2.11}%
+\contentsline {subsubsection}{\numberline {5.1.2.12}gui\_main()}{16}{subsubsection.5.1.2.12}%
+\contentsline {subsubsection}{\numberline {5.1.2.13}main()}{16}{subsubsection.5.1.2.13}%
+\contentsline {subsubsection}{\numberline {5.1.2.14}remove\_shared\_memory()}{17}{subsubsection.5.1.2.14}%
+\contentsline {subsubsection}{\numberline {5.1.2.15}t3\_main()}{17}{subsubsection.5.1.2.15}%
+\contentsline {subsubsection}{\numberline {5.1.2.16}ui\_main()}{17}{subsubsection.5.1.2.16}%
+\contentsline {section}{\numberline {5.2}Adaq.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{18}{section.5.2}%
+\contentsline {section}{\numberline {5.3}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Adaq/du.c File Reference}{19}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}Detailed Description}{20}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}Function Documentation}{20}{subsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.1}du\_connect()}{20}{subsubsection.5.3.2.1}%
+\contentsline {subsubsection}{\numberline {5.3.2.2}du\_init\_and\_run()}{20}{subsubsection.5.3.2.2}%
+\contentsline {subsubsection}{\numberline {5.3.2.3}du\_interpret()}{21}{subsubsection.5.3.2.3}%
+\contentsline {subsubsection}{\numberline {5.3.2.4}du\_main()}{21}{subsubsection.5.3.2.4}%
+\contentsline {subsubsection}{\numberline {5.3.2.5}du\_read()}{21}{subsubsection.5.3.2.5}%
+\contentsline {subsubsection}{\numberline {5.3.2.6}du\_read\_initfile()}{21}{subsubsection.5.3.2.6}%
+\contentsline {subsubsection}{\numberline {5.3.2.7}du\_send()}{22}{subsubsection.5.3.2.7}%
+\contentsline {subsubsection}{\numberline {5.3.2.8}du\_write()}{22}{subsubsection.5.3.2.8}%
+\contentsline {subsubsection}{\numberline {5.3.2.9}set\_socketoptions()}{22}{subsubsection.5.3.2.9}%
+\contentsline {section}{\numberline {5.4}eb.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{22}{section.5.4}%
+\contentsline {section}{\numberline {5.5}ad\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}shm.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{23}{section.5.5}%
+\contentsline {section}{\numberline {5.6}ad\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}\_\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}shm.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{23}{section.5.6}%
+\contentsline {section}{\numberline {5.7}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/dudaq/files/amsg.h File Reference}{24}{section.5.7}%
+\contentsline {subsection}{\numberline {5.7.1}Detailed Description}{26}{subsection.5.7.1}%
+\contentsline {section}{\numberline {5.8}amsg.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{26}{section.5.8}%
+\contentsline {section}{\numberline {5.9}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/dudaq/files/dudaq.c File Reference}{27}{section.5.9}%
+\contentsline {subsection}{\numberline {5.9.1}Detailed Description}{29}{subsection.5.9.1}%
+\contentsline {subsection}{\numberline {5.9.2}Function Documentation}{29}{subsection.5.9.2}%
+\contentsline {subsubsection}{\numberline {5.9.2.1}block\_signals()}{29}{subsubsection.5.9.2.1}%
+\contentsline {subsubsection}{\numberline {5.9.2.2}check\_server\_data()}{30}{subsubsection.5.9.2.2}%
+\contentsline {subsubsection}{\numberline {5.9.2.3}du\_get\_station\_id()}{30}{subsubsection.5.9.2.3}%
+\contentsline {subsubsection}{\numberline {5.9.2.4}du\_scope\_check\_commands()}{31}{subsubsection.5.9.2.4}%
+\contentsline {subsubsection}{\numberline {5.9.2.5}du\_scope\_main()}{31}{subsubsection.5.9.2.5}%
+\contentsline {subsubsection}{\numberline {5.9.2.6}du\_socket\_main()}{31}{subsubsection.5.9.2.6}%
+\contentsline {subsubsection}{\numberline {5.9.2.7}make\_server\_connection()}{32}{subsubsection.5.9.2.7}%
+\contentsline {subsubsection}{\numberline {5.9.2.8}send\_server\_data()}{32}{subsubsection.5.9.2.8}%
+\contentsline {subsubsection}{\numberline {5.9.2.9}socket\_send()}{33}{subsubsection.5.9.2.9}%
+\contentsline {section}{\numberline {5.10}dudaq.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{33}{section.5.10}%
+\contentsline {section}{\numberline {5.11}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/dudaq/files/scope.c File Reference}{33}{section.5.11}%
+\contentsline {subsection}{\numberline {5.11.1}Detailed Description}{35}{subsection.5.11.1}%
+\contentsline {subsection}{\numberline {5.11.2}Function Documentation}{35}{subsection.5.11.2}%
+\contentsline {subsubsection}{\numberline {5.11.2.1}scope\_read\_event()}{35}{subsubsection.5.11.2.1}%
+\contentsline {section}{\numberline {5.12}/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Users/timmer/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Library/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Mobile Documents/com$\sim $apple$\sim $\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Docs/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Cloud\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}Work/\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}GRAND/grand-\/daq-\/master/dudaq/files/scope.h File Reference}{36}{section.5.12}%
+\contentsline {subsection}{\numberline {5.12.1}Detailed Description}{40}{subsection.5.12.1}%
+\contentsline {subsection}{\numberline {5.12.2}Function Documentation}{40}{subsection.5.12.2}%
+\contentsline {subsubsection}{\numberline {5.12.2.1}scope\_read\_event()}{40}{subsubsection.5.12.2.1}%
+\contentsline {section}{\numberline {5.13}scope.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{40}{section.5.13}%
+\contentsline {section}{\numberline {5.14}Traces.\discretionary {\mbox {\scriptsize $\hookleftarrow $}}{}{}h}{43}{section.5.14}%
+\contentsline {chapter}{Index}{45}{section*.26}%

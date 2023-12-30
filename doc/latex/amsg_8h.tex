@@ -1,0 +1,165 @@
+\doxysection{/\+Users/timmer/\+Library/\+Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}\+Cloud\+Docs/\+Cloud\+Work/\+GRAND/grand-\/daq-\/master/dudaq/files/amsg.h File Reference}
+\hypertarget{amsg_8h}{}\label{amsg_8h}\index{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h@{/Users/timmer/Library/Mobile Documents/com\texorpdfstring{$\sim$}{\string~}apple\texorpdfstring{$\sim$}{\string~}CloudDocs/CloudWork/GRAND/grand-\/daq-\/master/dudaq/files/amsg.h}}
+
+
+General definitions used in the AERA DAQ.  
+
+
+{\ttfamily \#include $<$stdint.\+h$>$}\newline
+\doxysubsubsection*{Data Structures}
+\begin{DoxyCompactItemize}
+\item 
+struct \mbox{\hyperlink{struct_a_m_s_g}{AMSG}}
+\end{DoxyCompactItemize}
+\doxysubsubsection*{Macros}
+\begin{DoxyCompactItemize}
+\item 
+\Hypertarget{amsg_8h_a60048da1a819f66bf1e01b6936653738}\label{amsg_8h_a60048da1a819f66bf1e01b6936653738} 
+\#define {\bfseries DU\+\_\+\+BOOT}~0
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ada52376adbc96304382d39bb49347760}\label{amsg_8h_ada52376adbc96304382d39bb49347760} 
+\#define {\bfseries DU\+\_\+\+UPLOAD}~1
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ad05e6bf167729a806b757668641d2de2}\label{amsg_8h_ad05e6bf167729a806b757668641d2de2} 
+\#define {\bfseries DU\+\_\+\+RESET}~2
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a2d0574373f1d9614d3d9c852cec615a5}\label{amsg_8h_a2d0574373f1d9614d3d9c852cec615a5} 
+\#define {\bfseries DU\+\_\+\+INITIALIZE}~3
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a6b4d021acd71f38f3204ff76188bf85d}\label{amsg_8h_a6b4d021acd71f38f3204ff76188bf85d} 
+\#define {\bfseries DU\+\_\+\+SET}~4
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_aeff613d749a6204a8188d7a1ec9714d9}\label{amsg_8h_aeff613d749a6204a8188d7a1ec9714d9} 
+\#define {\bfseries DU\+\_\+\+GET}~5
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a0df1726ee63ab11f26b5b04a9f5bdcbb}\label{amsg_8h_a0df1726ee63ab11f26b5b04a9f5bdcbb} 
+\#define {\bfseries DU\+\_\+\+MONITOR}~6
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a97a7617b69455409932863e20e78a6fe}\label{amsg_8h_a97a7617b69455409932863e20e78a6fe} 
+\#define {\bfseries DU\+\_\+\+START}~7
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a0812a3f8d67c39c5939e83ae74d72460}\label{amsg_8h_a0812a3f8d67c39c5939e83ae74d72460} 
+\#define {\bfseries DU\+\_\+\+STOP}~8
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a3059d2ff66b13663c253bc9925346c57}\label{amsg_8h_a3059d2ff66b13663c253bc9925346c57} 
+\#define {\bfseries DU\+\_\+\+T2}~9
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a17dd7bd2c5c123c0a5623ec7106bde92}\label{amsg_8h_a17dd7bd2c5c123c0a5623ec7106bde92} 
+\#define {\bfseries DU\+\_\+\+GETEVENT}~10
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a918dcf51399c1df12c746f602297334d}\label{amsg_8h_a918dcf51399c1df12c746f602297334d} 
+\#define {\bfseries DU\+\_\+\+NO\+\_\+\+EVENT}~11
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_adfcb7c11103e8b810b61226761d5d388}\label{amsg_8h_adfcb7c11103e8b810b61226761d5d388} 
+\#define {\bfseries DU\+\_\+\+EVENT}~12
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a7798ac7f6e39ca384cd2969b9ccc2030}\label{amsg_8h_a7798ac7f6e39ca384cd2969b9ccc2030} 
+\#define {\bfseries DU\+\_\+\+GETMEM}~13
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a0a694c638d3aa987c9d26c4f39785f35}\label{amsg_8h_a0a694c638d3aa987c9d26c4f39785f35} 
+\#define {\bfseries DU\+\_\+\+SETMEM}~14
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a7ea6b5785c78453c02a1ab69d43a4689}\label{amsg_8h_a7ea6b5785c78453c02a1ab69d43a4689} 
+\#define {\bfseries DU\+\_\+\+SETBIT}~15
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ae656482ec6bec464601200e1dcd4ccf3}\label{amsg_8h_ae656482ec6bec464601200e1dcd4ccf3} 
+\#define {\bfseries DU\+\_\+\+CLRBIT}~16
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_aa61856bb25b463badf9057d4c38abf16}\label{amsg_8h_aa61856bb25b463badf9057d4c38abf16} 
+\#define {\bfseries DU\+\_\+\+GETFILE}~17
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a732a8d1243daf6d7441f9fc83a3e143f}\label{amsg_8h_a732a8d1243daf6d7441f9fc83a3e143f} 
+\#define {\bfseries DU\+\_\+\+SENDFILE}~18
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_abca5864aaf9061591ca95bf60f44fba4}\label{amsg_8h_abca5864aaf9061591ca95bf60f44fba4} 
+\#define {\bfseries DU\+\_\+\+EXEC}~19
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_afce4959b958bd9c958e2d2d842b50679}\label{amsg_8h_afce4959b958bd9c958e2d2d842b50679} 
+\#define {\bfseries DU\+\_\+\+CONNECT}~20
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_adc8a6812659084e0c0e7fc4e415082ce}\label{amsg_8h_adc8a6812659084e0c0e7fc4e415082ce} 
+\#define {\bfseries DU\+\_\+\+LISTEN}~21
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a8a0f71d38a7f4e873c3f5a9284e7073c}\label{amsg_8h_a8a0f71d38a7f4e873c3f5a9284e7073c} 
+\#define {\bfseries DU\+\_\+\+SCRIPT}~22
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a14716b9f261c1edcdd34c50c7dd81ce6}\label{amsg_8h_a14716b9f261c1edcdd34c50c7dd81ce6} 
+\#define {\bfseries DU\+\_\+\+GET\+\_\+\+MINBIAS\+\_\+\+EVENT}~29
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a3c50f6cdca3e9fb90e35e390844faa9e}\label{amsg_8h_a3c50f6cdca3e9fb90e35e390844faa9e} 
+\#define {\bfseries DU\+\_\+\+GET\+\_\+\+RANDOM\+\_\+\+EVENT}~32
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_acf5a614093f6362cb5454a3aa9a2fa24}\label{amsg_8h_acf5a614093f6362cb5454a3aa9a2fa24} 
+\#define {\bfseries T3\+\_\+\+EVENT\+\_\+\+REQUEST\+\_\+\+LIST}~201
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a3542cd108a842589af77f804d45fc9f8}\label{amsg_8h_a3542cd108a842589af77f804d45fc9f8} 
+\#define {\bfseries GUI\+\_\+\+UPDATE\+\_\+\+DB}~401
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_acc81fa0c658a5f4e1a1dae4e78d1ac9a}\label{amsg_8h_acc81fa0c658a5f4e1a1dae4e78d1ac9a} 
+\#define {\bfseries GUI\+\_\+\+INITIALIZE}~402
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a394e3c445eaa5cff11ed232b39f7ab2f}\label{amsg_8h_a394e3c445eaa5cff11ed232b39f7ab2f} 
+\#define {\bfseries GUI\+\_\+\+START\+\_\+\+RUN}~403
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a47c695adf43ed52cddcbcd4268de69d7}\label{amsg_8h_a47c695adf43ed52cddcbcd4268de69d7} 
+\#define {\bfseries GUI\+\_\+\+STOP\+\_\+\+RUN}~404
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a223f24c9bc40244aa695fe8a38578398}\label{amsg_8h_a223f24c9bc40244aa695fe8a38578398} 
+\#define {\bfseries GUI\+\_\+\+DELETE\+\_\+\+RUN}~406
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a8b8a7fb489f54f43660fcd20820116ea}\label{amsg_8h_a8b8a7fb489f54f43660fcd20820116ea} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SETATTENUATION}~450
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ac4d9c5b98bb138624f5d63d7d3daf021}\label{amsg_8h_ac4d9c5b98bb138624f5d63d7d3daf021} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SWITCHIO}~451
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a8e0607d41e7c77354029560c985108c1}\label{amsg_8h_a8e0607d41e7c77354029560c985108c1} 
+\#define {\bfseries GUI\+\_\+\+BC\+\_\+\+SETMODE}~452
+\begin{DoxyCompactList}\small\item\em Message tag as defined by DAQ group. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a815d56a67abc1beb7a3227ca80d6a924}\label{amsg_8h_a815d56a67abc1beb7a3227ca80d6a924} 
+\#define {\bfseries GRND1}~0x5247
+\begin{DoxyCompactList}\small\item\em End word1 for a message (GR) \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a670a5d7016643c339da8d4b434d047f3}\label{amsg_8h_a670a5d7016643c339da8d4b434d047f3} 
+\#define {\bfseries GRND2}~0x444E
+\begin{DoxyCompactList}\small\item\em End word 2 for a message (ND) \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ad8beef706da0344be19d59438fcdab6d}\label{amsg_8h_ad8beef706da0344be19d59438fcdab6d} 
+\#define {\bfseries ALIVE}~9998
+\begin{DoxyCompactList}\small\item\em Alive command sent by central DAQ. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_aa8afb4bb746d3ec3e77e0db892da3649}\label{amsg_8h_aa8afb4bb746d3ec3e77e0db892da3649} 
+\#define {\bfseries ALIVE\+\_\+\+ACK}~9999
+\begin{DoxyCompactList}\small\item\em Acknowledge alive, sent by DU. \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_ab1d1bc7f7331406d458d56217a9d9051}\label{amsg_8h_ab1d1bc7f7331406d458d56217a9d9051} 
+\#define {\bfseries INTSIZE}~4
+\item 
+\Hypertarget{amsg_8h_a2a86082cf89fd73335371fa2b479b469}\label{amsg_8h_a2a86082cf89fd73335371fa2b479b469} 
+\#define {\bfseries SOCKETS\+\_\+\+REUSEADDR\+\_\+\+OPT}~1
+\item 
+\Hypertarget{amsg_8h_aca8a250bbcbd08cbf1a6a908716d7422}\label{amsg_8h_aca8a250bbcbd08cbf1a6a908716d7422} 
+\#define {\bfseries SOCKETS\+\_\+\+KEEPALIVE\+\_\+\+OPT}~0
+\item 
+\Hypertarget{amsg_8h_a4d4d620c74bb59a8ef2e03db432ec818}\label{amsg_8h_a4d4d620c74bb59a8ef2e03db432ec818} 
+\#define {\bfseries SOCKETS\+\_\+\+NODELAY\+\_\+\+OPT}~1
+\item 
+\Hypertarget{amsg_8h_af53954b47ec98995f3b586ec783b1e77}\label{amsg_8h_af53954b47ec98995f3b586ec783b1e77} 
+\#define {\bfseries SOCKETS\+\_\+\+BUFFER\+\_\+\+SIZE}~4096
+\item 
+\Hypertarget{amsg_8h_a6beb7365a8d84d42492b4798e807cfd1}\label{amsg_8h_a6beb7365a8d84d42492b4798e807cfd1} 
+\#define {\bfseries SOCKETS\+\_\+\+TIMEOUT}~100
+\begin{DoxyCompactList}\small\item\em millisec \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a78d7d81cdd39806bdaaf6ee987b491c5}\label{amsg_8h_a78d7d81cdd39806bdaaf6ee987b491c5} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+LENGTH}~0
+\begin{DoxyCompactList}\small\item\em offset for message length wrt start of msg \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_abb5e5e3258dc220fa384110c4eb61135}\label{amsg_8h_abb5e5e3258dc220fa384110c4eb61135} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+TAG}~1
+\begin{DoxyCompactList}\small\item\em offset for message tag wrt start of msg \end{DoxyCompactList}\item 
+\Hypertarget{amsg_8h_a38e9e66c23211c082f298a284f4e3194}\label{amsg_8h_a38e9e66c23211c082f298a284f4e3194} 
+\#define {\bfseries AMSG\+\_\+\+OFFSET\+\_\+\+BODY}~2
+\begin{DoxyCompactList}\small\item\em offset for message body wrt start of msg \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+General definitions used in the AERA DAQ. 
+
+\begin{DoxyAuthor}{Author}
+C. Timmermans, Nikhef/\+RU 
+\end{DoxyAuthor}

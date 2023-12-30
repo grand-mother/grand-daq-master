@@ -22,8 +22,8 @@ Altering the code without explicit consent of the author is forbidden
 #define MAX_INP_MSG 200
 
 extern int errno;
-void cmd_run(unsigned short mode);
-void send_cmd(unsigned short mode,unsigned short istat);
+void cmd_run(unsigned int mode);
+void send_cmd(unsigned int mode,unsigned int istat);
 
 /**
  void interpret_command(unsigned short *cmdlist)
@@ -33,7 +33,7 @@ void send_cmd(unsigned short mode,unsigned short istat);
         Start
         Stop
  */
-void interpret_command(unsigned short *cmdlist)
+void interpret_command(unsigned int *cmdlist)
 {
     int i=1;
     while(i<cmdlist[0]-1){
@@ -60,7 +60,7 @@ void gui_main()
     fd_set sockset;
     int option, gui,i,bytesRead;
     struct timeval timeout;
-    unsigned short gui_input[MAX_INP_MSG];
+    unsigned int gui_input[MAX_INP_MSG];
     unsigned char *bf = (unsigned char *)gui_input;
     timeout.tv_sec = 0;
     timeout.tv_usec=100;
@@ -106,7 +106,7 @@ void gui_main()
         FD_SET(gui, &sockset);
         //printf("Set timeout\n");
         i= select(gui, &sockset, NULL, NULL, &timeout);//was gui+1
-        if((i = recvfrom(gui, gui_input,2,0,(struct sockaddr*)&A_address,&A_length))==2){ //read the buffer size
+        if((i = recvfrom(gui, gui_input,INTSIZE,0,(struct sockaddr*)&A_address,&A_length))==INTSIZE){ //read the buffer size
             if ((gui_input[0] < 0) || (gui_input[0]>MAX_INP_MSG)) {
                 printf("Check Server Data: bad buffer size when receiving socket data (%d shorts)\n", gui_input[0]);
                 shutdown(gui,SHUT_RDWR);
@@ -114,11 +114,11 @@ void gui_main()
                 gui = -1;
                 continue;
             }
-            bytesRead = 2;
-            while (bytesRead < (2*gui_input[0]+2) &&gui>0) {
+            bytesRead = 4;
+            while (bytesRead < (INTSIZE*gui_input[0]) &&gui>0) {
                 A_length = sizeof(A_address);
                 i = recvfrom(gui,&bf[bytesRead],
-                             2*gui_input[0]+2-bytesRead,0,(struct sockaddr*)&A_address,&A_length);
+                             INTSIZE*gui_input[0]-bytesRead,0,(struct sockaddr*)&A_address,&A_length);
                 if(i>0) bytesRead +=i;
                 if(errno == EAGAIN && i<0) continue;
                 if (i <= 0) {
@@ -129,7 +129,7 @@ void gui_main()
                 }
             }
             //printf("Read %d %d\n",gui_input[0],bytesRead);
-            if(bytesRead==(2*gui_input[0]+2)){// all is well, interpret
+            if(bytesRead==(INTSIZE*gui_input[0])){// all is well, interpret
                 interpret_command(gui_input);
             }
             shutdown(gui,SHUT_RDWR);
