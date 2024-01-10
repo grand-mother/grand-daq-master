@@ -1,7 +1,7 @@
 /***
  Event Builder
  Version:2.0
- Date: 28/6/2022
+ Date: 10/1/2024
  Author: Charles Timmermans, Nikhef/Radboud University
  
  Altering the code without explicit consent of the author is forbidden
@@ -352,7 +352,7 @@ void eb_write_events(){
     }
     if(DUn[EVT_EVT_ID] == evhdr.t3_id && DTime < 5E6){
       evhdr.DU_count ++;
-      evhdr.length += 2*(DUn[EVT_LENGTH+1]>>16);
+      evhdr.length += 4*(DUn[EVT_LENGTH]>>16);
       //evhdr.type |= DUn[EVT_T3FLAG];
     }else{
       //printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,du_sec,evhdr.seconds);

@@ -25,7 +25,7 @@ uint32_t cmdlist[CMDSIZE];
  */
 void cmd_run(uint32_t mode)
 {
-  cmdlist[0] = 4;
+  cmdlist[0] = 4; //should be 3 !!!!
   cmdlist[1] = mode;
   cmdlist[2]=0; // all local stations
   while(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_write)] != 0) {//possible problem!

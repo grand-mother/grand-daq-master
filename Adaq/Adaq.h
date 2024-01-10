@@ -13,7 +13,7 @@ Altering the code without explicit consent of the author is forbidden
 #include "ad_shm.h"
 
 #define ADAQ_VERSION 2
-#define MAXDU 2 //max number of Detector Units
+#define MAXDU 3 //max number of Detector Units
 #define ERROR -1
 #define NORMAL 1
 #define DEFAULT_CONFIGFILE "conf/Adaq.conf"

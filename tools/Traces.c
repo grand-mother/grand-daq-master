@@ -191,7 +191,7 @@ void print_du_configuration(uint32_t *du)
   if(du[EVT_TRIG_SELECT]&(1<<3))printf("\t Ch4");
   if(du[EVT_TRIG_SELECT]&(1<<4))printf("\t Ch1&Ch2");
   if(du[EVT_TRIG_SELECT]&(1<<5))printf("\t Ch1&Ch2&Ch3");
-  if(du[EVT_TRIG_SELECT]&(1<<6))printf("\t Ch1&Ch3&~Ch3");
+  if(du[EVT_TRIG_SELECT]&(1<<6))printf("\t Ch1&Ch2&~Ch3");
   if(du[EVT_TRIG_SELECT]&(1<<7))printf("\t 20Hz");
   if(du[EVT_TRIG_SELECT]&(1<<8))printf("\t 10 sec");
   printf("\n");
