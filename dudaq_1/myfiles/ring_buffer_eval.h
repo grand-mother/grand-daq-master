@@ -34,25 +34,25 @@ typedef struct
 
       /* mutex */
       pthread_mutex_t mutex;
-} RingBufferEval_struct;
+} S_RingBufferEval;
 
-RingBufferEval_struct*
+S_RingBufferEval*
 RBE_create (uint16_t size_buffer, uint16_t nb_array);
 
 void
-RBE_delete (RingBufferEval_struct **pp_rbe);
+RBE_delete (S_RingBufferEval **pp_rbe);
 
 void
-RBE_write (RingBufferEval_struct *p_rbe, void *p_buf);
+RBE_write (S_RingBufferEval *p_rbe, const void *p_buf);
 
 void
-RBE_update_write (RingBufferEval_struct *p_rbe);
+RBE_after_write (S_RingBufferEval * const p_rbe);
 
 void
-RBE_update_eval (RingBufferEval_struct *p_rbe);
+RBE_after_eval (S_RingBufferEval *p_rbe);
 
 void
-RBE_update_trigger (RingBufferEval_struct *p_rbe);
+RBE_after_trigger (S_RingBufferEval *p_rbe);
 
 void
 RBE_inc_modulo (uint16_t *p_int, uint16_t max_int);
