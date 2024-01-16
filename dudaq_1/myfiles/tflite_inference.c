@@ -9,6 +9,9 @@ short G_mask14 = 1 << 13; // --- bit 14
 short G_mask15 = 1 << 14; // --- bit 15
 short G_mask16 = 1 << 15; // --- bit 16
 
+#define OFFSET_1 2
+#define OFFSET_2 4
+
 /**
  * \fn TfLiteInterpreter TFLT_create*(void)
  * \brief
@@ -16,12 +19,12 @@ short G_mask16 = 1 << 15; // --- bit 16
  * \return
  */
 
-TFLT_struct*
+S_TFLite*
 TFLT_create(uint16_t size_trace) {
-	TFLT_struct *p_tflt = (TFLT_struct*) malloc(sizeof(TFLT_struct));
-	p_tflt->nb_sample = size_trace;
-	p_tflt->size_byte = sizeof(float) * size_trace * 3;
-	float *p_3dt = (float*) malloc(p_tflt->size_byte);
+	S_TFLite *self = (S_TFLite*) malloc(sizeof(S_TFLite));
+	self->nb_sample = size_trace;
+	self->size_byte = sizeof(float) * size_trace * 3;
+	float *p_3dt = (float*) malloc(self->size_byte);
 
 	TfLiteModel *model = TfLiteModelCreateFromFile("trigger_grand.tflite");
 	TfLiteInterpreterOptions *options = TfLiteInterpreterOptionsCreate();
@@ -33,10 +36,10 @@ TFLT_create(uint16_t size_trace) {
 	/*Allocate tensors and populate the input tensor data.*/
 	TfLiteInterpreterAllocateTensors(interpreter);
 
-	p_tflt->p_interp = interpreter;
-	p_tflt->a_3dtraces = p_3dt;
+	self->p_interp = interpreter;
+	self->a_3dtraces = p_3dt;
 
-	return p_tflt;
+	return self;
 }
 
 /**
@@ -47,17 +50,17 @@ TFLT_create(uint16_t size_trace) {
  * \return
  */
 
-void TFLT_delete(TFLT_struct **pp_tflt) {
+void TFLT_delete(S_TFLite **pself) {
 	/* Dispose of the model and interpreter objects.*/
-	TfLiteInterpreter *interpreter = (*pp_tflt)->p_interp;
+	TfLiteInterpreter *interpreter = (*pself)->p_interp;
 	TfLiteInterpreterDelete(interpreter);
 	/* #TODO:
 	 TfLiteInterpreterOptionsDelete (options);
 	 TfLiteModelDelete (model);
 	 */
-	free((*pp_tflt)->a_3dtraces);
-	free(*pp_tflt);
-	*pp_tflt = NULL;
+	free((*pself)->a_3dtraces);
+	free(*pself);
+	*pself = NULL;
 }
 
 /**
@@ -76,20 +79,19 @@ short TFLT_convert_adu(short adu) {
 	return value;
 }
 
-void TFLT_preprocessing(TFLT_struct *p_tflt, uint16_t *a_tr_adu) {
+void TFLT_preprocessing(S_TFLite *const self, uint8_t *a_tr_adu) {
 
 	int l_s;
 	short dec_adu;
 
-	for (l_s = 0; l_s < p_tflt->nb_sample; l_s++) {
+	for (l_s = 0; l_s < self->nb_sample; l_s++) {
 		dec_adu = TFLT_convert_adu(a_tr_adu[l_s]);
-		p_tflt->a_3dtraces[3 * l_s] = dec_adu / G_quantif;
+		self->a_3dtraces[3 * l_s] = dec_adu / G_quantif;
 		dec_adu = TFLT_convert_adu(a_tr_adu[l_s + OFFSET_1]);
-		p_tflt->a_3dtraces[3 * l_s + 1] = dec_adu / G_quantif;
+		self->a_3dtraces[3 * l_s + 1] = dec_adu / G_quantif;
 		dec_adu = TFLT_convert_adu(a_tr_adu[l_s + OFFSET_2]);
-		p_tflt->a_3dtraces[3 * l_s + 2] = dec_adu / G_quantif;
+		self->a_3dtraces[3 * l_s + 2] = dec_adu / G_quantif;
 	}
-
 }
 
 /**
@@ -101,17 +103,17 @@ void TFLT_preprocessing(TFLT_struct *p_tflt, uint16_t *a_tr_adu) {
  * \param output_proba
  */
 
-void TFLT_inference(TFLT_struct *p_tflt, float *output_proba) {
+void TFLT_inference(S_TFLite *const self, float *output_proba) {
 	TfLiteTensor *input_tensor = TfLiteInterpreterGetInputTensor(
-			p_tflt->p_interp, 0);
-	TfLiteTensorCopyFromBuffer(input_tensor, p_tflt->a_3dtraces,
-			p_tflt->size_byte);
+			self->p_interp, 0);
+	TfLiteTensorCopyFromBuffer(input_tensor, self->a_3dtraces,
+			self->size_byte);
 
 	/* Execute inference */
-	TfLiteInterpreterInvoke(p_tflt->p_interp);
+	TfLiteInterpreterInvoke(self->p_interp);
 
 	/* Extract the output tensor data */
 	const TfLiteTensor *output_tensor = TfLiteInterpreterGetOutputTensor(
-			p_tflt->p_interp, 0);
+			self->p_interp, 0);
 	TfLiteTensorCopyToBuffer(output_tensor, output_proba, sizeof(float));
 }

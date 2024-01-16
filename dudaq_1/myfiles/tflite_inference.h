@@ -17,14 +17,14 @@ typedef struct
       float *a_3dtraces; // array of 3d traces
       uint64_t size_byte; // size of array of 3d traces
       uint16_t nb_sample; // in one trace
-} TFLT_struct;
+} S_TFLite;
 
-TFLT_struct* TFLT_create (uint16_t size_trace);
+S_TFLite* TFLT_create (uint16_t size_trace);
 
-void TFLT_delete (TFLT_struct **pp_tflt);
+void TFLT_delete (S_TFLite **pself);
 
-void TFLT_preprocessing (TFLT_struct *p_tflt, uint8_t *a_tr_adu);
+void TFLT_preprocessing (S_TFLite * const self, uint8_t *a_tr_adu);
 
-void TFLT_inference (TFLT_struct *p_tflt, float *output_proba);
+void TFLT_inference (S_TFLite * const self, float *output_proba);
 
 #endif /* DUDAQ_1_MYFILES_TFLITE_INFERENCE_H_ */

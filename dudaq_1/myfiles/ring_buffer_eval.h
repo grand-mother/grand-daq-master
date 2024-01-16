@@ -40,19 +40,19 @@ S_RingBufferEval*
 RBE_create (uint16_t size_buffer, uint16_t nb_array);
 
 void
-RBE_delete (S_RingBufferEval **pp_rbe);
+RBE_delete (S_RingBufferEval **pself);
 
 void
-RBE_write (S_RingBufferEval *p_rbe, const void *p_buf);
+RBE_write (S_RingBufferEval *self, const void *p_buf);
 
 void
-RBE_after_write (S_RingBufferEval * const p_rbe);
+RBE_after_write (S_RingBufferEval * const self);
 
 void
-RBE_after_eval (S_RingBufferEval *p_rbe);
+RBE_after_eval (S_RingBufferEval *self);
 
 void
-RBE_after_trigger (S_RingBufferEval *p_rbe);
+RBE_after_trigger (S_RingBufferEval *self);
 
 void
 RBE_inc_modulo (uint16_t *p_int, uint16_t max_int);

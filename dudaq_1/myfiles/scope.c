@@ -90,20 +90,20 @@ uint16_t evtlen;
 #define MAX_BUF_TRIG 8
 #define TRIG_THRESHOLD 0.8
 
-RingBufferEval_struct *Gp_rbuf1trig = NULL;
-RingBufferEval_struct *Gp_rbuf2trig = NULL;
+S_RingBufferEval *Gp_rbuf1trig = NULL;
+S_RingBufferEval *Gp_rbuf2trig = NULL;
 
 /**
  * thread evaluation with Tensorflow Lite of 3D trace for trigger T2
  * 2 threads one by CPU CORTEX A53
  */
 pthread_t G_thread1_t2;
-TFLT_struct *Gp_tflt1 = NULL;
-FuncEval_struct *Gp_feev1 = NULL;
+S_TFLite *Gp_tflt1 = NULL;
+S_FuncEval *Gp_feev1 = NULL;
 
 pthread_t G_thread2_t2;
-TFLT_struct *Gp_tflt2 = NULL;
-FuncEval_struct *Gp_feev2 = NULL;
+S_TFLite *Gp_tflt2 = NULL;
+S_FuncEval *Gp_feev2 = NULL;
 
 /*
  * FUNCTIONS of scope.c
@@ -705,7 +705,7 @@ void scope_event_to_evaluation (uint16_t evnr, uint16_t trflag, uint16_t sec, ui
    int i;
    int offset = 0;
    uint32_t nanosec;
-   RingBufferEval_struct *Gp_buftrig = NULL;
+   S_RingBufferEval *Gp_buftrig = NULL;
    int next_write = *(shm_ev.next_write);
 
    if (Gp_rbuf1trig->nb_write > Gp_rbuf2trig->nb_write)
@@ -752,6 +752,7 @@ void scope_event_to_evaluation (uint16_t evnr, uint16_t trflag, uint16_t sec, ui
    }
 }
 
+
 /**
  * \fn void scope_evaluation_to_trigger(void)
  * \brief for each evaluation, perform trigger and if select copy in share memory
@@ -779,7 +780,7 @@ void scope_evaluation_to_trigger (void)
 	    next_write = 0;
 	 *(shm_ev.next_write) = next_write;
       }
-      RBE_update_trigger (Gp_rbuf1trig);
+      RBE_after_trigger (Gp_rbuf1trig);
    }
 
    while (Gp_rbuf2trig->nb_trig)
@@ -798,6 +799,6 @@ void scope_evaluation_to_trigger (void)
 	    next_write = 0;
 	 *(shm_ev.next_write) = next_write;
       }
-      RBE_update_trigger (Gp_rbuf2trig);
+      RBE_after_trigger (Gp_rbuf2trig);
    }
 }

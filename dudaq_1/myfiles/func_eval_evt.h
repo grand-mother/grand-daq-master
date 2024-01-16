@@ -6,11 +6,11 @@
 
 typedef struct
 {
-      RingBufferEval_struct *p_rbe; // data
-      void *p_eval; // for processing
-} FuncEval_struct;
+      S_RingBufferEval *p_rbe; // data
+      void *p_eval; // for generic processing
+} S_FuncEval;
 
-FuncEval_struct *FEEV_create(RingBufferEval_struct *p_rbe, void *p_eval);
+S_FuncEval *FEEV_create(S_RingBufferEval *p_rbe, void *p_eval);
 
 void *FEEV_run (void *p_args);
 

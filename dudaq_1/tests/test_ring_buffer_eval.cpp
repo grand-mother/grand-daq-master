@@ -64,15 +64,40 @@ TEST(TestRingBufferEval, Test_inc_modulo) {
 	 */
 }
 
-TEST(TestRingBufferEval, Test_after_write) {
+TEST(TestRingBufferEval, Test_after_xxx) {
 	S_RingBufferEval* p_rbe = NULL;
-	int nb_buf = 5;
+	int nb_buf = 2;
 
 	p_rbe = RBE_create(16, nb_buf);
 	CHECK(p_rbe->nb_write == nb_buf);
 	CHECK(p_rbe->inext_write == 0);
+	/* write */
 	RBE_after_write(p_rbe);
 	CHECK(p_rbe->nb_write == (nb_buf - 1));
 	CHECK(p_rbe->inext_write == 1);
+	/* write */
+	RBE_after_write(p_rbe);
+	CHECK(p_rbe->nb_write == (nb_buf - 2));
+	CHECK(p_rbe->nb_eval == 2);
+	CHECK(p_rbe->inext_write == 0);
+	/* eval */
+	RBE_after_eval(p_rbe);
+	CHECK(p_rbe->nb_eval == 1);
+	CHECK(p_rbe->nb_trig == 1);
+	CHECK(p_rbe->inext_eval == 1);
+	/* trigger */
+	RBE_after_trigger(p_rbe);
+	CHECK(p_rbe->nb_trig == 0);
+	CHECK(p_rbe->inext_trig == 1);
+	/* eval */
+	RBE_after_eval(p_rbe);
+	/* trigger */
+	RBE_after_trigger(p_rbe);
+	printf("\n%d", p_rbe->nb_write);
+	CHECK(p_rbe->nb_write == nb_buf);
+	CHECK(p_rbe->nb_eval == 0);
+	CHECK(p_rbe->nb_trig == 0);
+	CHECK(p_rbe->inext_write == 0);
+	CHECK(p_rbe->inext_eval == 0);
+	CHECK(p_rbe->inext_eval == 0);
 }
-

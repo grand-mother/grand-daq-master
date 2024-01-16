@@ -934,6 +934,7 @@ void du_socket_main (int argc, char **argv)
  \param argv character string of arguments (not used)
  \author C. Timmermans
  */
+#ifndef CPPUTEST
 int main (int argc, char **argv)
 {
    pid_t pid;
@@ -1017,3 +1018,4 @@ int main (int argc, char **argv)
    }
    remove_shared_memory ();
 }
+#endif

@@ -16,36 +16,36 @@ int G_cpt = 0;
 int G_running = 1; // if 0 stop all thread
 
 /**
- * \fn FuncEval_struct * FEEV_create(RingBufferEval_struct*, void*)
+ * \fn S_FuncEval * FEEV_create(S_RingBufferEval*, void*)
  * \brief
  *
  * \param p_rbe
  * \param p_eval
  * \return
  */
-FuncEval_struct* FEEV_create (RingBufferEval_struct *p_rbe, void *p_eval)
+S_FuncEval* FEEV_create (S_RingBufferEval *p_rbe, void *p_eval)
 {
-   FuncEval_struct *p_feev = (FuncEval_struct*) malloc (sizeof(FuncEval_struct));
+   S_FuncEval *p_feev = (S_FuncEval*) malloc (sizeof(S_FuncEval));
    p_feev->p_rbe = p_rbe;
    p_feev->p_eval = p_eval;
    return p_feev;
 }
 
 /**
- * \fn void FEEV_delete(FuncEval_struct**)
+ * \fn void FEEV_delete(S_FuncEval**)
  * \brief
  *
  * \param pp_feev
  * \return
  */
 
-void FEEV_delete (FuncEval_struct **pp_feev)
+void FEEV_delete (S_FuncEval **pself)
 {
-   RBE_delete(&((*pp_feev)->p_rbe));
+   RBE_delete(&((*pself)->p_rbe));
    /* p_eval must be free before */
-   assert((*pp_feev)->p_eval == NULL);
-   free (*pp_feev);
-   *pp_feev = NULL;
+   assert((*pself)->p_eval == NULL);
+   free (*pself);
+   *pself = NULL;
 }
 
 /**
@@ -56,9 +56,9 @@ void FEEV_delete (FuncEval_struct **pp_feev)
  */
 void *FEEV_run (void *p_args)
 {
-   FuncEval_struct *p_fe = (FuncEval_struct*) p_args;
-   RingBufferEval_struct *p_rbe = (RingBufferEval_struct*) p_fe->p_rbe;
-   void *p_eval = p_fe->p_eval;
+   S_FuncEval *self = (S_FuncEval*) p_args;
+   S_RingBufferEval *p_rbe = (S_RingBufferEval*) self->p_rbe;
+   void *p_eval = self->p_eval;
 
    uint16_t nb_eval;
    uint16_t idx_eval_buffer;
@@ -80,7 +80,7 @@ void *FEEV_run (void *p_args)
 	 FEEV_eval (p_eval,
 			 	p_rbe->a_buffers + idx_eval_byte,
 				p_rbe->a_prob + idx_eval_buffer);
-	 RBE_update_eval (p_rbe);
+	 RBE_after_eval (p_rbe);
       }
       else
       {
@@ -138,7 +138,7 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
  */
 void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
 {
-   TFLT_struct *p_tflt = (TFLT_struct*) p_eval;
+   S_TFLite *p_tflt = (S_TFLite*) p_eval;
    TFLT_preprocessing (p_tflt, p_buf);
    TFLT_inference (p_tflt, p_prob);
 }
