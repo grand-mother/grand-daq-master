@@ -18,7 +18,7 @@ if False:
 # sources
 src_prj = glob.glob(f"{PATH_SRC}*.c")
 print(src_prj)
-src_all = ['test_ring_buffer_eval.cpp', 'run_cpputest.cpp','test_tflite_inference.cpp'] + src_prj
+src_all = ['test_ring_buffer_eval.cpp', 'run_cpputest.cpp','test_tflite_inference.cpp','test_func_eval.cpp'] + src_prj
 
 
 # compilation option

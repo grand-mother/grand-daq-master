@@ -9,8 +9,11 @@ short G_mask14 = 1 << 13; // --- bit 14
 short G_mask15 = 1 << 14; // --- bit 15
 short G_mask16 = 1 << 15; // --- bit 16
 
+
+#define OFFSET_0 0
 #define OFFSET_1 2
 #define OFFSET_2 4
+
 
 /**
  * \fn TfLiteInterpreter TFLT_create*(void)
@@ -91,7 +94,7 @@ void TFLT_preprocessing(S_TFLite *const self, uint8_t *a_tr_adu) {
 	short dec_adu;
 
 	for (l_s = 0; l_s < self->nb_sample; l_s++) {
-		dec_adu = TFLT_convert_adu(a_tr_adu[l_s]);
+		dec_adu = TFLT_convert_adu(a_tr_adu[l_s+ OFFSET_0]);
 		self->a_3dtraces[3 * l_s] = dec_adu / G_quantif;
 		dec_adu = TFLT_convert_adu(a_tr_adu[l_s + OFFSET_1]);
 		self->a_3dtraces[3 * l_s + 1] = dec_adu / G_quantif;

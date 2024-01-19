@@ -6,7 +6,6 @@
  */
 
 #include "func_eval_evt.h"
-#include "ring_buffer_eval.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <unistd.h>
@@ -60,7 +59,6 @@ void *FEEV_run (void *p_args)
    S_RingBufferEval *p_rbe = (S_RingBufferEval*) self->p_rbe;
    void *p_eval = self->p_eval;
 
-   uint16_t nb_eval;
    uint16_t idx_eval_buffer;
    uint32_t idx_eval_byte;
 
@@ -68,12 +66,10 @@ void *FEEV_run (void *p_args)
    while (G_running)
    {
       /* evaluation of all events without tempo between*/
-      pthread_mutex_lock (&p_rbe->mutex);
-      nb_eval = p_rbe->nb_eval;
-      pthread_mutex_unlock (&p_rbe->mutex);
-      if (nb_eval > 0)
+      if (p_rbe->nb_eval > 0)
       {
 	 idx_eval_buffer = p_rbe->inext_eval;
+	 printf("\n=== %d JMC====",idx_eval_buffer);
 	 /* index (in byte ) where start buffer to evaluate */
 	 idx_eval_byte = ((uint32_t) idx_eval_buffer) * p_rbe->size_buffer;
 	 /* eval and update ring buffer */
@@ -86,7 +82,7 @@ void *FEEV_run (void *p_args)
       {
 	 /* all evaluation are done => sleep 0.1 ms */
 	 usleep (100);
-	 printf("Wake up !!!");
+	 printf("\nWake up !!!");
       }
    }
    pthread_exit(NULL);
@@ -128,6 +124,8 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
 #ifdef FEEV_IS_TFLT
 
 #include "tflite_inference.h"
+
+
 /**
  * \fn void FEEV_eval(void*, uint8_t*, float*)
  * \brief Evaluation with neural network with tensorflow lite library
@@ -136,6 +134,7 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
  * \param p_buf
  * \param p_prob
  */
+
 void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
 {
    S_TFLite *p_tflt = (S_TFLite*) p_eval;
