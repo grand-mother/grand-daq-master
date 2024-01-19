@@ -21,14 +21,18 @@ short G_mask16 = 1 << 15; // --- bit 16
 
 S_TFLite*
 TFLT_create(uint16_t size_trace) {
-	S_TFLite *self = (S_TFLite*) malloc(sizeof(S_TFLite));
-	self->nb_sample = size_trace;
-	self->size_byte = sizeof(float) * size_trace * 3;
-	float *p_3dt = (float*) malloc(self->size_byte);
+	S_TFLite *self = NULL;
 
+	self = (S_TFLite*) malloc(sizeof(S_TFLite));
+
+	/*
+	 * Tensorflow Lite init
+	 *
+	 * */
+#if 1
 	TfLiteModel *model = TfLiteModelCreateFromFile("trigger_grand.tflite");
 	TfLiteInterpreterOptions *options = TfLiteInterpreterOptionsCreate();
-	TfLiteInterpreterOptionsSetNumThreads(options, 1);
+	//TfLiteInterpreterOptionsSetNumThreads(options, 1);
 
 	/* Create the interpreter.*/
 	TfLiteInterpreter *interpreter = TfLiteInterpreterCreate(model, options);
@@ -37,7 +41,15 @@ TFLT_create(uint16_t size_trace) {
 	TfLiteInterpreterAllocateTensors(interpreter);
 
 	self->p_interp = interpreter;
-	self->a_3dtraces = p_3dt;
+#endif
+
+	/*
+	 * Array trace allocation
+	 *
+	 * */
+	self->nb_sample = size_trace;
+	self->size_byte = sizeof(float) * size_trace * 3;
+	self->a_3dtraces = (float*) malloc(self->size_byte);
 
 	return self;
 }
@@ -52,8 +64,7 @@ TFLT_create(uint16_t size_trace) {
 
 void TFLT_delete(S_TFLite **pself) {
 	/* Dispose of the model and interpreter objects.*/
-	TfLiteInterpreter *interpreter = (*pself)->p_interp;
-	TfLiteInterpreterDelete(interpreter);
+	TfLiteInterpreterDelete((*pself)->p_interp);
 	/* #TODO:
 	 TfLiteInterpreterOptionsDelete (options);
 	 TfLiteModelDelete (model);

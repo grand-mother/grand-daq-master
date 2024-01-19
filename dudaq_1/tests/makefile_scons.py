@@ -16,12 +16,9 @@ if False:
 		LIBPATH = "/home/grand/install/cpputest/cpputest_build/lib")
 
 # sources
-#os.chdir("/mydir")
 src_prj = glob.glob(f"{PATH_SRC}*.c")
 print(src_prj)
-#src_name_only = ["ring_buffer_eval.c"]
-#src_prj = [PATH_SRC+name for name in src_name_only]
-src_all = ['test_ring_buffer_eval.cpp', 'run_cpputest.cpp'] + src_prj
+src_all = ['test_ring_buffer_eval.cpp', 'run_cpputest.cpp','test_tflite_inference.cpp'] + src_prj
 
 
 # compilation option
