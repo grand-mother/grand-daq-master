@@ -29,19 +29,14 @@ TFLT_create(uint16_t size_trace) {
 	 * Tensorflow Lite init
 	 *
 	 * */
-#if 1
 	TfLiteModel *model = TfLiteModelCreateFromFile("trigger_grand.tflite");
 	TfLiteInterpreterOptions *options = TfLiteInterpreterOptionsCreate();
-	//TfLiteInterpreterOptionsSetNumThreads(options, 1);
-
+	TfLiteInterpreterOptionsSetNumThreads(options, 1);
 	/* Create the interpreter.*/
 	TfLiteInterpreter *interpreter = TfLiteInterpreterCreate(model, options);
-
 	/*Allocate tensors and populate the input tensor data.*/
 	TfLiteInterpreterAllocateTensors(interpreter);
-
 	self->p_interp = interpreter;
-#endif
 
 	/*
 	 * Array trace allocation
