@@ -1,5 +1,18 @@
 # Create HTML coverage report with lcov
 
+## Install lcov
+
+```bash
+sudo apt install lcov
+```
+
+## Creation procedure 
+
+* compile test project with option : -fprofile-arcs -ftest-coverage -g
+* run test
+* create file raw coverage with gcov for each module
+* create rapport with lcov
+* create HTML with genhtml
 
 ```bash
 cd /path/tests
