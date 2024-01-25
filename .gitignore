@@ -2,6 +2,7 @@
 nohup.out
 dudaq.tar
 dudaq/myfiles/.DS_Store
+.DS_Store
 *.o
 dudaq.tar
 dudaq.tar
@@ -17,3 +18,17 @@ SpecNancaydet.pdf
 SpecNancayfull.pdf
 *.pdf
 tools/noise.txt
+
+
+# coverage test files
+*.gcno
+*.gcda
+*.d
+
+# eclipse 
+.project
+.cproject
+.pydevproject
+.settings
+
+/.autotools
