@@ -24,3 +24,8 @@ tools/noise.txt
 /.autotools
 /.cproject
 /Debug/
+
+*.o
+*.gcno
+*.gcda
+*.d

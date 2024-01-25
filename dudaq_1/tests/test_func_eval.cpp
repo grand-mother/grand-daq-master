@@ -75,9 +75,9 @@ TEST(TestFuncEval, Test_inference)
 
    for (l_s = 0; l_s < NB_SAMPLE; l_s++)
    {
-      input[3 * l_s] = trace_fe_1[l_s];
-      input[3 * l_s + 1] = trace_fe_2[l_s];
-      input[3 * l_s + 2] = trace_fe_3[l_s];
+      input[3 * l_s] = trace_1[l_s];
+      input[3 * l_s + 1] = trace_2[l_s];
+      input[3 * l_s + 2] = trace_3[l_s];
    }
    RBE_after_write(p_rbuftrig);
 
