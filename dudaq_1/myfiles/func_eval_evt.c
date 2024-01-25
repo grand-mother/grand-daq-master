@@ -40,7 +40,7 @@ S_FuncEval* FEEV_create (S_RingBufferEval *p_rbe, void *p_eval)
 
 void FEEV_delete (S_FuncEval **pself)
 {
-   RBE_delete(&((*pself)->p_rbe));
+   RBE_delete (&((*pself)->p_rbe));
    /* p_eval must be free before */
    assert((*pself)->p_eval == NULL);
    free (*pself);
@@ -53,7 +53,7 @@ void FEEV_delete (S_FuncEval **pself)
  *
  * \param p_data
  */
-void *FEEV_run (void *p_args)
+void* FEEV_run (void *p_args)
 {
    S_FuncEval *self = (S_FuncEval*) p_args;
    S_RingBufferEval *p_rbe = (S_RingBufferEval*) self->p_rbe;
@@ -62,30 +62,27 @@ void *FEEV_run (void *p_args)
    uint16_t idx_eval_buffer;
    uint32_t idx_eval_byte;
 
-
    while (G_running)
    {
       /* evaluation of all events without tempo between*/
       if (p_rbe->nb_eval > 0)
       {
 	 idx_eval_buffer = p_rbe->inext_eval;
-	 printf("\n=== %d JMC====",idx_eval_buffer);
+	 printf ("\n=== %d JMC====", idx_eval_buffer);
 	 /* index (in byte ) where start buffer to evaluate */
 	 idx_eval_byte = ((uint32_t) idx_eval_buffer) * p_rbe->size_buffer;
 	 /* eval and update ring buffer */
-	 FEEV_eval (p_eval,
-			 	p_rbe->a_buffers + idx_eval_byte,
-				p_rbe->a_prob + idx_eval_buffer);
+	 FEEV_eval (p_eval, p_rbe->a_buffers + idx_eval_byte, p_rbe->a_prob + idx_eval_buffer);
 	 RBE_after_eval (p_rbe);
       }
       else
       {
 	 /* all evaluation are done => sleep 0.1 ms */
 	 usleep (100);
-	 printf("\nWake up !!!");
+	 printf ("\nWake up !!!");
       }
    }
-   pthread_exit(NULL);
+   pthread_exit (NULL);
 }
 
 /**
@@ -124,7 +121,6 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
 #ifdef FEEV_IS_TFLT
 
 #include "tflite_inference.h"
-
 
 /**
  * \fn void FEEV_eval(void*, uint8_t*, float*)

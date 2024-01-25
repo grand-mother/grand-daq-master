@@ -14,5 +14,4 @@ extern float trace_1[NB_SAMPLE];
 extern float trace_2[NB_SAMPLE];
 extern float trace_3[NB_SAMPLE];
 
-
 #endif /* TEST_DATA_H_ */
