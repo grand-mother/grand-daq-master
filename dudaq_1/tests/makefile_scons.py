@@ -1,23 +1,23 @@
 import os
 import glob
 
-# PATH to adapt 
 
+# try to build ouside of src directory
+#SConscript('makefile_scons', build_dir='../build')
 PATH_SRC = "../myfiles/"
+
+# PATH to adapt 
 CPPUTEST_HOME = "/home/grand/install/cpputest/include"
 PATH_TF = "/home/grand/install/tf_lite/tensorflow_src"
 
-
 # sources
 src_prj = glob.glob(f"{PATH_SRC}*.c")
-print(src_prj)
-src_tests = ['test_ring_buffer_eval.cpp', 'run_cpputest.cpp','test_tflite_inference.cpp','test_func_eval.cpp']
+src_tests = glob.glob("*.cpp")
 src_all = src_tests + src_prj
 
 
 # compilation option
-
-CPPPATH = [f"{CPPUTEST_HOME}", f"{PATH_SRC}", PATH_TF]
+CPPPATH = [CPPUTEST_HOME, PATH_SRC, PATH_TF]
 CCFLAGS = "-Wall -Wextra -O0 -fmessage-length=0 -MMD -MP -DCPPUTEST"
 CCFLAGS += " -fprofile-arcs -ftest-coverage -g" 
 env = Environment(CPPPATH=CPPPATH, CCFLAGS=CCFLAGS)
