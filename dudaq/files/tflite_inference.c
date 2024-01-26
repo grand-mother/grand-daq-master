@@ -23,11 +23,13 @@ TFLT_create (int nb_thread)
     * Tensorflow Lite init
     *
     * */
-   TfLiteModel *model = TfLiteModelCreateFromFile ("trigger_grand.tflite");
-   TfLiteInterpreterOptions *options = TfLiteInterpreterOptionsCreate ();
-   TfLiteInterpreterOptionsSetNumThreads (options, nb_thread);
+   TfLiteModel *pmodel = TfLiteModelCreateFromFile ("trigger_grand.tflite");
+   self->p_model = pmodel;
+   TfLiteInterpreterOptions *poptions = TfLiteInterpreterOptionsCreate ();
+   self->p_options = poptions;
+   TfLiteInterpreterOptionsSetNumThreads (poptions, nb_thread);
    /* Create the interpreter.*/
-   TfLiteInterpreter *interpreter = TfLiteInterpreterCreate (model, options);
+   TfLiteInterpreter *interpreter = TfLiteInterpreterCreate (pmodel, poptions);
    /*Allocate tensors and populate the input tensor data.*/
    TfLiteInterpreterAllocateTensors (interpreter);
    self->p_interp = interpreter;
@@ -53,16 +55,16 @@ TFLT_create (int nb_thread)
 
 void TFLT_delete (S_TFLite **pself)
 {
-   if (*pself == NULL)
+	S_TFLite *self = *pself;
+
+   if (self == NULL)
       return;
    /* Dispose of the model and interpreter objects.*/
-   TfLiteInterpreterDelete ((*pself)->p_interp);
-   /* #TODO:
-    TfLiteInterpreterOptionsDelete (options);
-    TfLiteModelDelete (model);
-    */
-   free ((*pself)->a_3dtraces);
-   free (*pself);
+   TfLiteInterpreterDelete (self->p_interp);
+   TfLiteInterpreterOptionsDelete (self->p_options);
+   TfLiteModelDelete (self->p_model);
+   free (self->a_3dtraces);
+   free (self);
    *pself = NULL;
 }
 

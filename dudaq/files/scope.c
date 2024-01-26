@@ -939,7 +939,7 @@ int scope_t2 (uint32_t *evt, float threasold)
    static float proba = -1.0;
 
    int nb_sample = 2*(evt[EVT_TRACELENGTH] >> 16);
-   if (nb_sample != 1024)
+   if (nb_sample != TFLT_SAMPLE_IN_TRACE)
    {
       if (proba < 0.0)
       {

@@ -30,7 +30,7 @@ typedef struct
    uint16_t nb_trig; // nb buffer to trig
 
    /* array of buffer*/
-   uint32_t *a_buffers; // reing buffer : array of all buffers
+   uint32_t *a_buffers; // ring buffer : array of all buffers
    float *a_prob; // array of probability for each buffer
 
    /* mutex */

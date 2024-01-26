@@ -59,17 +59,17 @@ void* FEEV_run (void *p_args)
    S_RingBufferEval *p_rbe = (S_RingBufferEval*) self->p_rbe;
    void *p_eval = self->p_eval;
 
-   uint16_t idx_eval_buffer;
+   uint16_t idx;
 
    while (G_running)
    {
       /* evaluation of all events without tempo between*/
       if (p_rbe->nb_eval > 0)
       {
-	 idx_eval_buffer = p_rbe->inext_eval;
-	 printf ("\n=== %d JMC====", idx_eval_buffer);
+	 idx = p_rbe->inext_eval;
+	 printf ("\n=== %d JMC====", idx);
 	 /* eval and update ring buffer */
-	 FEEV_eval (p_eval, p_rbe->a_buffers + idx_eval_buffer, p_rbe->a_prob + idx_eval_buffer);
+	 FEEV_eval (p_eval, p_rbe->a_buffers + idx, p_rbe->a_prob + idx);
 	 RBE_after_eval (p_rbe);
       }
       else

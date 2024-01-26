@@ -10,9 +10,13 @@
 
 #include "tensorflow/lite/c/c_api.h"
 
+#define TFLT_SAMPLE_IN_TRACE 1024
+
 typedef struct
 {
    TfLiteInterpreter *p_interp; // tensor flow lite structure for inference
+   TfLiteInterpreterOptions *p_options;
+   TfLiteModel *p_model;
    float *a_3dtraces; // array of 3d traces
    uint64_t size_byte; // size of array of 3d traces
    uint16_t nb_sample; // in one trace
