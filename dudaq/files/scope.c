@@ -26,6 +26,7 @@
 #include "ad_shm.h"
 #include "dudaq.h"
 #include "scope.h"
+#include "tflite_inference.h"
 
 int32_t dev = 0;
 void *axi_ptr;

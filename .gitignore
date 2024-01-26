@@ -31,4 +31,4 @@ tools/noise.txt
 .pydevproject
 .settings
 
-/.autotools
+.autotools
