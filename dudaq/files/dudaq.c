@@ -657,19 +657,6 @@ void du_get_station_id()
   if(station_id ==0) station_id = -1;
   printf("Read station %d\n",station_id);
   return;
-  fpn = fopen("/etc/network/interfaces","r");
-  if(fpn == NULL) return;
-  while(line == fgets(line,199,fpn)){
-    if(sscanf(line,"%s %d.%d.%d.%d",wrd,&n1,&n2,&n3,&n4) == 5){
-      if(strncmp(wrd,"address",7) == 0){
-        station_id = n4;
-        break;
-      }
-    }
-  }
-  fclose(fpn);
-  if(station_id ==0) station_id = -1;
-  printf("Read station %d\n",station_id);
 }
 
 /*!
@@ -777,7 +764,7 @@ int main(int argc, char **argv)
     if(station_id <=0) sleep(2);
     i++;
   }
-
+  if(station_id <=0) printf("Bad station id: %d\n",station_id);
   if(ad_shm_create(&shm_ev,BUFSIZE,1) <0){
     printf("Cannot create T3  shared memory !!\n");
     exit(-1);

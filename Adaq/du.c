@@ -73,16 +73,9 @@ void du_interpret(uint32_t *buffer)
         }
         break;
       case DU_MONITOR:
-        //printf("DU: Receive monitor info Stat=%d Sec=%d rate=%d\n",buffer[i+2]&0xff,*(int *)&buffer[i+3],buffer[i+5]);
-        //  break;
       case DU_EVENT:
         if(idebug)
           printf("Received an event\n");
-        uint32_t *DUinfo;
-        DUinfo = (uint32_t *)msg->body;
-        //printf("DU: Found event L=%d ID = %d (%d, %u)\n",msg->length,DUinfo[EVT_EVT_ID],DUinfo[EVT_HARDWARE_ID], DUinfo[EVT_SECOND]);
-        //printf("DU: ADC = %08x %08x %08x %08x\n",DUinfo[EVT_HDR_LENGTH], DUinfo[EVT_HDR_LENGTH+1]
-        //       , DUinfo[EVT_HDR_LENGTH+2], DUinfo[EVT_HDR_LENGTH+3]);
       case DU_NO_EVENT:
         if(msg->length<EVSIZE){
           // wait until the shared memory is not full
@@ -208,7 +201,6 @@ void du_connect()
     ilog = 1;
     sprintf(line,"%s %d",line,DUinfo[i].DUid);
     //1. Create the socket
-    //DUinfo[i].DUsock =  socket ( PF_INET, SOCK_DGRAM, 0 );
     DUinfo[i].DUsock =  socket ( PF_INET, SOCK_STREAM, 0 );
     DUinfo[i].LSTconnect = tnow.tv_sec;
     if(DUinfo[i].DUsock < 0 ) {
@@ -294,10 +286,6 @@ void du_read()
           ntry++;
           usleep(10);
         }
-        //shutdown(DUinfo[i].DUsock,SHUT_RDWR);
-        //close(DUinfo[i].DUsock);
-        //DUinfo[i].DUsock = -1;
-        //DUinfo[i].LSTconnect = 0;
         continue;
       }
       // read remaining data
@@ -306,7 +294,6 @@ void du_read()
       //printf("Socket reading-before loop  %d %d\n",bytesRead,(INTSIZE*buffer[0]));
       while (bytesRead < (INTSIZE*buffer[0])) { //size is in ints, including the first word!
         nread = INTSIZE*buffer[0]-bytesRead;
-        //if(nread>SOCKETS_BUFFER_SIZE/2) nread = SOCKETS_BUFFER_SIZE/2;
         //printf("Socket reading %d %d %d\n",bytesRead,(INTSIZE*buffer[0]),nread);
         errno = 0;
         recvRet = recvfrom(DUinfo[i].DUsock,&bf[bytesRead],
@@ -456,7 +443,7 @@ uint32_t du_read_initfile(int ls,uint32_t *bf)
   while(fgets(line,199,fp) == line){
     if(line[0]==0 || line[0] == '#') continue;
     if(sscanf(line,"%d 0x%x 0x%x",&axi,&reg,&val) == 3){
-      if(axi < 32 || reg == Reg_Rate){ // normal registers
+      if(axi < 25 || reg == Reg_Rate){ // normal registers
         bf[rcode++] = (reg<<16)+(axi&0xffff);
         bf[rcode++] = val;
       }
@@ -551,9 +538,6 @@ void du_write()
               du_cmd[5+length] = GRND2;
               du_cmd[0] = 6+length;
               du_cmd[1] = 3+length;
-              //for(int i=0;i<du_cmd[0];i++){
-              //  printf("%d %08x %d\n",i,du_cmd[i],du_cmd[i]);
-              //}
               du_send(du_cmd,il);
             }
           }
@@ -594,17 +578,15 @@ void du_main()
   sprintf(fname,"%s/du",LOG_FOLDER);
   fp_log = fopen(fname,"w");
   du_connect();
+  fclose(fp_log);
   while(1) {
     usleep(100);
-    fseek(fp_log,0,SEEK_SET);
     du_read();
     du_write();
-    //fp_log = fopen(fname,"w");
     du_connect(); // perform regular reconnection attempts
     fp_log = freopen(fname,"w",fp_log);
     for(i=0;i<MAXLOG;i++)fputs(loglines[i],fp_log);
-    //fputc(EOF,fp_log);
     fflush(fp_log);
-    //fclose(fp_log);
+    fclose(fp_log);
   }
 }

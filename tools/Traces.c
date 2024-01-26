@@ -43,6 +43,7 @@ void print_file_header()
 {
   int i,additional_int;
   struct tm *mytime;
+  time_t clock;
   
   additional_int = 1+(filehdr[FILE_HDR_LENGTH]/INTSIZE) - FILE_HDR_ADDITIONAL; //number of additional words in the header
   if(additional_int<0){
@@ -54,10 +55,12 @@ void print_file_header()
   printf("Header Run Mode is %d\n",filehdr[FILE_HDR_RUN_MODE]);
   printf("Header File Serial Number is %d\n",filehdr[FILE_HDR_SERIAL]);
   printf("Header First Event is %d\n",filehdr[FILE_HDR_FIRST_EVENT]);
-  mytime = gmtime((const time_t *)(&filehdr[FILE_HDR_FIRST_EVENT_SEC]));
+  clock = filehdr[FILE_HDR_FIRST_EVENT_SEC];
+  mytime = gmtime(&clock);
   printf("Header First Event Time is %s",asctime(mytime));
   printf("Header Last Event is %d\n",filehdr[FILE_HDR_LAST_EVENT]);
-  mytime = gmtime((const time_t *)(&filehdr[FILE_HDR_LAST_EVENT_SEC]));
+  clock = filehdr[FILE_HDR_LAST_EVENT_SEC];
+  mytime = gmtime(&clock);
   printf("Header Last Event Time is %s",asctime(mytime));
   for(i=0;i<additional_int;i++){
     printf("HEADER Additional Word %d = %d\n",i,filehdr[i+FILE_HDR_ADDITIONAL]);

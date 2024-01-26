@@ -33,9 +33,8 @@ typedef struct{
   uint32_t nanosec;
   uint16_t type;
   uint16_t version;
-  uint32_t free;
-  uint32_t event_free;
   uint32_t DU_count;
+  uint32_t event_free;
   uint16_t DUdata[];
 }EVHDR;
 
