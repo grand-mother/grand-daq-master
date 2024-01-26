@@ -18,12 +18,12 @@ typedef struct
    uint16_t nb_sample; // in one trace
 } S_TFLite;
 
-S_TFLite* TFLT_create (uint16_t size_trace);
+S_TFLite* TFLT_create (int nb_thread);
 
 void TFLT_delete (S_TFLite **pself);
 
-void TFLT_preprocessing (S_TFLite *const self, uint8_t *a_tr_adu);
+void TFLT_preprocessing (S_TFLite *const self, const uint32_t *const a_tr_adu);
 
-void TFLT_inference (S_TFLite *const self, float *output_proba);
+void TFLT_inference (S_TFLite *const self, float *const p_proba);
 
 #endif /* DUDAQ_1_MYFILES_TFLITE_INFERENCE_H_ */

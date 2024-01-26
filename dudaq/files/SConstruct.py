@@ -61,7 +61,7 @@ env = Environment(ENV = os.environ, CC=CC_val, CCFLAGS=f'-Wall -O2 -fmessage-len
 
 
 # Build application.c
-env.Program('dudaq_arm', ['ad_shm.c','buffer.c','dudaq.c','monitor.c','scope.c','ring_buffer_eval.c','tflite_inference.c','func_eval_evt.c'],
+env.Program('dudaq_arm', ['ad_shm.c','dudaq.c','scope.c','ring_buffer_eval.c','tflite_inference.c','func_eval_evt.c'],
 	LIBS = ['tensorflowlite_c','pthread'],
 	LIBPATH = m_LIBPATH)
 

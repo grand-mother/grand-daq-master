@@ -57,6 +57,9 @@ uint32_t ddrOffset = 0, ddrPrevOffset = 0;
 uint32_t eventLength, ppsLength;
 uint32_t Overlap, preOverlap, postOverlap;
 
+S_TFLite *G_ptflt1 = NULL;
+float G_threasold=0.7;
+
 void short_wait ()
 {
    usleep (1);
@@ -760,6 +763,8 @@ void scope_close ()
    }
    close (dev);
    dev = 0;
+
+   TFLT_delete(&G_ptflt1);
 }
 
 void scope_start_run ()
@@ -928,15 +933,38 @@ void scope_initialize ()
     *shm_gps.next_write = 0;*/
 }
 
-int scope_t2 (uint32_t *evt)
+int scope_t2 (uint32_t *evt, float threasold)
 {
-   return (1);
+   static float proba = -1.0;
+
+   int nb_sample = 2*(evt[EVT_TRACELENGTH] >> 16);
+   if (nb_sample != 1024)
+   {
+      if (proba < 0.0)
+      {
+	 /* print message only one time */
+	 printf ("\nTrigger ConvNet is defined for 1024 samples ONLY, no trigger T2");
+	 proba = 0.0;
+      }
+      return (1);
+   }
+
+   if (G_ptflt1 == NULL)
+   {
+      /* use multithreading of Tensorflow Lite => 2 CPUs*/
+      G_ptflt1 = TFLT_create (2);
+   }
+
+   TFLT_preprocessing (G_ptflt1, evt + EVT_START_ADC);
+   TFLT_inference (G_ptflt1, &proba);
+   if (proba > threasold) return (1);
+   return (0);
 }
 
 int scope_read_event (uint32_t index)
 {
    /** temp fix for ARG */
-   //struct timeval tv;
+//struct timeval tv;
    struct tm tt;
    int length;
    double fracsec;
@@ -944,7 +972,7 @@ int scope_read_event (uint32_t index)
    uint32_t *sec;
    uint32_t *evt = &vadd_psddr[index];
 
-   if (scope_t2 (evt) != 1)
+   if (scope_t2 (evt, G_threasold) != 1)
       return (SCOPE_EVENT); // only for a T2
    length = evt[0] >> 16;
    if (length <= 0)

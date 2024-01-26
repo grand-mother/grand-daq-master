@@ -3,15 +3,7 @@
 #include "tensorflow/lite/c/c_api.h"
 #include "tflite_inference.h"
 
-/* ADC 14 bits */
-float G_quantif = 32768.0;
-short G_mask14 = 1 << 13; // --- bit 14
-short G_mask15 = 1 << 14; // --- bit 15
-short G_mask16 = 1 << 15; // --- bit 16
-
-#define OFFSET_0 0
-#define OFFSET_1 2
-#define OFFSET_2 4
+float G_quantif = 1 >> 13;
 
 /**
  * \fn TfLiteInterpreter TFLT_create*(void)
@@ -21,10 +13,10 @@ short G_mask16 = 1 << 15; // --- bit 16
  */
 
 S_TFLite*
-TFLT_create (uint16_t size_trace)
+TFLT_create (int nb_thread)
 {
+   const uint16_t nb_sample = 1024;
    S_TFLite *self = NULL;
-
    self = (S_TFLite*) malloc (sizeof(S_TFLite));
 
    /*
@@ -33,7 +25,7 @@ TFLT_create (uint16_t size_trace)
     * */
    TfLiteModel *model = TfLiteModelCreateFromFile ("trigger_grand.tflite");
    TfLiteInterpreterOptions *options = TfLiteInterpreterOptionsCreate ();
-   TfLiteInterpreterOptionsSetNumThreads (options, 1);
+   TfLiteInterpreterOptionsSetNumThreads (options, nb_thread);
    /* Create the interpreter.*/
    TfLiteInterpreter *interpreter = TfLiteInterpreterCreate (model, options);
    /*Allocate tensors and populate the input tensor data.*/
@@ -44,8 +36,8 @@ TFLT_create (uint16_t size_trace)
     * Array trace allocation
     *
     * */
-   self->nb_sample = size_trace;
-   self->size_byte = sizeof(float) * size_trace * 3;
+   self->nb_sample = nb_sample;
+   self->size_byte = sizeof(float) * nb_sample * 3;
    self->a_3dtraces = (float*) malloc (self->size_byte);
 
    return self;
@@ -61,6 +53,8 @@ TFLT_create (uint16_t size_trace)
 
 void TFLT_delete (S_TFLite **pself)
 {
+   if (*pself == NULL)
+      return;
    /* Dispose of the model and interpreter objects.*/
    TfLiteInterpreterDelete ((*pself)->p_interp);
    /* #TODO:
@@ -73,36 +67,36 @@ void TFLT_delete (S_TFLite **pself)
 }
 
 /**
- * \fn void TFLT_convert_traces(uint8_t*, float*)
- * \brief
+ * \fn void TFLT_preprocessing(S_TFLite* const, const uint32_t* const)
+ * \brief preprocessing specific to data format of dudaq version 2
  *
+ * \param self
  * \param a_tr_adu
- * \param a_tr_f32
  */
-
-short TFLT_convert_adu (short adu)
-{
-   short value = adu;
-   short bit14 = (value & (G_mask14)) >> 13;
-   value = (value & (~G_mask15)) | (bit14 << 14);
-   value = (value & (~G_mask16)) | (bit14 << 15);
-   return value;
-}
-
-void TFLT_preprocessing (S_TFLite *const self, uint8_t *a_tr_adu)
+void TFLT_preprocessing (S_TFLite *const self, const uint32_t *const a_tr_adu)
 {
 
-   int l_s;
-   short dec_adu;
+   int l_s, idx = 0;
+   short val1, val2;
 
-   for (l_s = 0; l_s < self->nb_sample; l_s++)
+   for (l_s = 0; l_s < self->nb_sample / 2; l_s++)
    {
-      dec_adu = TFLT_convert_adu (a_tr_adu[l_s + OFFSET_0]);
-      self->a_3dtraces[3 * l_s] = dec_adu / G_quantif;
-      dec_adu = TFLT_convert_adu (a_tr_adu[l_s + OFFSET_1]);
-      self->a_3dtraces[3 * l_s + 1] = dec_adu / G_quantif;
-      dec_adu = TFLT_convert_adu (a_tr_adu[l_s + OFFSET_2]);
-      self->a_3dtraces[3 * l_s + 2] = dec_adu / G_quantif;
+      /* Channel 1 */
+      val2 = a_tr_adu[l_s] >> 16;
+      val1 = a_tr_adu[l_s] & 0xffff;
+      self->a_3dtraces[idx] = val1 / G_quantif;
+      self->a_3dtraces[idx + 3] = val2 / G_quantif;
+      /* Channel 2 */
+      val2 = a_tr_adu[l_s + 512] >> 16;
+      val1 = a_tr_adu[l_s + 512] & 0xffff;
+      self->a_3dtraces[idx + 1] = val1 / G_quantif;
+      self->a_3dtraces[idx + 4] = val2 / G_quantif;
+      /* Channel 3 */
+      val2 = a_tr_adu[l_s + 1024] >> 16;
+      val1 = a_tr_adu[l_s + 1024] & 0xffff;
+      self->a_3dtraces[idx + 2] = val1 / G_quantif;
+      self->a_3dtraces[idx + 5] = val2 / G_quantif;
+      idx += 6;
    }
 }
 
@@ -115,7 +109,7 @@ void TFLT_preprocessing (S_TFLite *const self, uint8_t *a_tr_adu)
  * \param output_proba
  */
 
-void TFLT_inference (S_TFLite *const self, float *output_proba)
+void TFLT_inference (S_TFLite *const self, float *const p_proba)
 {
    TfLiteTensor *input_tensor = TfLiteInterpreterGetInputTensor (self->p_interp, 0);
    TfLiteTensorCopyFromBuffer (input_tensor, self->a_3dtraces, self->size_byte);
@@ -125,5 +119,5 @@ void TFLT_inference (S_TFLite *const self, float *output_proba)
 
    /* Extract the output tensor data */
    const TfLiteTensor *output_tensor = TfLiteInterpreterGetOutputTensor (self->p_interp, 0);
-   TfLiteTensorCopyToBuffer (output_tensor, output_proba, sizeof(float));
+   TfLiteTensorCopyToBuffer (output_tensor, p_proba, sizeof(float));
 }
