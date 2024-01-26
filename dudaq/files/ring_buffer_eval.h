@@ -6,15 +6,16 @@
 #ifndef DUDAQ_1_MYFILES_RING_BUFFER_H_
 #define DUDAQ_1_MYFILES_RING_BUFFER_H_
 
-#include  <pthread.h>
+#include <pthread.h>
 #include <stdint.h>
 #include <string.h>
 
 typedef struct
 {
    /* dimension of array of buffer */
-   uint16_t size_buffer; // size of one buffer in byte
-   uint16_t nb_array; // number of buffer in array
+   uint16_t size_buffer_byte; // size of one buffer in byte
+   uint16_t nb_elet_buffer; // number of elet in buffer
+   uint16_t nb_buffer; // number of buffer in ring buffers
    uint16_t idx_max; // index max , ie nb_array-1
 
    /* index in array, nb_array > inext_trig >= 0*/
@@ -29,7 +30,7 @@ typedef struct
    uint16_t nb_trig; // nb buffer to trig
 
    /* array of buffer*/
-   uint8_t *a_buffers; // array of all buffers
+   uint32_t *a_buffers; // reing buffer : array of all buffers
    float *a_prob; // array of probability for each buffer
 
    /* mutex */
@@ -37,7 +38,7 @@ typedef struct
 } S_RingBufferEval;
 
 S_RingBufferEval*
-RBE_create (uint16_t size_buffer, uint16_t nb_array);
+RBE_create (uint16_t nb_elet_buffer, uint16_t nb_array);
 
 void
 RBE_delete (S_RingBufferEval **pself);

@@ -4,7 +4,7 @@ import glob
 
 # try to build ouside of src directory
 #SConscript('makefile_scons', build_dir='../build')
-PATH_SRC = "../myfiles/"
+PATH_SRC = "../files/"
 
 # PATH to adapt 
 CPPUTEST_HOME = "/home/grand/install/cpputest/include"
@@ -12,9 +12,10 @@ PATH_TF = "/home/grand/install/tf_lite/tensorflow_src"
 
 # sources
 src_prj = glob.glob(f"{PATH_SRC}*.c")
+src_prj.remove('../files/dudaq.c')
+src_prj.remove('../files/scope.c')
 src_tests = glob.glob("*.cpp")
 src_all = src_tests + src_prj
-
 
 # compilation option
 CPPPATH = [CPPUTEST_HOME, PATH_SRC, PATH_TF]

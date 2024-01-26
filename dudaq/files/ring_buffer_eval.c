@@ -12,15 +12,14 @@ int RBE_error = 0;
  *
  *
  * \param size_buffer
- * \param nb_array
+ * \param nb_buffer
  * \return
  */
 S_RingBufferEval*
-RBE_create (uint16_t size_buffer, uint16_t nb_array)
+RBE_create (uint16_t nb_elet_buffer, uint16_t nb_buffer)
 {
    S_RingBufferEval *self;
-   uint64_t nb_byte;
-   uint8_t *p_buf;
+   uint32_t *p_buf;
    float *p_prob;
    int ret_mtx;
 
@@ -33,22 +32,22 @@ RBE_create (uint16_t size_buffer, uint16_t nb_array)
    self->inext_eval = 0;
    self->inext_trig = 0;
    self->inext_write = 0;
-   self->nb_array = nb_array;
-   self->idx_max = nb_array - 1;
-   self->size_buffer = size_buffer;
+   self->nb_buffer = nb_buffer;
+   self->idx_max = nb_buffer - 1;
+   self->nb_elet_buffer = nb_elet_buffer;
    self->nb_eval = 0;
    self->nb_trig = 0;
-   self->nb_write = nb_array;
-   // alloc array of buffer
-   nb_byte = (uint64_t) size_buffer * (uint64_t) nb_array;
-   p_buf = (uint8_t*) malloc (nb_byte);
+   self->nb_write = nb_buffer;
+   // alloc array of buffer : element is ** uint32 **
+   self->size_buffer_byte = (uint64_t) nb_elet_buffer * (uint64_t) nb_buffer * sizeof(uint32_t);
+   p_buf = (uint32_t*) malloc (self->size_buffer_byte);
    if (p_buf == NULL)
    {
       RBE_error = 2;
       return NULL;
    }
    self->a_buffers = p_buf;
-   p_prob = (float*) malloc (sizeof(float) * (uint64_t) nb_array);
+   p_prob = (float*) malloc (sizeof(float) * (uint64_t) nb_elet_buffer);
    if (p_prob == NULL)
    {
       RBE_error = 3;
@@ -93,10 +92,7 @@ void RBE_delete (S_RingBufferEval **pself)
  */
 void RBE_write (S_RingBufferEval *self, const void *p_buf)
 {
-   uint32_t idx_eval_buffer = self->inext_eval;
-   /* index (in byte ) where start buffer to evaluate */
-   uint32_t idx_eval_byte = ((uint32_t) idx_eval_buffer) * self->size_buffer;
-   memcpy (&self->a_buffers[idx_eval_byte], p_buf, self->size_buffer);
+   memcpy (self->a_buffers + self->inext_write, p_buf, self->size_buffer_byte);
    self->nb_write -= 1;
    self->nb_eval += 1;
    RBE_inc_modulo (&self->inext_write, self->idx_max);

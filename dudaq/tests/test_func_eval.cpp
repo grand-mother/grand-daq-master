@@ -55,7 +55,7 @@ TEST(TestFuncEval, Test_inference)
    S_RingBufferEval *p_rbuftrig = RBE_create (NB_SAMPLE*sizeof(float), 3);
 
    /* Create 2 Tensorflow Lite inference structure */
-   p_tflt = TFLT_create (p_rbuftrig->size_buffer);
+   p_tflt = TFLT_create (1);
 
    /* Create 2 process of evaluation */
    S_FuncEval *p_feev = FEEV_create (p_rbuftrig, (void*) p_tflt);

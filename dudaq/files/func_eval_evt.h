@@ -15,6 +15,6 @@ void* FEEV_run (void *p_args);
 
 void FEEV_stop (void);
 
-void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob);
+void FEEV_eval (void *p_eval, uint32_t *p_buf, float *p_prob);
 
 #endif

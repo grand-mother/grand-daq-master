@@ -60,7 +60,6 @@ void* FEEV_run (void *p_args)
    void *p_eval = self->p_eval;
 
    uint16_t idx_eval_buffer;
-   uint32_t idx_eval_byte;
 
    while (G_running)
    {
@@ -69,10 +68,8 @@ void* FEEV_run (void *p_args)
       {
 	 idx_eval_buffer = p_rbe->inext_eval;
 	 printf ("\n=== %d JMC====", idx_eval_buffer);
-	 /* index (in byte ) where start buffer to evaluate */
-	 idx_eval_byte = ((uint32_t) idx_eval_buffer) * p_rbe->size_buffer;
 	 /* eval and update ring buffer */
-	 FEEV_eval (p_eval, p_rbe->a_buffers + idx_eval_byte, p_rbe->a_prob + idx_eval_buffer);
+	 FEEV_eval (p_eval, p_rbe->a_buffers + idx_eval_buffer, p_rbe->a_prob + idx_eval_buffer);
 	 RBE_after_eval (p_rbe);
       }
       else
@@ -131,7 +128,7 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
  * \param p_prob
  */
 
-void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
+void FEEV_eval (void *p_eval, uint32_t *p_buf, float *p_prob)
 {
    S_TFLite *p_tflt = (S_TFLite*) p_eval;
    TFLT_preprocessing (p_tflt, p_buf);
