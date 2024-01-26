@@ -14,9 +14,9 @@
 
 typedef struct
 {
-   TfLiteInterpreter *p_interp; // tensor flow lite structure for inference
-   TfLiteInterpreterOptions *p_options;
-   TfLiteModel *p_model;
+   TfLiteInterpreter *p_interp; // tensorflow lite structure for inference
+   TfLiteInterpreterOptions *p_options; // tensorflow lite structure for inference
+   TfLiteModel *p_model; // tensorflow lite structure for inference
    float *a_3dtraces; // array of 3d traces
    uint64_t size_byte; // size of array of 3d traces
    uint16_t nb_sample; // in one trace

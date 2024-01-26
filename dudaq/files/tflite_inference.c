@@ -3,7 +3,8 @@
 #include "tensorflow/lite/c/c_api.h"
 #include "tflite_inference.h"
 
-float G_quantif = 1 >> 13;
+// 2**13 = 8192
+float G_quantif = 8192.0 ;
 
 /**
  * \fn TfLiteInterpreter TFLT_create*(void)
@@ -15,7 +16,7 @@ float G_quantif = 1 >> 13;
 S_TFLite*
 TFLT_create (int nb_thread)
 {
-   const uint16_t nb_sample = 1024;
+   const uint16_t nb_sample = TFLT_SAMPLE_IN_TRACE;
    S_TFLite *self = NULL;
    self = (S_TFLite*) malloc (sizeof(S_TFLite));
 

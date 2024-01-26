@@ -20,7 +20,7 @@ src_all = src_tests + src_prj
 # compilation option
 CPPPATH = [CPPUTEST_HOME, PATH_SRC, PATH_TF]
 CCFLAGS = "-Wall -Wextra -O0 -fmessage-length=0 -MMD -MP -DCPPUTEST"
-CCFLAGS +=  " -DCPPUTEST_MEM_LEAK_DETECTION_DISABLED"
+#CCFLAGS +=  " -DCPPUTEST_MEM_LEAK_DETECTION_DISABLED"
 #CCFLAGS += " -fprofile-arcs -ftest-coverage -g" 
 env = Environment(CPPPATH=CPPPATH, CCFLAGS=CCFLAGS)
 
