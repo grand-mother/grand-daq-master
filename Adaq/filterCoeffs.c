@@ -3,6 +3,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdarg.h>
+#include<stdint.h>
 
 #define FRAC_BITS 14
 

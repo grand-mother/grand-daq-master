@@ -566,9 +566,6 @@ void du_scope_check_commands()
         fprintf(fp,"#/bin/sh\n");
         while(il<(msg_len-2)){ 
           addr = msg_start[il+1]>>1;
-          //if((addr&1))addr -=1;
-          //else addr+=1;
-          //if(msg_start[il+1]<127) sl[addr] = msg_start[il+2];
           fprintf(fp,"devmem 0x%x 32 0x%08x\n",0x80000000+(msg_start[il+1]>>16),msg_start[il+2]);
           fprintf(fp,"sleep 0.1\n");
           il+=2;
@@ -606,7 +603,6 @@ void du_scope_main()
   
   while(stop_process == 0){
     if((i =scope_read()) < 0){
-      //scope_flush();
       printf("Error reading scope %d\n",i);  // read out the scope
     }
     du_scope_check_commands();

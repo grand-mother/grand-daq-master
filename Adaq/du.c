@@ -584,9 +584,9 @@ void du_main()
     du_read();
     du_write();
     du_connect(); // perform regular reconnection attempts
-    fp_log = freopen(fname,"w",fp_log);
+    //fp_log = freopen(fname,"w",fp_log);
     for(i=0;i<MAXLOG;i++)fputs(loglines[i],fp_log);
-    fflush(fp_log);
-    fclose(fp_log);
+    //fflush(fp_log);
+    //fclose(fp_log);
   }
 }

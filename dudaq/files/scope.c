@@ -832,7 +832,6 @@ int scope_read()
       short_wait();
     }
     while ((evtReady == 0) && (ppsReady == 0));
-    //while (evtReady == 0);
     short_wait();
     // -----------------------------------
     // 9. Clear the IOC interrupt bit

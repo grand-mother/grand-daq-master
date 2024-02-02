@@ -319,6 +319,7 @@ void eb_write_events(){
   evhdr.seconds = DUinfo[EVT_SECOND];
   evhdr.nanosec = DUinfo[EVT_NANOSEC];
   evhdr.type = DUinfo[EVT_TRIGGER_STAT]>>16;
+  if(DUinfo[EVT_TRIGGER_STAT]&0x100) evhdr.type |= TRIGGER_T3_MINBIAS;
   evhdr.version=DUinfo[EVT_VERSION];
   //printf("Event Type %d Version %d Time %u\n",evhdr.type,evhdr.version,evhdr.seconds);
   for(i=(i_DUbuffer-2);i>=0;i--){
@@ -373,7 +374,14 @@ void eb_write_events(){
           fp=fpmb; //single station triggered
           isub = 2;
         }
-        else fp = fpout;
+        else {
+          if(evhdr.DU_count == 1) {
+            fp = fpmb;
+            isub = 2;
+            evhdr.type |= TRIGGER_T3_RANDOM;
+          } else
+            fp = fpout;
+        }
       }
       //printf("EB: Writing event %d\n",(int)fp);
       if(evhdr.DU_count == 0) return;
@@ -402,6 +410,7 @@ void eb_write_events(){
       evhdr.seconds = DUinfo[EVT_SECOND];
       evhdr.nanosec = DUinfo[EVT_NANOSEC];
       evhdr.type = DUinfo[EVT_TRIGGER_STAT]>>16;
+      if(DUinfo[EVT_TRIGGER_STAT]&0x100) evhdr.type |= TRIGGER_T3_MINBIAS;
       evhdr.version=DUinfo[EVT_VERSION];
       il_start = i;
       i_DUbuffer = i+1;
