@@ -26,6 +26,7 @@ unsigned int *event=NULL;
 
 float *ttrace,*fmag,*fphase;
 int fftlen = 0;
+TH1F *hstep,*hfftstep;
 TProfile *HFsum[100][3]; // One for each arm
 TProfile *HBattery[100];
 TProfile2D *HFTime[100][3];
@@ -142,6 +143,27 @@ void print_du(uint32_t *du)
       snprintf(hname,100,"HSF%d",ich);
       HFsum[0][ich] = new TProfile(fname,hname,(du[EVT_TRACELENGTH]>>16),0.,250);
     }
+    hstep =  new TH1F("Hstep","Hstep",2*(du[EVT_TRACELENGTH]>>16),0.,4*(du[EVT_TRACELENGTH]>>16));
+    hfftstep =  new TH1F("Hfftstep","Hfftstep",(du[EVT_TRACELENGTH]>>16),0.,250);
+    if(fftlen !=2*(du[EVT_TRACELENGTH]>>16)){
+      fftlen = 2*(du[EVT_TRACELENGTH]>>16);
+      fft_init(fftlen);
+      ttrace = (float *)malloc(fftlen*sizeof(float));
+      fmag = (float *)malloc(fftlen*sizeof(float));
+      fphase = (float *)malloc(fftlen*sizeof(float));
+    }
+    for(int i=0;i<2*(du[EVT_TRACELENGTH]>>16);i++){
+      if(i<(du[EVT_TRACELENGTH]>>16)) ttrace[i] = 1*(16384/(1.8*10));
+      else ttrace[i] = -1*(1.8/16384);
+      hstep->SetBinContent(i,ttrace[i]);
+    }
+    hstep->Write();
+    mag_and_phase(ttrace,fmag,fphase);
+    for(i=0;i<fftlen/2;i++){
+      //printf("%d %g\n",i,fmag[i]);
+      hfftstep->Fill(500.*(i)/fftlen,fmag[i]);
+    }
+    hfftstep->Write();
     dtft_init(2*(du[EVT_TRACELENGTH]>>16), 0.002, DTFMIN, DTFMAX, NDTFREQ);
     n_DU = 1;
   }

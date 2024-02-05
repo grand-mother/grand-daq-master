@@ -18,6 +18,7 @@
 #include "eb.h"
 #include "scope.h"
 
+char fname[400];
 extern char *configfile;
 int ad_init_param(char *file);
 
@@ -30,7 +31,6 @@ int running = 0;
 uint32_t DUbuffer[NDU][EVSIZE];
 int i_DUbuffer = 0;
 
-int eb_sub = 1; //file subnumber
 int eb_event = 0;
 
 int isub;
@@ -38,7 +38,7 @@ static int write_sub[3]={0,0,0};
 
 
 FILEHDR eb_fhdr;
-FILE *fpout = NULL,*fpten=NULL,*fpmon=NULL,*fpmb=NULL;
+FILE *fpout = NULL,*fpten=NULL,*fpmb=NULL;
 
 /**
  void eb_open(EVHDR *evhdr)
@@ -48,7 +48,6 @@ FILE *fpout = NULL,*fpten=NULL,*fpmon=NULL,*fpmb=NULL;
  */
 void eb_open(EVHDR *evhdr)
 {
-  char fname[400];
   struct tm *gtime;
   struct timeval tp;
   struct timezone tzp;
@@ -83,12 +82,15 @@ void eb_open(EVHDR *evhdr)
   //sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_MN_%s",eb_dir,eb_site,gtime->tm_year+1900,
   //        gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
   //        eb_run,eb_extra);
-  //fpmon = fopen(fname,"w");
   // next write file header
+  sprintf(fname,"%s_%4d%02d%02d_%02d%02d_%06d_XX_%s",eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+          eb_run,eb_extra);
+
   eb_fhdr.length = sizeof(FILEHDR)-sizeof(int32_t);
   eb_fhdr.run_id = eb_run;
   eb_fhdr.run_mode = eb_run_mode;
-  eb_fhdr.file_id = eb_sub;
+  eb_fhdr.file_id = 0;
   eb_fhdr.first_event_id = evhdr->event_id;
   eb_fhdr.first_event_time = evhdr->seconds;
   eb_fhdr.last_event_id = evhdr->event_id;
@@ -98,6 +100,7 @@ void eb_open(EVHDR *evhdr)
   fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpout);
   fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpten);
   fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpmb);
+  printf("Open: %d %d %d %d\n",eb_fhdr.first_event_id,eb_fhdr.first_event_time,eb_fhdr.last_event_id,eb_fhdr.last_event_time);
 }
 
 /**
@@ -109,6 +112,7 @@ void eb_close()
 {
   char cmd[400];
   // first update file header
+  printf("Close: %d %d %d %d\n",eb_fhdr.first_event_id,eb_fhdr.first_event_time,eb_fhdr.last_event_id,eb_fhdr.last_event_time);
   if(fpout != NULL){
     rewind(fpout);
     fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpout);
@@ -124,11 +128,9 @@ void eb_close()
     fwrite(&eb_fhdr,1,sizeof(FILEHDR),fpmb);
     fclose(fpmb);
   }
-  if(fpmon != NULL) fclose(fpmon);
   fpout = NULL;
   fpten = NULL;
   fpmb = NULL;
-  fpmon = NULL;
 }
 
 /**
@@ -191,7 +193,6 @@ void eb_getui()
         printf("EB: Starting the run\n");
         running = 1;
         i_DUbuffer = 0; // get rid of old data
-        eb_sub = 1;
       }
       shm_ebcmd.Ubuf[(*shm_ebcmd.size)*(*shm_ebcmd.next_readb)] &= ~2;
     }
@@ -228,7 +229,6 @@ void eb_gett3(){
  
  interpret the data from the detector units
  copy events into a local buffer (DUbuffer)
- write monitoring informatie into an ASCII file (fpmon); also when there is no run!
  sort the event fragments in memory (latest first)
  */
 void eb_getdata(){
@@ -251,6 +251,7 @@ void eb_getdata(){
       //printf("EB: ADC = %08x %08x %08x %08x\n",DUinfo[EVT_HDR_LENGTH], DUinfo[EVT_HDR_LENGTH+1]
       //       , DUinfo[EVT_HDR_LENGTH+2], DUinfo[EVT_HDR_LENGTH+3]);
       if((DUinfo[EVT_LENGTH]>>16) < EVSIZE){
+        DUinfo[EVT_VERSION] = DUinfo[EVT_VERSION]+((ADAQ_VERSION&0xff)<<8);
         if(i_DUbuffer < NDU) memcpy((void *)&DUbuffer[i_DUbuffer],(void *)DUinfo,INTSIZE*(DUinfo[EVT_LENGTH]>>16));
         if(running ==1) i_DUbuffer +=1;
         if(i_DUbuffer >= NDU) {
@@ -318,6 +319,7 @@ void eb_write_events(){
   evhdr.seconds = DUinfo[EVT_SECOND];
   evhdr.nanosec = DUinfo[EVT_NANOSEC];
   evhdr.type = DUinfo[EVT_TRIGGER_STAT]>>16;
+  if(DUinfo[EVT_TRIGGER_STAT]&0x100) evhdr.type |= TRIGGER_T3_MINBIAS;
   evhdr.version=DUinfo[EVT_VERSION];
   //printf("Event Type %d Version %d Time %u\n",evhdr.type,evhdr.version,evhdr.seconds);
   for(i=(i_DUbuffer-2);i>=0;i--){
@@ -353,7 +355,6 @@ void eb_write_events(){
     if(DUn[EVT_EVT_ID] == evhdr.t3_id && DTime < 5E6){
       evhdr.DU_count ++;
       evhdr.length += 4*(DUn[EVT_LENGTH]>>16);
-      //evhdr.type |= DUn[EVT_T3FLAG];
     }else{
       //printf("EB: Found event %d with %d DU Length = %d (%d, %d %d)\n",evhdr.t3_id,evhdr.DU_count,evhdr.length,i_DUbuffer,du_sec,evhdr.seconds);
       eb_fhdr.last_event_id = evhdr.event_id;
@@ -373,9 +374,17 @@ void eb_write_events(){
           fp=fpmb; //single station triggered
           isub = 2;
         }
-        else fp = fpout;
+        else {
+          if(evhdr.DU_count == 1) {
+            fp = fpmb;
+            isub = 2;
+            evhdr.type |= TRIGGER_T3_RANDOM;
+          } else
+            fp = fpout;
+        }
       }
       //printf("EB: Writing event %d\n",(int)fp);
+      if(evhdr.DU_count == 0) return;
       fwrite(&evhdr,1,44,fp);
       for(ils=il_start;ils>(il_start-evhdr.DU_count);ils--){
         DUn = (uint32_t *)DUbuffer[ils];
@@ -384,7 +393,7 @@ void eb_write_events(){
       }// that is it, start a new event
       n_written++;
       write_sub[isub]++;
-      if(n_written >=eb_max_evts) {
+      if(n_written >=eb_max_evts) { // do we still need this?????
         eb_close();
         //printf("EB: after closing  files %d\n",(int) fpout);
         //printf("EB: after closing  files %d\n",(int) fpout);
@@ -392,6 +401,17 @@ void eb_write_events(){
       eb_event++;
       DUinfo = (uint32_t *)DUbuffer[i];
       DUn = (uint32_t *)DUbuffer[i-1];
+      evhdr.t3_id = DUinfo[EVT_EVT_ID];
+      evhdr.DU_count = 1;
+      evhdr.length = 40+4*(DUinfo[EVT_LENGTH]>>16);
+      evhdr.run_id = eb_run;
+      evhdr.event_id = eb_event;
+      evhdr.first_DU = DUinfo[EVT_STATION_ID];
+      evhdr.seconds = DUinfo[EVT_SECOND];
+      evhdr.nanosec = DUinfo[EVT_NANOSEC];
+      evhdr.type = DUinfo[EVT_TRIGGER_STAT]>>16;
+      if(DUinfo[EVT_TRIGGER_STAT]&0x100) evhdr.type |= TRIGGER_T3_MINBIAS;
+      evhdr.version=DUinfo[EVT_VERSION];
       il_start = i;
       i_DUbuffer = i+1;
       break;
@@ -410,13 +430,12 @@ void eb_write_events(){
  */
 void eb_main()
 {
-  char fname[100];
+  char flname[100];
   FILE *fp_log;
   
-  sprintf(fname,"%s/eb",LOG_FOLDER);
-  fp_log = fopen(fname,"w");
+  sprintf(flname,"%s/eb",LOG_FOLDER);
+  fp_log = fopen(flname,"w");
   printf("Starting EB\n");
-  //int nloop = 0;
   while(1) {
     fseek(fp_log,0,SEEK_SET);
     eb_getui();
@@ -427,12 +446,11 @@ void eb_main()
     //  nloop = 0;
     //}
     if(running == 1) eb_write_events();
-    fprintf(fp_log,"To Disk: Run %6d, file %4d\n",eb_run,eb_sub);
-    fprintf(fp_log,"AD events: %5d\n",write_sub[0]);
-    fprintf(fp_log,"MD events: %5d\n",write_sub[2]);
-    fprintf(fp_log,"TD events: %5d\n",write_sub[1]);
+    fprintf(fp_log,"%s\n",fname);
+    fprintf(fp_log,"CD events: %5d\n",write_sub[0]);
+    fprintf(fp_log,"UD events: %5d\n",write_sub[2]);
+    fprintf(fp_log,"MD events: %5d\n",write_sub[1]);
     usleep(1000);
-    //nloop ++;
   }
   fclose(fp_log);
 }

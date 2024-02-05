@@ -20,6 +20,7 @@ SpecNancayfull.pdf
 tools/noise.txt
 
 
+
 # coverage test files
 *.gcno
 *.gcda
@@ -32,3 +33,6 @@ tools/noise.txt
 .settings
 
 .autotools
+
+tools/Traces
+

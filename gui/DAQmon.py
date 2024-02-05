@@ -17,7 +17,7 @@ app.setFont(12)
 app.addEmptyMessage("Trigger",0,0)
 app.setMessageWidth("Trigger", 200)
 app.addEmptyMessage("EventBuilder",0,1)
-app.setMessageWidth("EventBuilder", 200)
+app.setMessageWidth("EventBuilder", 400)
 app.addTextArea("DUStatus",1,0)
 #app.addScrolledTextArea("DUStatus",1,0)
 def update():

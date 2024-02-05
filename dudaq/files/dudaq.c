@@ -622,52 +622,44 @@ int send_t3_event (int t3_id, int index, int evttype)
 
 void du_scope_check_commands ()
 {
-   uint32_t *msg_start;
-   uint32_t msg_tag, msg_len, addr;
-   uint32_t il;
-   FILE *fp;
-
-   //printf("Check cmds %d\n",*shm_cmd.next_read);
-   while (((shm_cmd.Ubuf[(*shm_cmd.size) * (*shm_cmd.next_read)]) & 1) == 1)
-   { // loop over the T3 input
-     //printf("Received command\n");
-      msg_start = (uint32_t*) (&(shm_cmd.Ubuf[(*shm_cmd.size) * (*shm_cmd.next_read) + 1]));
-      msg_len = msg_start[AMSG_OFFSET_LENGTH];
-      msg_tag = msg_start[AMSG_OFFSET_TAG];
-
-      switch (msg_tag)
-	 {
-	 case DU_BOOT:
-	 case DU_RESET:
-	 case DU_INITIALIZE:
-	    il = 2;
-	    fp = fopen ("/DUdef.sh", "w");
-	    fprintf (fp, "#/bin/sh\n");
-	    while (il < (msg_len - 2))
-	    {
-	       addr = msg_start[il + 1] >> 1;
-	       //if((addr&1))addr -=1;
-	       //else addr+=1;
-	       //if(msg_start[il+1]<127) sl[addr] = msg_start[il+2];
-	       fprintf (fp, "devmem 0x%x 32 0x%08x\n", 0x80000000 + (msg_start[il + 1] >> 16),
-			msg_start[il + 2]);
-	       fprintf (fp, "sleep 0.1\n");
-	       il += 2;
-	    }
-	    fclose (fp);
-	    system ("source /DUdef.sh\n");
-	    sleep (5);
-	    printf ("Initializing scope\n");
-	    scope_initialize (); // resets and initialize scope
-	    break;
-	 default:
-	    printf ("Received unimplemented message %d\n", msg_tag);
-	 }
-      shm_cmd.Ubuf[(*shm_cmd.size) * (*shm_cmd.next_read)] &= ~1;
-      *shm_cmd.next_read = (*shm_cmd.next_read) + 1;
-      if (*shm_cmd.next_read >= *shm_cmd.nbuf)
-	 *shm_cmd.next_read = 0;
-   }
+  uint32_t *msg_start;
+  uint32_t msg_tag,msg_len,addr;
+  uint32_t il;
+  FILE *fp;
+  
+  //printf("Check cmds %d\n",*shm_cmd.next_read);
+  while(((shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)]) &1) ==  1){ // loop over the T3 input
+    //printf("Received command\n");
+    msg_start = (uint32_t *)(&(shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)+1]));
+    msg_len = msg_start[AMSG_OFFSET_LENGTH];
+    msg_tag = msg_start[AMSG_OFFSET_TAG];
+    
+    switch(msg_tag){
+      case DU_BOOT:
+      case DU_RESET:
+      case DU_INITIALIZE:
+        il = 2;
+        fp = fopen("/DUdef.sh","w");
+        fprintf(fp,"#/bin/sh\n");
+        while(il<(msg_len-2)){ 
+          addr = msg_start[il+1]>>1;
+          fprintf(fp,"devmem 0x%x 32 0x%08x\n",0x80000000+(msg_start[il+1]>>16),msg_start[il+2]);
+          fprintf(fp,"sleep 0.1\n");
+          il+=2;
+        }
+        fclose(fp);
+        system("source /DUdef.sh\n"); 
+        sleep(5);
+        printf("Initializing scope\n");
+        scope_initialize(); // resets and initialize scope
+        break;
+      default:
+        printf("Received unimplemented message %d\n",msg_tag);
+    }
+    shm_cmd.Ubuf[(*shm_cmd.size)*(*shm_cmd.next_read)] &= ~1;
+    *shm_cmd.next_read = (*shm_cmd.next_read) + 1;
+    if( *shm_cmd.next_read >= *shm_cmd.nbuf) *shm_cmd.next_read = 0;
+  }
 }
 
 /*!
@@ -684,18 +676,16 @@ void du_scope_check_commands ()
 
 void du_scope_main ()
 {
-   int i;
-
-   while (stop_process == 0)
-   {
-      if ((i = scope_read ()) < 0)
-      {
-	 //scope_flush();
-	 printf ("Error reading scope %d\n", i); // read out the scope
-      }
-      du_scope_check_commands ();
-   }
+  int i;
+  
+  while(stop_process == 0){
+    if((i =scope_read()) < 0){
+      printf("Error reading scope %d\n",i);  // read out the scope
+    }
+    du_scope_check_commands();
+  }
 }
+
 
 /*!
  \fn void du_get_station_id()
@@ -707,60 +697,39 @@ void du_scope_main ()
  */
 void du_get_station_id ()
 {
-   unsigned char ip_address[15];
-   int fd;
-   struct ifreq ifr;
-
-   FILE *fpn;
-   char line[100], wrd[20];
-   int n1, n2, n3, n4;
-
-   station_id = -1;
-
-   /*AF_INET - to define network interface IPv4*/
-   /*Creating soket for it.*/
-   fd = socket (AF_INET, SOCK_DGRAM, 0);
-   /*AF_INET - to define IPv4 Address type.*/
-   ifr.ifr_addr.sa_family = AF_INET;
-   /*eth0 - define the ifr_name - port name
-    where network attached.*/
-   memcpy (ifr.ifr_name, "eth0", IFNAMSIZ - 1);
-   /*Accessing network interface information by
-    passing address using ioctl.*/
-   ioctl (fd, SIOCGIFADDR, &ifr);
-   /*closing fd*/
-   close (fd);
-   strcpy ((char*) ip_address, inet_ntoa (((struct sockaddr_in*) &ifr.ifr_addr)->sin_addr));
-
-   printf ("System IP Address is: %s\n", ip_address);
-   if (sscanf ((char*) ip_address, "%d.%d.%d.%d", &n1, &n2, &n3, &n4) == 4)
-   {
-      station_id = n4;
-   }
-   if (n1 != 10)
-      station_id = -1; //dangerous!
-   if (station_id == 0)
-      station_id = -1;
-   printf ("Read station %d\n", station_id);
-   return;
-   fpn = fopen ("/etc/network/interfaces", "r");
-   if (fpn == NULL)
-      return;
-   while (line == fgets (line, 199, fpn))
-   {
-      if (sscanf (line, "%s %d.%d.%d.%d", wrd, &n1, &n2, &n3, &n4) == 5)
-      {
-	 if (strncmp (wrd, "address", 7) == 0)
-	 {
-	    station_id = n4;
-	    break;
-	 }
-      }
-   }
-   fclose (fpn);
-   if (station_id == 0)
-      station_id = -1;
-   printf ("Read station %d\n", station_id);
+  unsigned char ip_address[15];
+  int fd;
+  struct ifreq ifr;
+  
+  FILE *fpn;
+  char line[100],wrd[20];
+  int n1,n2,n3,n4;
+  
+  station_id = -1;
+  
+  /*AF_INET - to define network interface IPv4*/
+  /*Creating soket for it.*/
+  fd = socket(AF_INET, SOCK_DGRAM, 0);
+  /*AF_INET - to define IPv4 Address type.*/
+  ifr.ifr_addr.sa_family = AF_INET;
+  /*eth0 - define the ifr_name - port name
+   where network attached.*/
+  memcpy(ifr.ifr_name, "eth0", IFNAMSIZ - 1);
+  /*Accessing network interface information by
+   passing address using ioctl.*/
+  ioctl(fd, SIOCGIFADDR, &ifr);
+  /*closing fd*/
+  close(fd);
+  strcpy((char *)ip_address, inet_ntoa(((struct sockaddr_in*)&ifr.ifr_addr)->sin_addr));
+  
+  printf("System IP Address is: %s\n", ip_address);
+  if(sscanf((char *)ip_address,"%d.%d.%d.%d",&n1,&n2,&n3,&n4) == 4){
+    station_id = n4;
+  }
+  if(n1 != 10) station_id = -1; //dangerous!
+  if(station_id ==0) station_id = -1;
+  printf("Read station %d\n",station_id);
+  return;
 }
 
 /*!
@@ -863,62 +832,50 @@ void du_socket_main ()
  */
 int main (int argc, char **argv)
 {
-   pid_t pid;
-   int32_t status, i;
-
-   signal (SIGHUP, clean_stop);
-   signal (SIGINT, clean_stop);
-   signal (SIGTERM, clean_stop);
-   signal (SIGABRT, clean_stop);
-   signal (SIGKILL, clean_stop);
-
-   i = 0;
-   while (station_id <= 0 && i < 60)
-   {
-      du_get_station_id ();
-      if (station_id <= 0)
-	 sleep (2);
-      i++;
-   }
-
-   if (ad_shm_create (&shm_ev, BUFSIZE, 1) < 0)
-   {
-      printf ("Cannot create T3  shared memory !!\n");
-      exit (-1);
-   }
-   *(shm_ev.next_read) = 0;
-   *(shm_ev.next_write) = 0;
-   if (ad_shm_create (&shm_gps, GPSSIZE, 1) < 0)
-   {
-      printf ("Cannot create GPS shared memory !!\n");
-      exit (-1);
-   }
-   *(shm_gps.next_read) = 0;
-   *(shm_gps.next_write) = 0;
-   if (ad_shm_create (&shm_cmd, MSGSTOR, sizeof(int)) < 0)
-   {
-      printf ("Cannot create CMD shared memory !!\n");
-      exit (-1);
-   }
-   scope_open ();
-   if ((pid_scope = fork ()) == 0)
-      du_scope_main ();
-   if ((pid_socket = fork ()) == 0)
-      du_socket_main ();
-   while (stop_process == 0)
-   {
-      pid = waitpid (WAIT_ANY, &status, 0);
-      if (pid == pid_scope && stop_process == 0)
-      {
-	 if ((pid_scope = fork ()) == 0)
-	    du_scope_main ();
-      }
-      if (pid == pid_socket && stop_process == 0)
-      {
-	 if ((pid_socket = fork ()) == 0)
-	    du_socket_main ();
-      }
-      sleep (1);
-   }
-   remove_shared_memory ();
+  pid_t pid;
+  int32_t status,i;
+  
+  signal(SIGHUP,clean_stop);
+  signal(SIGINT,clean_stop);
+  signal(SIGTERM,clean_stop);
+  signal(SIGABRT,clean_stop);
+  signal(SIGKILL,clean_stop);
+  
+  i = 0;
+  while(station_id <= 0 && i < 60) {
+    du_get_station_id();
+    if(station_id <=0) sleep(2);
+    i++;
+  }
+  if(station_id <=0) printf("Bad station id: %d\n",station_id);
+  if(ad_shm_create(&shm_ev,BUFSIZE,1) <0){
+    printf("Cannot create T3  shared memory !!\n");
+    exit(-1);
+  }
+  *(shm_ev.next_read) = 0;
+  *(shm_ev.next_write) = 0;
+  if(ad_shm_create(&shm_gps,GPSSIZE,1) <0){
+    printf("Cannot create GPS shared memory !!\n");
+    exit(-1);
+  }
+  *(shm_gps.next_read) = 0;
+  *(shm_gps.next_write) = 0;
+  if(ad_shm_create(&shm_cmd,MSGSTOR,sizeof(int)) <0){
+    printf("Cannot create CMD shared memory !!\n");
+    exit(-1);
+  }
+  scope_open();
+  if((pid_scope = fork()) == 0) du_scope_main();
+  if((pid_socket = fork()) == 0) du_socket_main();
+  while(stop_process == 0){
+    pid = waitpid (WAIT_ANY, &status, 0);
+    if(pid == pid_scope && stop_process == 0) {
+      if((pid_scope = fork()) == 0) du_scope_main();
+    }
+    if(pid == pid_socket && stop_process == 0) {
+      if((pid_socket = fork()) == 0) du_socket_main();
+    }
+    sleep(1);
+  }
+  remove_shared_memory();
 }

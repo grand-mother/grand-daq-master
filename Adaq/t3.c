@@ -15,7 +15,7 @@
 #include "Adaq.h"
 #include "amsg.h"
 
-#define MAXRATE 1000
+#define MAXRATE 2000
 #define MAXSEC 12 // has to be above 10 to avoid missing 10sec triggers!
 #define NEVT (MAXSEC*MAXDU*MAXRATE)
 #define GIGA    1000000000
@@ -104,7 +104,7 @@ void t3_gett2()
        }*/
       if(sec != last_read_sec) last_read_sec = sec;
       if((sec>(t2evts[0].sec+100))&&t2write != 0) {
-        printf("T3: Error in timing, large jump; LS=%d\n",stat);
+        printf("T3: Warning in timing, large jump; LS=%d\n",stat);
       }
       prev_nsec = 0;      // needed to check if we loop over into next second
       nsub = (msg->length-5)/2;  // number of subseconds in this T2
@@ -168,12 +168,6 @@ void t3_gett2()
       t2evts[ind].insertsec = 0;
       t2evts[ind].sec = 0;
     }
-    /**if((t2evts[ind].sec>t2evts[t2write-1].sec) &&(t2evts[ind].sec-t2evts[t2write-1].sec)>MAXSEC){
-     //if(idebug)
-     printf("T3: Cleanup1 %u %u %d\n",t2evts[ind].sec,t2evts[t2write-1].sec,ind);
-     t2evts[ind].insertsec = 0; //get rid of GPS issues
-     t2evts[ind].sec = 0; //get rid of GPS issues
-     }**/
   }
   qsort(t2evts,t2write,sizeof(T2evts),t3_compare);
   // remove old data
@@ -185,10 +179,7 @@ void t3_gett2()
   while(sec > t2evts[ind].insertsec &&ind>0) {
     ind--; //real cleanup!
   }
-  //if(sec >t2evts[1].insertsec )
   t2write = ind+1;
-  //else t2write = ind;
-  //printf("t2write =  %d\n",t2write);
 }
 
 
@@ -244,7 +235,7 @@ void t3_maket3()
     //check if there are any coincidences
     eventindex[0] = ind;
     evsize = 1;
-    evnear = 0;
+    //evnear = 0;
     if(t2evts[ind].trigflag&0x4) isten = 1;
     else isten = 0;
     if(t2evts[ind].trigflag&0x8) israndom = 1;

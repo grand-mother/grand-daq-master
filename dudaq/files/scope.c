@@ -59,7 +59,7 @@ uint32_t eventLength, ppsLength;
 uint32_t Overlap, preOverlap, postOverlap;
 
 S_TFLite *G_ptflt1 = NULL;
-float G_threasold=0.7;
+float G_thresold=0.7;
 
 void short_wait ()
 {
@@ -934,7 +934,7 @@ void scope_initialize ()
     *shm_gps.next_write = 0;*/
 }
 
-int scope_t2 (uint32_t *evt, float threasold)
+int scope_t2 (uint32_t *evt, float thresold)
 {
    static float proba = -1.0;
 
@@ -958,7 +958,7 @@ int scope_t2 (uint32_t *evt, float threasold)
 
    TFLT_preprocessing (G_ptflt1, evt + EVT_START_ADC);
    TFLT_inference (G_ptflt1, &proba);
-   if (proba > threasold) return (1);
+   if (proba > thresold) return (1);
    return (0);
 }
 
@@ -973,7 +973,7 @@ int scope_read_event (uint32_t index)
    uint32_t *sec;
    uint32_t *evt = &vadd_psddr[index];
 
-   if (scope_t2 (evt, G_threasold) != 1)
+   if (scope_t2 (evt, G_thresold) != 1)
       return (SCOPE_EVENT); // only for a T2
    length = evt[0] >> 16;
    if (length <= 0)
@@ -1034,44 +1034,35 @@ int32_t scope_read_pps (uint32_t index)
 
 int scope_read ()
 {
-
-   dma_initiate ();
-   if (dma_completion () == -1)
-   {
-      dma_reset ();
-   }
-   else
-   {
-      if (evtReady == 1)
-	 scope_read_event (ddrPrevOffset / 4);
-      if (ppsReady == 1)
-      {
-	 if (evtReady == 1)
-	    scope_read_pps ((ddrPrevOffset + eventLength) / 4);
-	 else
-	    scope_read_pps (ddrPrevOffset / 4);
-      }
-      ddrPrevOffset = ddrOffset;
-      // -----------------------------------
-      // 8. Wait for evtReady or ppsReady
-      // -----------------------------------
-      do
-      {
-	 evtReady = DUreg_rd_bit (0x0050, 0);
-	 short_wait ();
-	 ppsReady = DUreg_rd_bit (0x0050, 1);
-	 short_wait ();
-      }
-      while ((evtReady == 0) && (ppsReady == 0));
-      //while (evtReady == 0);
-      short_wait ();
-      // -----------------------------------
-      // 9. Clear the IOC interrupt bit
-      // -----------------------------------
-      dma_wr_bit (vadd_cdma, CDMA_SR, 12, 1);
-      short_wait ();
-   }
-   return (0);
+  
+  dma_initiate();
+  if(dma_completion() == -1){
+    dma_reset();
+  }else{
+    if(evtReady == 1) scope_read_event(ddrPrevOffset/4);
+    if(ppsReady == 1){
+      if(evtReady == 1) scope_read_pps((ddrPrevOffset+eventLength)/4);
+      else scope_read_pps(ddrPrevOffset/4);
+    }
+    ddrPrevOffset = ddrOffset;
+    // -----------------------------------
+    // 8. Wait for evtReady or ppsReady
+    // -----------------------------------
+    do {
+      evtReady = DUreg_rd_bit(0x0050,0);
+      short_wait();
+      ppsReady = DUreg_rd_bit(0x0050,1);
+      short_wait();
+    }
+    while ((evtReady == 0) && (ppsReady == 0));
+    short_wait();
+    // -----------------------------------
+    // 9. Clear the IOC interrupt bit
+    // -----------------------------------
+    dma_wr_bit(vadd_cdma, CDMA_SR, 12, 1);
+    short_wait();
+  }
+  return(0);
 }
 
 int scope_calc_t3nsec ()
