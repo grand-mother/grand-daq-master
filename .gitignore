@@ -2,7 +2,6 @@
 nohup.out
 dudaq.tar
 dudaq/myfiles/.DS_Store
-.DS_Store
 *.o
 dudaq.tar
 dudaq.tar
@@ -18,8 +17,9 @@ SpecNancaydet.pdf
 SpecNancayfull.pdf
 *.pdf
 tools/noise.txt
+tools/Traces
 
-
+.DS_Store
 
 # coverage test files
 *.gcno
@@ -33,6 +33,4 @@ tools/noise.txt
 .settings
 
 .autotools
-
-tools/Traces
 
