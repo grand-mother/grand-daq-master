@@ -18,3 +18,19 @@ SpecNancayfull.pdf
 *.pdf
 tools/noise.txt
 tools/Traces
+
+.DS_Store
+
+# coverage test files
+*.gcno
+*.gcda
+*.d
+
+# eclipse 
+.project
+.cproject
+.pydevproject
+.settings
+
+.autotools
+
