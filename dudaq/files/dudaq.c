@@ -59,6 +59,12 @@ pid_t pid_scope; //!< process id of the process reading/writing the fpga
 pid_t pid_socket; //!< process id of the process reading/writing to the central DAQ
 uint8_t stop_process = 0; //!< after an interrupt this flag is set so that all forked processes are killed
 
+#define STR_IMPL(x) #x
+#define STR(x) STR_IMPL(x)
+
+const char GIT_BRANCH[] = STR(VERSION);
+const char GIT_SHA1[] = STR(GIT_SHA);
+
 /*!
  * \fn remove_shared_memory()
  * \brief deletes all shared memories
@@ -841,6 +847,12 @@ int main (int argc, char **argv)
   signal(SIGABRT,clean_stop);
   signal(SIGKILL,clean_stop);
   
+  printf ("\n====================================");
+  printf ("\nExecutable dudaq, compiled %s %s", __DATE__, __TIME__);
+  printf ("\n\nfrom git branch %s with sha1 %s", GIT_BRANCH, GIT_SHA1);
+  printf ("\n====================================\n\n");
+
+
   i = 0;
   while(station_id <= 0 && i < 60) {
     du_get_station_id();
