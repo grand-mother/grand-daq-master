@@ -48,8 +48,8 @@ typedef struct{
 #define NT3BUF 500 // max 500 T3 buffers (small messages anyway)
 #define T3SIZE (3+2*MAXDU) //Max. size (in ints) for T3 info in 1 message
 
-#define NEVBUF 4 // maximal 40 event buffers
-#define EVSIZE 65000 //Max. size (in ints) for evsize for each DU
+#define NEVBUF 30 // maximal 40 event buffers
+#define EVSIZE 25000 //Max. size (in ints) for evsize for each DU
 
 #define CMDBUF 40 // leave 40 command buffers
 #define CMDSIZE 5000 //Max. size (in ints) for command (should be able to hold config file)

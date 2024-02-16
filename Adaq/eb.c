@@ -23,7 +23,7 @@ extern char *configfile;
 int ad_init_param(char *file);
 
 
-#define NDU (5*MAXDU) // maximally 5 events for each DU in memory
+#define NDU (500*MAXDU) // maximally 5 events for each DU in memory
 #define EBTIMEOUT 5 // need to have at least 5 seconds of data before writing
 
 int running = 0;
