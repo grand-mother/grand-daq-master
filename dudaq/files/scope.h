@@ -259,7 +259,6 @@ void scope_start_run();
 void scope_stop_run();
 void scope_reboot();
 void scope_initialize();
-void scope_create_memory();
 int scope_read_event(uint32_t index);
 int scope_read_pps(uint32_t index);
 int scope_read();

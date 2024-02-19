@@ -26,7 +26,9 @@
 #include "ad_shm.h"
 #include "dudaq.h"
 #include "scope.h"
-#include "tflite_inference.h"
+#include "tflite_inference.h"   // TFLT_xxx()
+#include "ring_buffer_eval.h"  // RBE_xxx()
+#include "func_eval_evt.h" // FEEV_xxx()
 
 int32_t dev = 0;
 void *axi_ptr;
@@ -55,11 +57,9 @@ uint32_t addr1, addr2, addr3;
 uint32_t addr4, addr5, addr6;
 uint32_t addr7, addr8;
 uint32_t ddrOffset = 0, ddrPrevOffset = 0;
-uint32_t eventLength, ppsLength;
+uint32_t eventLength=0, ppsLength;
 uint32_t Overlap, preOverlap, postOverlap;
 
-S_TFLite *G_ptflt1 = NULL;
-float G_thresold=0.0;
 
 void short_wait ()
 {
@@ -932,6 +932,9 @@ void scope_initialize ()
     *shm_ev.next_write = 0;
     *shm_gps.next_read = 0;
     *shm_gps.next_write = 0;*/
+
+   /* Init TRIGGER 2*/
+   scope_create_thread_T2();
 }
 
 int scope_t2 (uint32_t *evt, float thresold)
@@ -963,8 +966,19 @@ int scope_t2 (uint32_t *evt, float thresold)
 //   return (0);
 }
 
+/**
+ *  1) Add GPS datation in event message
+ *  2) Add event in ring buffer for evaluation
+ *  3) Inspect event evaluated
+ */
 int scope_read_event (uint32_t index)
 {
+	static int GS_thread = 0;
+
+	/* get lock*/
+	pthread_mutex_lock (Gp_rbuftrig[0]->mutex);
+	pthread_mutex_lock (Gp_rbuftrig[1]->mutex);
+
    /** temp fix for ARG */
 //struct timeval tv;
    struct tm tt;
@@ -974,8 +988,7 @@ int scope_read_event (uint32_t index)
    uint32_t *sec;
    uint32_t *evt = &vadd_psddr[index];
 
-   if (scope_t2 (evt, G_thresold) != 1)
-      return (SCOPE_EVENT); // only for a T2
+   /* Add GPS datation in event message */
    length = evt[0] >> 16;
    if (length <= 0)
       return (-2);
@@ -1010,12 +1023,40 @@ int scope_read_event (uint32_t index)
    last_sec = *sec;
    fracsec = (double) (CTD) / (double) (CTP);
    evt[EVT_NANOSEC] = 1.E9 * fracsec;
-
    evt[EVT_STATION_ID] = station_id;
+
+   /* Add event in ring buffer for evaluation */
+   if (Gp_rbuftrig[GS_thread]->nb_write > 0)
+   {
+	   RBE_write(Gp_rbuftrig[GS_thread], evt);
+   }
+   else
+   {
+	   printf("\nT2 ring buffer saturated ! ");
+   }
+   /* switch thread write */
+   if (GS_thread == 0){
+	   GS_thread = 1;
+   }
+   else {
+	   GS_thread = 0;
+   }
+
+   /* Inspect event evaluated  */
+   if (Gp_rbuftrig[0]->nb_trig > 0)
+   {
+	   int idx = Gp_rbuftrig[0]->inext_eval;
+	   if (Gp_rbuftrig[0]->a_prob[idx] > TRIG_THRESHOLD)
+	   {}
+   }
+   {
    shm_ev.Ubuf[*shm_ev.next_write] = index;
    *(shm_ev.next_write) = *(shm_ev.next_write) + 1;
    if (*shm_ev.next_write >= *shm_ev.nbuf)
       *(shm_ev.next_write) = 0;
+   }
+   pthread_mutex_unlock (Gp_rbuftrig[0]->mutex);
+   pthread_mutex_unlock (Gp_rbuftrig[1]->mutex);
    return (SCOPE_EVENT); // success!
 }
 
@@ -1071,3 +1112,71 @@ int scope_calc_t3nsec ()
    return (1);
 }
 
+
+
+/*******************************************
+ *
+ *  TRIGGER T2 PART
+ *
+ *******************************************
+ */
+
+/**
+ * 2 ring buffer trigger 1, one for each processor
+ */
+#define MAX_BUF_TRIG 8
+#define TRIG_THRESHOLD 0.8
+
+S_RingBufferEval *Gp_rbuftrig[2] = {NULL,NULL};
+
+
+/**
+ * thread evaluation with Tensorflow Lite of 3D trace for trigger T2
+ * 2 threads one by CPU CORTEX A53
+ */
+pthread_t G_thread_t2[2]={0,0};
+S_TFLite *Gp_tflt[2] = {NULL,NULL};
+S_FuncEval *Gp_feev[2] = {NULL,NULL};
+
+
+/**
+ * \fn void scope_create_thread_T2()
+ * \brief with TensorFlow Lite trigger
+ *
+ */
+void scope_create_thread_T2 (void)
+{
+   int ret;
+
+   /* Create 2 ring buffer event for trigger T2 */
+   if (eventLength == 0)
+   	   {
+	      printf ("[scope_create_thread_T2] Failed, eventLength isn't set ");
+	      return(1);
+   	   }
+   Gp_rbuftrig[0] = RBE_create (eventLength, MAX_BUF_TRIG);
+   Gp_rbuftrig[1] = RBE_create (eventLength, MAX_BUF_TRIG);
+
+   /* Create 2 Tensorflow Lite inference structure */
+   Gp_tflt[0] = TFLT_create (1);
+   Gp_tflt[1] = TFLT_create (1);
+
+   /* Create 2 process of evaluation */
+   Gp_feev[0] = FEEV_create (Gp_rbuftrig[0], (void*) Gp_tflt[0]);
+   Gp_feev[1] = FEEV_create (Gp_rbuftrig[1], (void*) Gp_tflt[0]);
+
+   /* Create 2 thread */
+   ret = pthread_create (&G_thread_t2[0], NULL,FEEV_run, Gp_feev[0]);
+   if (ret != 0)
+   {
+      printf ("[scope_create_thread_T2] Failed create thread 1, ret=%d ", ret);
+      return(1);
+   }
+   ret = pthread_create (&G_thread_t2[1], NULL,FEEV_run, Gp_feev[1]);
+   if (ret != 0)
+   {
+      printf ("[scope_create_thread_T2] Failed create thread 2, ret=%d ", ret);
+      return(1);
+   }
+   return(0);
+}
