@@ -30,21 +30,23 @@
 #include "ring_buffer_eval.h"  // RBE_xxx()
 #include "func_eval_evt.h" // FEEV_xxx()
 
+/* EXTERNAL */
+S_RingBufferEval* Gp_rbuftrig[2]
+
 int32_t dev = 0;
-void *axi_ptr;
+void* axi_ptr;
 uint32_t page_offset;
 
-extern shm_struct shm_ev;
 extern shm_struct shm_gps;
 int hw_id = 0;
 uint32_t last_sec;
 uint32_t prev_ppsid = 0;
 extern int station_id;
 
-uint32_t *vadd_ram1, *vadd_ram2, *vadd_ram3;
-uint32_t *vadd_ram4, *vadd_ram5, *vadd_ram6;
-uint32_t *vadd_ram7, *vadd_ram8;
-uint32_t *vadd_psddr, *vadd_cdma, *vadd_sg;
+uint32_t* vadd_ram1, * vadd_ram2, * vadd_ram3;
+uint32_t* vadd_ram4, * vadd_ram5, * vadd_ram6;
+uint32_t* vadd_ram7, * vadd_ram8;
+uint32_t* vadd_psddr, * vadd_cdma, * vadd_sg;
 unsigned int page_size;
 volatile uint8_t resetBit;
 volatile uint8_t idleBit;
@@ -57,31 +59,30 @@ uint32_t addr1, addr2, addr3;
 uint32_t addr4, addr5, addr6;
 uint32_t addr7, addr8;
 uint32_t ddrOffset = 0, ddrPrevOffset = 0;
-uint32_t eventLength=0, ppsLength;
+uint32_t eventLength = 0, ppsLength;
 uint32_t Overlap, preOverlap, postOverlap;
 
-
-void short_wait ()
+void short_wait()
 {
-   usleep (1);
+   usleep(1);
 }
 
-unsigned int dma_wr_reg (unsigned int *dma_virtual_address, int offset, unsigned int value)
+unsigned int dma_wr_reg(unsigned int* dma_virtual_address, int offset, unsigned int value)
 {
    dma_virtual_address[offset >> 2] = value;
    return (0);
 }
 
-unsigned int dma_rd_reg (unsigned int *dma_virtual_address, int offset)
+unsigned int dma_rd_reg(unsigned int* dma_virtual_address, int offset)
 {
    return dma_virtual_address[offset >> 2];
 }
 
-unsigned int dma_wr_bit (
-			 unsigned int *dma_virtual_address,
-			 int offset,
-			 uint8_t bitNo,
-			 uint8_t bitVal)
+unsigned int dma_wr_bit(
+                        unsigned int* dma_virtual_address,
+                        int offset,
+                        uint8_t bitNo,
+                        uint8_t bitVal)
 {
    int32_t mask = 1 << bitNo;
    int32_t current_value = dma_virtual_address[offset >> 2];
@@ -90,35 +91,35 @@ unsigned int dma_wr_bit (
    return (0);
 }
 
-unsigned int dma_rd_bit (unsigned int *dma_virtual_address, int offset, uint8_t bitNo)
+unsigned int dma_rd_bit(unsigned int* dma_virtual_address, int offset, uint8_t bitNo)
 {
    int32_t current_value = dma_virtual_address[offset >> 2];
    return (current_value & (1 << bitNo)) >> bitNo;
 }
 
-void DUreg_write (uint32_t reg_addr, uint32_t value)
+void DUreg_write(uint32_t reg_addr, uint32_t value)
 {
    *((unsigned int*) (axi_ptr + page_offset + reg_addr)) = value;
 }
 
-uint32_t DUreg_read (uint32_t reg_addr)
+uint32_t DUreg_read(uint32_t reg_addr)
 {
    return *((unsigned int*) (axi_ptr + page_offset + reg_addr));
 }
 
-unsigned int DUreg_rd_bit (uint32_t reg_addr, uint8_t bitNo)
+unsigned int DUreg_rd_bit(uint32_t reg_addr, uint8_t bitNo)
 {
-   uint32_t regValue = DUreg_read (reg_addr);
+   uint32_t regValue = DUreg_read(reg_addr);
    return (regValue & (1 << bitNo)) >> bitNo;
 }
 
-unsigned int DUreg_rd_excerpt (uint32_t reg_addr, uint8_t bitNoStart, uint8_t bitNoStop)
+unsigned int DUreg_rd_excerpt(uint32_t reg_addr, uint8_t bitNoStart, uint8_t bitNoStop)
 {
-   uint32_t regValue = DUreg_read (reg_addr);
+   uint32_t regValue = DUreg_read(reg_addr);
    if (bitNoStart > bitNoStop)
    {
-      printf ("ERROR: bitNoStart sjould be smaller than bitNoStop");
-      exit (0);
+      printf("ERROR: bitNoStart sjould be smaller than bitNoStop");
+      exit(0);
    }
    unsigned int mask = 0;
    for (unsigned i = bitNoStart; i <= bitNoStop; i++)
@@ -126,29 +127,29 @@ unsigned int DUreg_rd_excerpt (uint32_t reg_addr, uint8_t bitNoStart, uint8_t bi
    return (mask & regValue) >> bitNoStart;
 }
 
-unsigned int print_CDMA_regs (unsigned int *dma_virtual_address)
+unsigned int print_CDMA_regs(unsigned int* dma_virtual_address)
 {
-   printf ("    CDMACR        :0x%08x\n", dma_rd_reg (dma_virtual_address, CDMA_CR));
-   printf ("    CDMASR        :0x%08x\n", dma_rd_reg (dma_virtual_address, CDMA_SR));
-   printf ("    CURDESC_PNTR  :0x%08x\n", dma_rd_reg (dma_virtual_address, CDMA_CURDESC_PNTR));
-   printf ("    TAILDESC_PNTR :0x%08x\n", dma_rd_reg (dma_virtual_address, CDMA_TAILDESC_PNTR));
+   printf("    CDMACR        :0x%08x\n", dma_rd_reg(dma_virtual_address, CDMA_CR));
+   printf("    CDMASR        :0x%08x\n", dma_rd_reg(dma_virtual_address, CDMA_SR));
+   printf("    CURDESC_PNTR  :0x%08x\n", dma_rd_reg(dma_virtual_address, CDMA_CURDESC_PNTR));
+   printf("    TAILDESC_PNTR :0x%08x\n", dma_rd_reg(dma_virtual_address, CDMA_TAILDESC_PNTR));
    return (0);
 }
 
 // -- for DMA in Scatter-Gather Mode, print the buffer descriptors
-unsigned int print_CDMA_SG_descriptors (unsigned int *dma_SG_virtual_address, int offset)
+unsigned int print_CDMA_SG_descriptors(unsigned int* dma_SG_virtual_address, int offset)
 {
-   printf ("    Transfer descriptors at base address: 0x%08x\n", SG_BASE_ADDR + offset);
-   printf ("    NXTDESC_PNTR :0x%08x\n",
-	   dma_rd_reg (dma_SG_virtual_address, offset + SG_NXTDESC_PNTR));
-   printf ("    SA           :0x%08x\n", dma_rd_reg (dma_SG_virtual_address, offset + SG_SA));
-   printf ("    DA           :0x%08x\n", dma_rd_reg (dma_SG_virtual_address, offset + SG_DA));
-   printf ("    CONTROL      :0x%08x\n", dma_rd_reg (dma_SG_virtual_address, offset + SG_CONTROL));
-   printf ("    STATUS       :0x%08x\n", dma_rd_reg (dma_SG_virtual_address, offset + SG_STATUS));
+   printf("    Transfer descriptors at base address: 0x%08x\n", SG_BASE_ADDR + offset);
+   printf("    NXTDESC_PNTR :0x%08x\n",
+          dma_rd_reg(dma_SG_virtual_address, offset + SG_NXTDESC_PNTR));
+   printf("    SA           :0x%08x\n", dma_rd_reg(dma_SG_virtual_address, offset + SG_SA));
+   printf("    DA           :0x%08x\n", dma_rd_reg(dma_SG_virtual_address, offset + SG_DA));
+   printf("    CONTROL      :0x%08x\n", dma_rd_reg(dma_SG_virtual_address, offset + SG_CONTROL));
+   printf("    STATUS       :0x%08x\n", dma_rd_reg(dma_SG_virtual_address, offset + SG_STATUS));
    return (0);
 }
 
-void dma_initiate ()
+void dma_initiate()
 {
    if ((ddrOffset + eventLength + ppsLength) > (DDR_MAP_SIZE))
       ddrOffset = 0;
@@ -157,69 +158,69 @@ void dma_initiate ()
 
    if (evtReady == 1)
    { //-- CASE 1: event only DMA transfer
-      dma_wr_reg (vadd_sg, SG_DA, addr1 + ddrOffset); //-- RAM header
-      dma_wr_reg (vadd_sg, SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, SG_DA, addr1 + ddrOffset); //-- RAM header
+      dma_wr_reg(vadd_sg, SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0x40 + SG_DA, addr2 + ddrOffset); //-- RAM pre  ch. 1
-      dma_wr_reg (vadd_sg, 0x40 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x40 + SG_DA, addr2 + ddrOffset); //-- RAM pre  ch. 1
+      dma_wr_reg(vadd_sg, 0x40 + SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0x80 + SG_DA, addr3 + ddrOffset); //-- RAM post ch. 1
-      dma_wr_reg (vadd_sg, 0x80 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x80 + SG_DA, addr3 + ddrOffset); //-- RAM post ch. 1
+      dma_wr_reg(vadd_sg, 0x80 + SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0xC0 + SG_DA, addr4 + ddrOffset); //-- RAM pre  ch. 2
-      dma_wr_reg (vadd_sg, 0xC0 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0xC0 + SG_DA, addr4 + ddrOffset); //-- RAM pre  ch. 2
+      dma_wr_reg(vadd_sg, 0xC0 + SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0x100 + SG_DA, addr5 + ddrOffset); //-- RAM post ch. 2
-      dma_wr_reg (vadd_sg, 0x100 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x100 + SG_DA, addr5 + ddrOffset); //-- RAM post ch. 2
+      dma_wr_reg(vadd_sg, 0x100 + SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0x140 + SG_DA, addr6 + ddrOffset); //-- RAM pre  ch. 3
-      dma_wr_reg (vadd_sg, 0x140 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x140 + SG_DA, addr6 + ddrOffset); //-- RAM pre  ch. 3
+      dma_wr_reg(vadd_sg, 0x140 + SG_STATUS, 0x0);
 
-      dma_wr_reg (vadd_sg, 0x180 + SG_DA, addr7 + ddrOffset); //-- RAM post ch. 3
-      dma_wr_reg (vadd_sg, 0x180 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x180 + SG_DA, addr7 + ddrOffset); //-- RAM post ch. 3
+      dma_wr_reg(vadd_sg, 0x180 + SG_STATUS, 0x0);
 
       if (ppsReady == 1)
       { //-- CASE 2: event + PPS DMA transfer
-	 dma_wr_reg (vadd_sg, 0x1C0 + SG_DA, addr8 + ddrOffset); //-- RAM pps
-	 //dma_wr_reg(vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
-	 dma_wr_reg (vadd_sg, 0x1C0 + SG_STATUS, 0x0);
-	 //printf("Transferring event + pps (evtReady,ppsReady)=(%d,%d) ", evtReady,ppsReady);
-	 ddrOffset = ddrOffset + eventLength + ppsLength;
+         dma_wr_reg(vadd_sg, 0x1C0 + SG_DA, addr8 + ddrOffset); //-- RAM pps
+         //dma_wr_reg(vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
+         dma_wr_reg(vadd_sg, 0x1C0 + SG_STATUS, 0x0);
+         //printf("Transferring event + pps (evtReady,ppsReady)=(%d,%d) ", evtReady,ppsReady);
+         ddrOffset = ddrOffset + eventLength + ppsLength;
       }
       else
-	 ddrOffset = ddrOffset + eventLength;
+         ddrOffset = ddrOffset + eventLength;
    }
    else if (ppsReady == 1)
    { //-- CASE 3: PPS only DMA transfer
-      dma_wr_reg (vadd_sg, 0x1C0 + SG_DA, addr1 + ddrOffset); //-- RAM pps
-      dma_wr_reg (vadd_sg, 0x1C0 + SG_STATUS, 0x0);
+      dma_wr_reg(vadd_sg, 0x1C0 + SG_DA, addr1 + ddrOffset); //-- RAM pps
+      dma_wr_reg(vadd_sg, 0x1C0 + SG_STATUS, 0x0);
       //printf("Transferring pps only (evtReady,ppsReady)=(%d,%d) ", evtReady,ppsReady);
       ddrOffset = ddrOffset + ppsLength;
    }
 }
 
-int dma_completion ()
+int dma_completion()
 {
    // -----------------------------------
    // 1. Verify CDMASR.IDLE = 1
    // -----------------------------------
    do
    {
-      idleBit = dma_rd_bit (vadd_cdma, CDMA_SR, 1);
-      short_wait ();
+      idleBit = dma_rd_bit(vadd_cdma, CDMA_SR, 1);
+      short_wait();
    }
    while (idleBit == 0);
    //printf("DMA transfer: 1 ");
    // -----------------------------------
    // 2. Clear CDMACR.SGMode = 0
    // -----------------------------------
-   dma_wr_bit (vadd_cdma, CDMA_CR, 3, 0);
-   short_wait ();
+   dma_wr_bit(vadd_cdma, CDMA_CR, 3, 0);
+   short_wait();
    // -----------------------------------
    // 3. Set CDMACR.SGMode = 1
    // -----------------------------------
-   dma_wr_bit (vadd_cdma, CDMA_CR, 3, 1);
-   short_wait ();
+   dma_wr_bit(vadd_cdma, CDMA_CR, 3, 1);
+   short_wait();
    // -----------------------------------
    // 4. Write CURDESC_PNTR register with first BD pointer
    // 5. Enable interrupts in CDMACR
@@ -227,31 +228,31 @@ int dma_completion ()
    // -----------------------------------
    if (evtReady == 1)
    {
-      dma_wr_reg (vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR);
-      short_wait ();
+      dma_wr_reg(vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR);
+      short_wait();
       if (ppsReady == 1)
       { //-- CASE 2: event + PPS DMA transfer
-	 dma_wr_reg (vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evtpps);
-	 short_wait ();
-	 dma_wr_reg (vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x1C0);
-	 short_wait ();
+         dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evtpps);
+         short_wait();
+         dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x1C0);
+         short_wait();
       }
       else
       { //-- CASE 1: event only DMA transfer
-	 dma_wr_reg (vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evt);
-	 short_wait ();
-	 dma_wr_reg (vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x180);
-	 short_wait ();
+         dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evt);
+         short_wait();
+         dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x180);
+         short_wait();
       }
    }
    else
    { //-- CASE 3: PPS only DMA transfer
-      dma_wr_reg (vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR + 0x1C0);
-      short_wait ();
-      dma_wr_reg (vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_pps);
-      short_wait ();
-      dma_wr_reg (vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x1C0);
-      short_wait ();
+      dma_wr_reg(vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR + 0x1C0);
+      short_wait();
+      dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_pps);
+      short_wait();
+      dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR + 0x1C0);
+      short_wait();
 
    }
    // -----------------------------------
@@ -259,90 +260,88 @@ int dma_completion ()
    // -----------------------------------
    do
    {
-      IOC_Irq = dma_rd_bit (vadd_cdma, CDMA_SR, 12);
-      short_wait ();
-      errorIrq = dma_rd_bit (vadd_cdma, CDMA_SR, 14);
-      short_wait ();
+      IOC_Irq = dma_rd_bit(vadd_cdma, CDMA_SR, 12);
+      short_wait();
+      errorIrq = dma_rd_bit(vadd_cdma, CDMA_SR, 14);
+      short_wait();
    }
    while ((IOC_Irq == 0) && (errorIrq == 0));
-   short_wait ();
+   short_wait();
    if (errorIrq)
       return (-1);
    return (0);
 }
 
-void dma_reset ()
+void dma_reset()
 {
-   SGDecErr = dma_rd_bit (vadd_cdma, CDMA_SR, 10); //-- SG engine issues address request to invalid location
-   short_wait ();
-   SGSlvErr = dma_rd_bit (vadd_cdma, CDMA_SR, 9); //-- AXI slave error response received during transfer descriptor read/write
-   short_wait ();
-   SGIntErr = dma_rd_bit (vadd_cdma, CDMA_SR, 8); //-- fetched descriptor has already the complete bit in the status register set (stale)
-   short_wait ();
+   SGDecErr = dma_rd_bit(vadd_cdma, CDMA_SR, 10); //-- SG engine issues address request to invalid location
+   short_wait();
+   SGSlvErr = dma_rd_bit(vadd_cdma, CDMA_SR, 9); //-- AXI slave error response received during transfer descriptor read/write
+   short_wait();
+   SGIntErr = dma_rd_bit(vadd_cdma, CDMA_SR, 8); //-- fetched descriptor has already the complete bit in the status register set (stale)
+   short_wait();
 
-   DMADecErr = dma_rd_bit (vadd_cdma, CDMA_SR, 6); //-- AXI Data Mover issues address request to invalid location
-   short_wait ();
-   DMASlvErr = dma_rd_bit (vadd_cdma, CDMA_SR, 5); //-- AXI slave error response received by AXI Data Mover during read/write
-   short_wait ();
-   DMAIntErr = dma_rd_bit (vadd_cdma, CDMA_SR, 4); //-- bytes to transfer inside SG control register is 0, or AXI Data Mover internal error
-   short_wait ();
-   printf (
-	 "DMA ERROR: SGDecErr %d, SGSlvErr %d, SGIntErr %d; DMADecErr %d, DMASlvErr %d, DMAIntErr %d\n",
-	 SGDecErr, SGSlvErr, SGIntErr, DMADecErr, DMASlvErr, DMAIntErr);
+   DMADecErr = dma_rd_bit(vadd_cdma, CDMA_SR, 6); //-- AXI Data Mover issues address request to invalid location
+   short_wait();
+   DMASlvErr = dma_rd_bit(vadd_cdma, CDMA_SR, 5); //-- AXI slave error response received by AXI Data Mover during read/write
+   short_wait();
+   DMAIntErr = dma_rd_bit(vadd_cdma, CDMA_SR, 4); //-- bytes to transfer inside SG control register is 0, or AXI Data Mover internal error
+   short_wait();
+   printf("DMA ERROR: SGDecErr %d, SGSlvErr %d, SGIntErr %d; DMADecErr %d, DMASlvErr %d, DMAIntErr %d\n",
+          SGDecErr, SGSlvErr, SGIntErr, DMADecErr, DMASlvErr, DMAIntErr);
 
    //-- DMA halts gracefully, so wait for CMDA shut down
    do
    {
-      idleBit = dma_rd_bit (vadd_cdma, CDMA_SR, 1);
-      short_wait ();
+      idleBit = dma_rd_bit(vadd_cdma, CDMA_SR, 1);
+      short_wait();
    }
    while (idleBit == 0);
 
    //-- reset DMA engine to clear error condition
    do
    {
-      resetBit = dma_rd_bit (vadd_cdma, CDMA_CR, 2);
-      short_wait ();
+      resetBit = dma_rd_bit(vadd_cdma, CDMA_CR, 2);
+      short_wait();
    }
    while (resetBit == 1);
 }
 
-int hardware_id ()
+int hardware_id()
 {
    int fd;
    ssize_t size;
-   u_int32_t read_data[50] =
-      { 0 };
+   u_int32_t read_data[50] = {0};
    int32_t index;
 
-   fd = open ("/sys/bus/nvmem/devices/zynqmp-nvmem0/nvmem", O_RDWR);
+   fd = open("/sys/bus/nvmem/devices/zynqmp-nvmem0/nvmem", O_RDWR);
    if (fd <= 0)
       return errno;
 
-   size = pread (fd, (void*) &read_data, 12, 0xC);
+   size = pread(fd, (void*) &read_data, 12, 0xC);
    if (size == 12)
    {
-      printf ("FPGA ID (96 bits): ");
+      printf("FPGA ID (96 bits): ");
       for (index = (size / 4) - 1; index >= 0; index--)
       {
-	 printf ("%x ", read_data[index]);
+         printf("%x ", read_data[index]);
       }
-      printf ("\n\r");
+      printf("\n\r");
    }
    else
    {
-      printf ("size != length\n\r");
+      printf("size != length\n\r");
       return 0;
    }
 
-   close (fd);
+   close(fd);
 
-   printf ("Hardware ID: %x \n", read_data[0]);
+   printf("Hardware ID: %x \n", read_data[0]);
 
    return read_data[0];
 }
 
-int scope_open ()
+int scope_open()
 {
    uint8_t ch1En = 0, ch2En = 0, ch3En = 0; //-- channel is enabled for readout
    uint32_t ram1Size, ram2Size, ram3Size;
@@ -350,7 +349,7 @@ int scope_open ()
    uint32_t ram7Size, ram8Size;
    uint32_t ramPreSize, ramPostSize;
    unsigned int addr, page_addr;
-   unsigned int page_size = sysconf (_SC_PAGESIZE);
+   unsigned int page_size = sysconf(_SC_PAGESIZE);
 
    off_t PSDDR_pbase = DDR_BASE_ADDR;
    off_t RAM1_pbase = RAM1_BASE_ADDR; //-- 1KB   (RAM header)
@@ -366,190 +365,190 @@ int scope_open ()
    off_t SG_pbase = SG_BASE_ADDR; //-- 32KB
 
    if (dev != 0)
-      scope_close ();
+      scope_close();
 
-   dev = open ("/dev/mem", O_RDWR | O_SYNC);
+   dev = open("/dev/mem", O_RDWR | O_SYNC);
    if (dev == -1)
    {
-      printf ("Can't open /dev/mem.\n");
-      exit (0);
+      printf("Can't open /dev/mem.\n");
+      exit(0);
    }
-   printf ("/dev/mem opened.\n");
+   printf("/dev/mem opened.\n");
 
-   page_size = sysconf (_SC_PAGESIZE);
+   page_size = sysconf(_SC_PAGESIZE);
    /* ========================================================================================== Map TDAQ DUregs */
    addr = (unsigned int) TDAQDUregs_BASE_ADDR;
    page_addr = (addr & ~(page_size - 1));
    page_offset = addr - page_addr;
 
    axi_ptr = NULL;
-   axi_ptr = mmap (NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, dev, page_addr);
+   axi_ptr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, dev, page_addr);
    if ((long) axi_ptr == -1)
    {
-      perror ("opening scope\n");
-      exit (-1);
+      perror("opening scope\n");
+      exit(-1);
    }
    /* ========================================================================================== Map FPGA RAMs */
    // ------------------------------------------------------------- RAM header
-   vadd_ram1 = (uint32_t*) mmap (0, RAM_HEADER_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM1_pbase);
+   vadd_ram1 = (uint32_t*) mmap(0, RAM_HEADER_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM1_pbase);
    if (vadd_ram1 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM1 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM1 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM pre CH1
-   vadd_ram2 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM2_pbase);
+   vadd_ram2 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM2_pbase);
    if (vadd_ram2 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM2 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM2 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM pre CH2
-   vadd_ram3 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM3_pbase);
+   vadd_ram3 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM3_pbase);
    if (vadd_ram3 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM3 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM3 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM pre CH3
-   vadd_ram4 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM4_pbase);
+   vadd_ram4 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM4_pbase);
    if (vadd_ram4 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM4 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM4 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM post CH1
-   vadd_ram5 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM5_pbase);
+   vadd_ram5 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM5_pbase);
    if (vadd_ram5 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM5 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM5 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM post CH2
-   vadd_ram6 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM6_pbase);
+   vadd_ram6 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM6_pbase);
    if (vadd_ram6 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM6 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM6 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM post CH3
-   vadd_ram7 = (uint32_t*) mmap (0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM7_pbase);
+   vadd_ram7 = (uint32_t*) mmap(0, RAM_DATA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM7_pbase);
    if (vadd_ram7 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM7 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM7 memory to user space.\n");
+      exit(0);
    }
    // ------------------------------------------------------------- RAM pps
-   vadd_ram8 = (uint32_t*) mmap (0, RAM_HEADER_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 RAM8_pbase);
+   vadd_ram8 = (uint32_t*) mmap(0, RAM_HEADER_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                RAM8_pbase);
    if (vadd_ram8 == (uint32_t*) -1)
    {
-      printf ("Can't map the RAM8 memory to user space.\n");
-      exit (0);
+      printf("Can't map the RAM8 memory to user space.\n");
+      exit(0);
    }
    /* ========================================================================================== Map PSDDR */
-   vadd_psddr = (uint32_t*) mmap (0, DDR_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				  PSDDR_pbase);
+   vadd_psddr = (uint32_t*) mmap(0, DDR_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                 PSDDR_pbase);
    if (vadd_psddr == (uint32_t*) -1)
    {
-      printf ("Can't map the PSDDR memory to user space.\n");
-      exit (0);
+      printf("Can't map the PSDDR memory to user space.\n");
+      exit(0);
    }
    /* ========================================================================================== Map CDMA regs */
-   vadd_cdma = (uint32_t*) mmap (0, CDMA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
-				 CDMA_pbase);
+   vadd_cdma = (uint32_t*) mmap(0, CDMA_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev,
+                                CDMA_pbase);
    if (vadd_cdma == (uint32_t*) -1)
    {
-      printf ("Can't map the CDMA memory to user space.\n");
-      exit (0);
+      printf("Can't map the CDMA memory to user space.\n");
+      exit(0);
    }
    /* ========================================================================================== Map SG regs */
-   vadd_sg = (uint32_t*) mmap (0, SG_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev, SG_pbase);
+   vadd_sg = (uint32_t*) mmap(0, SG_MAP_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, dev, SG_pbase);
    if (vadd_sg == (uint32_t*) -1)
    {
-      printf ("Can't map the SG memory to user space.\n");
-      exit (0);
+      printf("Can't map the SG memory to user space.\n");
+      exit(0);
    }
 
    /* ========================================================================================== Write SG descriptors */
-   printf ("%x %llx\n", (int) vadd_sg, SG_pbase);
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR);
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_SA, RAM1_pbase);
-   dma_wr_reg (vadd_sg, SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_CONTROL, 4);
-   dma_wr_reg (vadd_sg, SG_STATUS, 0x0);
+   printf("%x %llx\n", (int) vadd_sg, SG_pbase);
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR);
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_SA, RAM1_pbase);
+   dma_wr_reg(vadd_sg, SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_CONTROL, 4);
+   dma_wr_reg(vadd_sg, SG_STATUS, 0x0);
    // -----------------------------------
    // Reset CMDA
    // -----------------------------------
-   dma_wr_bit (vadd_cdma, CDMA_CR, 2, 1);
+   dma_wr_bit(vadd_cdma, CDMA_CR, 2, 1);
    do
    {
-      resetBit = dma_rd_bit (vadd_cdma, CDMA_CR, 2);
-      short_wait ();
+      resetBit = dma_rd_bit(vadd_cdma, CDMA_CR, 2);
+      short_wait();
    }
    while (resetBit == 1);
-   printf ("DMA initialization: ");
+   printf("DMA initialization: ");
    // -----------------------------------
    // 1. Verify CDMASR.IDLE = 1
    // -----------------------------------
    do
    {
-      idleBit = dma_rd_bit (vadd_cdma, CDMA_SR, 1);
-      short_wait ();
+      idleBit = dma_rd_bit(vadd_cdma, CDMA_SR, 1);
+      short_wait();
    }
    while (idleBit == 0);
-   printf ("1 ");
+   printf("1 ");
    // -----------------------------------
    // 2. Clear CDMACR.SGMode = 0
    // -----------------------------------
-   dma_wr_bit (vadd_cdma, CDMA_CR, 3, 0);
-   printf ("2 ");
+   dma_wr_bit(vadd_cdma, CDMA_CR, 3, 0);
+   printf("2 ");
    // -----------------------------------
    // 3. Set CDMACR.SGMode = 1
    // -----------------------------------
-   dma_wr_bit (vadd_cdma, CDMA_CR, 3, 1);
-   printf ("3 ");
+   dma_wr_bit(vadd_cdma, CDMA_CR, 3, 1);
+   printf("3 ");
    // -----------------------------------
    // 4. Write CURDESC_PNTR register with first BD pointer
    // -----------------------------------
-   dma_wr_reg (vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR);
-   printf ("4 ");
+   dma_wr_reg(vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR);
+   printf("4 ");
    // -----------------------------------
    // 5. Enable interrupts in CDMACR
    // -----------------------------------
-   dma_wr_reg (vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_pps);
-   printf ("5 ");
+   dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_pps);
+   printf("5 ");
    // -----------------------------------
    // 6. Write tail descriptor pointer (start DMA transfer)
    // -----------------------------------
-   dma_wr_reg (vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR);
-   printf ("6 ");
+   dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR);
+   printf("6 ");
    // -----------------------------------
    // 7. Wait for the transfer to finish
    // -----------------------------------
    do
    {
-      IOC_Irq = dma_rd_bit (vadd_cdma, CDMA_SR, 12);
-      short_wait ();
-      errorIrq = dma_rd_bit (vadd_cdma, CDMA_SR, 14);
-      short_wait ();
+      IOC_Irq = dma_rd_bit(vadd_cdma, CDMA_SR, 12);
+      short_wait();
+      errorIrq = dma_rd_bit(vadd_cdma, CDMA_SR, 14);
+      short_wait();
    }
    while ((IOC_Irq == 0) && (errorIrq == 0));
-   printf ("7 ");
+   printf("7 ");
 
    if (errorIrq)
    {
-      dma_reset ();
+      dma_reset();
    }
    else
    {
@@ -558,31 +557,31 @@ int scope_open ()
       // -----------------------------------
       do
       {
-	 evtReady = DUreg_rd_bit (0x0050, 0);
-	 short_wait ();
-	 ppsReady = DUreg_rd_bit (0x0050, 1);
-	 short_wait ();
+         evtReady = DUreg_rd_bit(0x0050, 0);
+         short_wait();
+         ppsReady = DUreg_rd_bit(0x0050, 1);
+         short_wait();
       }
       while ((evtReady == 0) && (ppsReady == 0));
-      printf ("8 ");
+      printf("8 ");
       // -----------------------------------
       // 9. Clear the IOC interrupt bit
       // -----------------------------------
-      dma_wr_bit (vadd_cdma, CDMA_SR, 12, 1);
-      printf ("9 ... done\n");
+      dma_wr_bit(vadd_cdma, CDMA_SR, 12, 1);
+      printf("9 ... done\n");
    }
    /* ========================================================================================== Prepare SG descriptors */
    ram1Size = 584; //-- header transfer size in Bytes
-   postOverlap = 4 * DUreg_rd_excerpt (0x0010, 17, 28); //-- postOverlap transfer size per channel in Bytes
-   preOverlap = 4 * DUreg_rd_excerpt (0x0010, 5, 16); //-- preOverlap transfer size per channel in Bytes
-   Overlap = 4 * DUreg_rd_excerpt (0x0010, 0, 4); //-- Overlap transfer size per channel in Bytes
-   printf ("Windows (Bytes) %d %d %d\n", preOverlap, Overlap, postOverlap);
+   postOverlap = 4 * DUreg_rd_excerpt(0x0010, 17, 28); //-- postOverlap transfer size per channel in Bytes
+   preOverlap = 4 * DUreg_rd_excerpt(0x0010, 5, 16); //-- preOverlap transfer size per channel in Bytes
+   Overlap = 4 * DUreg_rd_excerpt(0x0010, 0, 4); //-- Overlap transfer size per channel in Bytes
+   printf("Windows (Bytes) %d %d %d\n", preOverlap, Overlap, postOverlap);
    ram8Size = 88; //-- pps transfer size in Bytes
-   if (DUreg_rd_excerpt (0x0014, 1, 4) != 0)
+   if (DUreg_rd_excerpt(0x0014, 1, 4) != 0)
       ch1En = 1; //-- channel 1 is enabled for readout
-   if (DUreg_rd_excerpt (0x0014, 6, 9) != 0)
+   if (DUreg_rd_excerpt(0x0014, 6, 9) != 0)
       ch2En = 1; //-- channel 2 is enabled for readout
-   if (DUreg_rd_excerpt (0x0014, 11, 14) != 0)
+   if (DUreg_rd_excerpt(0x0014, 11, 14) != 0)
       ch3En = 1; //-- channel 3 is enabled for readout
    ramPreSize = preOverlap + Overlap;
    ramPostSize = postOverlap;
@@ -618,172 +617,170 @@ int scope_open ()
    addr8 = addr7 + ch3En * ram7Size; //-- RAM pps
 
    eventLength = ram1Size + ch1En * (ram2Size + ram3Size) + ch2En * (ram4Size + ram5Size)
-	 + ch3En * (ram6Size + ram7Size);
-   printf ("Scope_open: Event Length =  %d\n", eventLength / 4);
+                                 + ch3En * (ram6Size + ram7Size);
+   printf("Scope_open: Event Length =  %d\n", eventLength / 4);
    ppsLength = ram8Size;
 
    //-- 0x00; 0x40; 0x80; 0xC0; 0x100; 0x140; 0x180; 0x1C0; 0x200;
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x40); //-- RAM header
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_SA, RAM1_pbase);
-   dma_wr_reg (vadd_sg, SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_CONTROL, ram1Size);
-   dma_wr_reg (vadd_sg, SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x40); //-- RAM header
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_SA, RAM1_pbase);
+   dma_wr_reg(vadd_sg, SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_CONTROL, ram1Size);
+   dma_wr_reg(vadd_sg, SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x40 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x80); //-- RAM pre ch. 1
-   dma_wr_reg (vadd_sg, 0x40 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_SA, RAM2_pbase);
-   dma_wr_reg (vadd_sg, 0x40 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x40 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_CONTROL, ram2Size);
-   dma_wr_reg (vadd_sg, 0x40 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x80); //-- RAM pre ch. 1
+   dma_wr_reg(vadd_sg, 0x40 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_SA, RAM2_pbase);
+   dma_wr_reg(vadd_sg, 0x40 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x40 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_CONTROL, ram2Size);
+   dma_wr_reg(vadd_sg, 0x40 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0xC0 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x100); //-- RAM pre ch. 2
-   dma_wr_reg (vadd_sg, 0xC0 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_SA, RAM3_pbase);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_CONTROL, ram3Size);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x100); //-- RAM pre ch. 2
+   dma_wr_reg(vadd_sg, 0xC0 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_SA, RAM3_pbase);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_CONTROL, ram3Size);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x140 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x180); //-- RAM pre ch. 3
-   dma_wr_reg (vadd_sg, 0x140 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_SA, RAM4_pbase);
-   dma_wr_reg (vadd_sg, 0x140 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x140 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_CONTROL, ram4Size);
-   dma_wr_reg (vadd_sg, 0x140 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x180); //-- RAM pre ch. 3
+   dma_wr_reg(vadd_sg, 0x140 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_SA, RAM4_pbase);
+   dma_wr_reg(vadd_sg, 0x140 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x140 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_CONTROL, ram4Size);
+   dma_wr_reg(vadd_sg, 0x140 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x80 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0xC0); //-- RAM post ch. 1
-   dma_wr_reg (vadd_sg, 0x80 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_SA, RAM5_pbase);
-   dma_wr_reg (vadd_sg, 0x80 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x80 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_CONTROL, ram5Size);
-   dma_wr_reg (vadd_sg, 0x80 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0xC0); //-- RAM post ch. 1
+   dma_wr_reg(vadd_sg, 0x80 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_SA, RAM5_pbase);
+   dma_wr_reg(vadd_sg, 0x80 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x80 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_CONTROL, ram5Size);
+   dma_wr_reg(vadd_sg, 0x80 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x100 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x140); //-- RAM post ch. 2
-   dma_wr_reg (vadd_sg, 0x100 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_SA, RAM6_pbase);
-   dma_wr_reg (vadd_sg, 0x100 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x100 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_CONTROL, ram6Size);
-   dma_wr_reg (vadd_sg, 0x100 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x140); //-- RAM post ch. 2
+   dma_wr_reg(vadd_sg, 0x100 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_SA, RAM6_pbase);
+   dma_wr_reg(vadd_sg, 0x100 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x100 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_CONTROL, ram6Size);
+   dma_wr_reg(vadd_sg, 0x100 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x180 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x1C0); //-- RAM post ch. 3
-   dma_wr_reg (vadd_sg, 0x180 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_SA, RAM7_pbase);
-   dma_wr_reg (vadd_sg, 0x180 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x180 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_CONTROL, ram7Size);
-   dma_wr_reg (vadd_sg, 0x180 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x1C0); //-- RAM post ch. 3
+   dma_wr_reg(vadd_sg, 0x180 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_SA, RAM7_pbase);
+   dma_wr_reg(vadd_sg, 0x180 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x180 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_CONTROL, ram7Size);
+   dma_wr_reg(vadd_sg, 0x180 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_NXTDESC_PNTR, SG_BASE_ADDR); //-- RAM pps
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_SA, RAM8_pbase);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_CONTROL, ram8Size);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_NXTDESC_PNTR, SG_BASE_ADDR); //-- RAM pps
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_SA, RAM8_pbase);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_CONTROL, ram8Size);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_STATUS, 0x0);
 
    ddrOffset = 0;
-   *shm_ev.next_read = 0;
-   *shm_ev.next_write = 0;
    *shm_gps.next_read = 0;
    *shm_gps.next_write = 0;
 
    return (1);
 }
 
-void scope_close ()
+void scope_close()
 {
-   printf ("scope close\n");
-   if (munmap (vadd_psddr, DDR_MAP_SIZE) == -1)
+   printf("scope close\n");
+   if (munmap(vadd_psddr, DDR_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap DDR  memory from user space.\n");
-      exit (0);
+      printf("Can't unmap DDR  memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_sg, SG_MAP_SIZE) == -1)
+   if (munmap(vadd_sg, SG_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap SG   memory from user space.\n");
-      exit (0);
+      printf("Can't unmap SG   memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_cdma, CDMA_MAP_SIZE) == -1)
+   if (munmap(vadd_cdma, CDMA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap CDMA memory from user space.\n");
-      exit (0);
+      printf("Can't unmap CDMA memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram1, RAM_HEADER_MAP_SIZE) == -1)
+   if (munmap(vadd_ram1, RAM_HEADER_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM1 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM1 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram2, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram2, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM2 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM2 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram3, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram3, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM3 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM3 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram4, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram4, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM4 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM4 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram5, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram5, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM5 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM5 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram6, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram6, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM6 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM6 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram7, RAM_DATA_MAP_SIZE) == -1)
+   if (munmap(vadd_ram7, RAM_DATA_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM7 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM7 memory from user space.\n");
+      exit(0);
    }
-   if (munmap (vadd_ram8, RAM_HEADER_MAP_SIZE) == -1)
+   if (munmap(vadd_ram8, RAM_HEADER_MAP_SIZE) == -1)
    {
-      printf ("Can't unmap RAM8 memory from user space.\n");
-      exit (0);
+      printf("Can't unmap RAM8 memory from user space.\n");
+      exit(0);
    }
-   close (dev);
+   close(dev);
    dev = 0;
 
    TFLT_delete(&G_ptflt1);
 }
 
-void scope_start_run ()
+void scope_start_run()
 {
    if (axi_ptr == NULL)
       return;
    //scope_flush();
 }
 
-void scope_stop_run ()
+void scope_stop_run()
 {
-   printf ("Scope stop run\n");
+   printf("Scope stop run\n");
    if (axi_ptr == NULL)
       return;
    //scope_flush();
 }
 
-void scope_initialize ()
+void scope_initialize()
 {
    uint8_t ch1En = 0, ch2En = 0, ch3En = 0; //-- channel is enabled for readout
    uint32_t ram1Size, ram2Size, ram3Size;
@@ -805,16 +802,16 @@ void scope_initialize ()
    //off_t SG_pbase    = SG_BASE_ADDR;       //-- 32KB
    /* ========================================================================================== Prepare SG descriptors */
    ram1Size = 584; //-- header transfer size in Bytes
-   postOverlap = 4 * DUreg_rd_excerpt (0x0010, 17, 28); //-- postOverlap transfer size per channel in Bytes
-   preOverlap = 4 * DUreg_rd_excerpt (0x0010, 5, 16); //-- preOverlap transfer size per channel in Bytes
-   Overlap = 4 * DUreg_rd_excerpt (0x0010, 0, 4); //-- Overlap transfer size per channel in Bytes
+   postOverlap = 4 * DUreg_rd_excerpt(0x0010, 17, 28); //-- postOverlap transfer size per channel in Bytes
+   preOverlap = 4 * DUreg_rd_excerpt(0x0010, 5, 16); //-- preOverlap transfer size per channel in Bytes
+   Overlap = 4 * DUreg_rd_excerpt(0x0010, 0, 4); //-- Overlap transfer size per channel in Bytes
    //printf("Windows (Bytes) %d %d %d\n",preOverlap,Overlap,postOverlap);
    ram8Size = 88; //-- pps transfer size in Bytes
-   if (DUreg_rd_excerpt (0x0014, 1, 4) != 0)
+   if (DUreg_rd_excerpt(0x0014, 1, 4) != 0)
       ch1En = 1; //-- channel 1 is enabled for readout
-   if (DUreg_rd_excerpt (0x0014, 6, 9) != 0)
+   if (DUreg_rd_excerpt(0x0014, 6, 9) != 0)
       ch2En = 1; //-- channel 2 is enabled for readout
-   if (DUreg_rd_excerpt (0x0014, 11, 14) != 0)
+   if (DUreg_rd_excerpt(0x0014, 11, 14) != 0)
       ch3En = 1; //-- channel 3 is enabled for readout
    ramPreSize = preOverlap + Overlap;
    ramPostSize = postOverlap;
@@ -850,120 +847,85 @@ void scope_initialize ()
    addr8 = addr7 + ch3En * ram7Size; //-- RAM pps
 
    eventLength = ram1Size + ch1En * (ram2Size + ram3Size) + ch2En * (ram4Size + ram5Size)
-	 + ch3En * (ram6Size + ram7Size);
+                                 + ch3En * (ram6Size + ram7Size);
    //printf("Scope_open: Event Length =  %d\n",eventLength/4);
    ppsLength = ram8Size;
 
    //-- 0x00; 0x40; 0x80; 0xC0; 0x100; 0x140; 0x180; 0x1C0; 0x200;
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x40); //-- RAM header
-   dma_wr_reg (vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_SA, RAM1_pbase);
-   dma_wr_reg (vadd_sg, SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, SG_CONTROL, ram1Size);
-   dma_wr_reg (vadd_sg, SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x40); //-- RAM header
+   dma_wr_reg(vadd_sg, SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_SA, RAM1_pbase);
+   dma_wr_reg(vadd_sg, SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, SG_CONTROL, ram1Size);
+   dma_wr_reg(vadd_sg, SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x40 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x80); //-- RAM pre ch. 1
-   dma_wr_reg (vadd_sg, 0x40 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_SA, RAM2_pbase);
-   dma_wr_reg (vadd_sg, 0x40 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x40 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x40 + SG_CONTROL, ram2Size);
-   dma_wr_reg (vadd_sg, 0x40 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x80); //-- RAM pre ch. 1
+   dma_wr_reg(vadd_sg, 0x40 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_SA, RAM2_pbase);
+   dma_wr_reg(vadd_sg, 0x40 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x40 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x40 + SG_CONTROL, ram2Size);
+   dma_wr_reg(vadd_sg, 0x40 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0xC0 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x100); //-- RAM pre ch. 2
-   dma_wr_reg (vadd_sg, 0xC0 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_SA, RAM3_pbase);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_CONTROL, ram3Size);
-   dma_wr_reg (vadd_sg, 0xC0 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x100); //-- RAM pre ch. 2
+   dma_wr_reg(vadd_sg, 0xC0 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_SA, RAM3_pbase);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_CONTROL, ram3Size);
+   dma_wr_reg(vadd_sg, 0xC0 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x140 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x180); //-- RAM pre ch. 3
-   dma_wr_reg (vadd_sg, 0x140 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_SA, RAM4_pbase);
-   dma_wr_reg (vadd_sg, 0x140 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x140 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x140 + SG_CONTROL, ram4Size);
-   dma_wr_reg (vadd_sg, 0x140 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x180); //-- RAM pre ch. 3
+   dma_wr_reg(vadd_sg, 0x140 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_SA, RAM4_pbase);
+   dma_wr_reg(vadd_sg, 0x140 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x140 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x140 + SG_CONTROL, ram4Size);
+   dma_wr_reg(vadd_sg, 0x140 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x80 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0xC0); //-- RAM post ch. 1
-   dma_wr_reg (vadd_sg, 0x80 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_SA, RAM5_pbase);
-   dma_wr_reg (vadd_sg, 0x80 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x80 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x80 + SG_CONTROL, ram5Size);
-   dma_wr_reg (vadd_sg, 0x80 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0xC0); //-- RAM post ch. 1
+   dma_wr_reg(vadd_sg, 0x80 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_SA, RAM5_pbase);
+   dma_wr_reg(vadd_sg, 0x80 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x80 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x80 + SG_CONTROL, ram5Size);
+   dma_wr_reg(vadd_sg, 0x80 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x100 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x140); //-- RAM post ch. 2
-   dma_wr_reg (vadd_sg, 0x100 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_SA, RAM6_pbase);
-   dma_wr_reg (vadd_sg, 0x100 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x100 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x100 + SG_CONTROL, ram6Size);
-   dma_wr_reg (vadd_sg, 0x100 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x140); //-- RAM post ch. 2
+   dma_wr_reg(vadd_sg, 0x100 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_SA, RAM6_pbase);
+   dma_wr_reg(vadd_sg, 0x100 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x100 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x100 + SG_CONTROL, ram6Size);
+   dma_wr_reg(vadd_sg, 0x100 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x180 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x1C0); //-- RAM post ch. 3
-   dma_wr_reg (vadd_sg, 0x180 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_SA, RAM7_pbase);
-   dma_wr_reg (vadd_sg, 0x180 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x180 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x180 + SG_CONTROL, ram7Size);
-   dma_wr_reg (vadd_sg, 0x180 + SG_STATUS, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_NXTDESC_PNTR, SG_BASE_ADDR + 0x1C0); //-- RAM post ch. 3
+   dma_wr_reg(vadd_sg, 0x180 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_SA, RAM7_pbase);
+   dma_wr_reg(vadd_sg, 0x180 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x180 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x180 + SG_CONTROL, ram7Size);
+   dma_wr_reg(vadd_sg, 0x180 + SG_STATUS, 0x0);
 
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_NXTDESC_PNTR, SG_BASE_ADDR); //-- RAM pps
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_NXTDESC_PNTR_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_SA, RAM8_pbase);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_DA, PSDDR_pbase);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_DA_MSB, 0x0);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_CONTROL, ram8Size);
-   dma_wr_reg (vadd_sg, 0x1C0 + SG_STATUS, 0x0);
-
-   /*ddrOffset = 0;
-    *shm_ev.next_read = 0;
-    *shm_ev.next_write = 0;
-    *shm_gps.next_read = 0;
-    *shm_gps.next_write = 0;*/
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_NXTDESC_PNTR, SG_BASE_ADDR); //-- RAM pps
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_NXTDESC_PNTR_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_SA, RAM8_pbase);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_SA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_DA, PSDDR_pbase);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_DA_MSB, 0x0);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_CONTROL, ram8Size);
+   dma_wr_reg(vadd_sg, 0x1C0 + SG_STATUS, 0x0);
 
    /* Init TRIGGER 2*/
    scope_create_thread_T2();
-}
-
-int scope_t2 (uint32_t *evt, float thresold)
-{
-   static float proba = -1.0;
-   float * p_float;
-
-   int nb_sample = 2*(evt[EVT_TRACELENGTH] >> 16);
-   if (nb_sample != TFLT_SAMPLE_IN_TRACE)
-   {
-	 printf ("\nTrigger ConvNet is defined for 1024 samples ONLY, no trigger T2");
-	 proba = 0.0;
-     return (1);
-   }
-
-   if (G_ptflt1 == NULL)
-   {
-      /* use multithreading of Tensorflow Lite => 2 CPUs*/
-      G_ptflt1 = TFLT_create (2);
-   }
-
-   TFLT_preprocessing (G_ptflt1, evt + EVT_START_ADC);
-   TFLT_inference (G_ptflt1, &proba);
-   p_float = (float*)(evt+EVT_OFFSET);
-   *p_float=proba;
-   printf("\nproba: %f", proba);
-   return(1);
-//   if (proba > thresold) return (1);
-//   return (0);
 }
 
 /**
@@ -971,13 +933,9 @@ int scope_t2 (uint32_t *evt, float thresold)
  *  2) Add event in ring buffer for evaluation
  *  3) Inspect event evaluated
  */
-int scope_read_event (uint32_t index)
+int scope_read_event(uint32_t index)
 {
-	static int GS_thread = 0;
-
-	/* get lock*/
-	pthread_mutex_lock (Gp_rbuftrig[0]->mutex);
-	pthread_mutex_lock (Gp_rbuftrig[1]->mutex);
+   static int S_idx_write = 0;
 
    /** temp fix for ARG */
 //struct timeval tv;
@@ -985,8 +943,8 @@ int scope_read_event (uint32_t index)
    int length;
    double fracsec;
    uint32_t CTP, CTD;
-   uint32_t *sec;
-   uint32_t *evt = &vadd_psddr[index];
+   uint32_t* sec;
+   uint32_t* evt = &vadd_psddr[index];
 
    /* Add GPS datation in event message */
    length = evt[0] >> 16;
@@ -994,7 +952,7 @@ int scope_read_event (uint32_t index)
       return (-2);
    evt[EVT_VERSION] = (evt[EVT_VERSION] & 0xffff0000) + (DUDAQ_VERSION & 0xff);
    if (hw_id == 0)
-      hw_id = hardware_id ();
+      hw_id = hardware_id();
    evt[EVT_HARDWARE_ID] = hw_id;
    //printf("Read Event; PPS = %d sec = %d CTP = %d CTD = %d Offset = %g Trigger %04x\n",
    //       evt[EVT_PPS_ID],evt[EVT_WEEKTIME],evt[EVT_CTP],evt[EVT_CTD],*(float *)&evt[EVT_OFFSET],
@@ -1015,7 +973,7 @@ int scope_read_event (uint32_t index)
       CTD &= 0x7fffffff;
       *(uint32_t*) &evt[EVT_CTD] = CTD;
    }
-   *sec = (unsigned int) timegm (&tt); //previous PPS was used
+   *sec = (unsigned int) timegm(&tt); //previous PPS was used
    if (evt[EVT_PPS_ID] > prev_ppsid)
       *sec = *sec + 1;
    //printf("scope_read_evt: Second = %d --> %u\n",tt.tm_sec,*sec);
@@ -1026,43 +984,33 @@ int scope_read_event (uint32_t index)
    evt[EVT_STATION_ID] = station_id;
 
    /* Add event in ring buffer for evaluation */
-   if (Gp_rbuftrig[GS_thread]->nb_write > 0)
+   if (Gp_rbuftrig[S_idx_write]->nb_write > 0)
    {
-	   RBE_write(Gp_rbuftrig[GS_thread], evt);
+      RBE_write(Gp_rbuftrig[S_idx_write], evt);
+      /*prendre le mutex des le debut ?*/
+      RBE_after_write(Gp_rbuftrig[S_idx_write]);
    }
    else
    {
-	   printf("\nT2 ring buffer saturated ! ");
-   }
-   /* switch thread write */
-   if (GS_thread == 0){
-	   GS_thread = 1;
-   }
-   else {
-	   GS_thread = 0;
+      printf("\nT2 ring buffer saturated ! ");
    }
 
-   /* Inspect event evaluated  */
-   if (Gp_rbuftrig[0]->nb_trig > 0)
+   /* switch thread write */
+   if (S_idx_write == 0)
    {
-	   int idx = Gp_rbuftrig[0]->inext_eval;
-	   if (Gp_rbuftrig[0]->a_prob[idx] > TRIG_THRESHOLD)
-	   {}
+      S_idx_write = 1;
    }
+   else
    {
-   shm_ev.Ubuf[*shm_ev.next_write] = index;
-   *(shm_ev.next_write) = *(shm_ev.next_write) + 1;
-   if (*shm_ev.next_write >= *shm_ev.nbuf)
-      *(shm_ev.next_write) = 0;
+      S_idx_write = 0;
    }
-   pthread_mutex_unlock (Gp_rbuftrig[0]->mutex);
-   pthread_mutex_unlock (Gp_rbuftrig[1]->mutex);
+
    return (SCOPE_EVENT); // success!
 }
 
-int32_t scope_read_pps (uint32_t index)
+int32_t scope_read_pps(uint32_t index)
 {
-   uint32_t *pps = &vadd_psddr[index];
+   uint32_t* pps = &vadd_psddr[index];
    //printf("PPS reading: %d sec = %d CTP = %d Offset = %g\n",
    //       pps[PPS_ID],pps[PPS_WEEKTIME],pps[PPS_CTP],*(float *)&pps[PPS_OFFSET]);
    prev_ppsid = pps[PPS_ID];
@@ -1074,109 +1022,49 @@ int32_t scope_read_pps (uint32_t index)
    return (SCOPE_GPS);
 }
 
-int scope_read ()
+int scope_read()
 {
-  
-  dma_initiate();
-  if(dma_completion() == -1){
-    dma_reset();
-  }else{
-    if(evtReady == 1) scope_read_event(ddrPrevOffset/4);
-    if(ppsReady == 1){
-      if(evtReady == 1) scope_read_pps((ddrPrevOffset+eventLength)/4);
-      else scope_read_pps(ddrPrevOffset/4);
-    }
-    ddrPrevOffset = ddrOffset;
-    // -----------------------------------
-    // 8. Wait for evtReady or ppsReady
-    // -----------------------------------
-    do {
-      evtReady = DUreg_rd_bit(0x0050,0);
+
+   dma_initiate();
+   if (dma_completion() == -1)
+   {
+      dma_reset();
+   }
+   else
+   {
+      if (evtReady == 1)
+         scope_read_event(ddrPrevOffset / 4);
+      if (ppsReady == 1)
+      {
+         if (evtReady == 1)
+            scope_read_pps((ddrPrevOffset + eventLength) / 4);
+         else
+            scope_read_pps(ddrPrevOffset / 4);
+      }
+      ddrPrevOffset = ddrOffset;
+      // -----------------------------------
+      // 8. Wait for evtReady or ppsReady
+      // -----------------------------------
+      do
+      {
+         evtReady = DUreg_rd_bit(0x0050, 0);
+         short_wait();
+         ppsReady = DUreg_rd_bit(0x0050, 1);
+         short_wait();
+      }
+      while ((evtReady == 0) && (ppsReady == 0));
       short_wait();
-      ppsReady = DUreg_rd_bit(0x0050,1);
+      // -----------------------------------
+      // 9. Clear the IOC interrupt bit
+      // -----------------------------------
+      dma_wr_bit(vadd_cdma, CDMA_SR, 12, 1);
       short_wait();
-    }
-    while ((evtReady == 0) && (ppsReady == 0));
-    short_wait();
-    // -----------------------------------
-    // 9. Clear the IOC interrupt bit
-    // -----------------------------------
-    dma_wr_bit(vadd_cdma, CDMA_SR, 12, 1);
-    short_wait();
-  }
-  return(0);
+   }
+   return (0);
 }
 
-int scope_calc_t3nsec ()
+int scope_calc_t3nsec()
 {
    return (1);
 }
 
-
-
-/*******************************************
- *
- *  TRIGGER T2 PART
- *
- *******************************************
- */
-
-/**
- * 2 ring buffer trigger 1, one for each processor
- */
-#define MAX_BUF_TRIG 8
-#define TRIG_THRESHOLD 0.8
-
-S_RingBufferEval *Gp_rbuftrig[2] = {NULL,NULL};
-
-
-/**
- * thread evaluation with Tensorflow Lite of 3D trace for trigger T2
- * 2 threads one by CPU CORTEX A53
- */
-pthread_t G_thread_t2[2]={0,0};
-S_TFLite *Gp_tflt[2] = {NULL,NULL};
-S_FuncEval *Gp_feev[2] = {NULL,NULL};
-
-
-/**
- * \fn void scope_create_thread_T2()
- * \brief with TensorFlow Lite trigger
- *
- */
-void scope_create_thread_T2 (void)
-{
-   int ret;
-
-   /* Create 2 ring buffer event for trigger T2 */
-   if (eventLength == 0)
-   	   {
-	      printf ("[scope_create_thread_T2] Failed, eventLength isn't set ");
-	      return(1);
-   	   }
-   Gp_rbuftrig[0] = RBE_create (eventLength, MAX_BUF_TRIG);
-   Gp_rbuftrig[1] = RBE_create (eventLength, MAX_BUF_TRIG);
-
-   /* Create 2 Tensorflow Lite inference structure */
-   Gp_tflt[0] = TFLT_create (1);
-   Gp_tflt[1] = TFLT_create (1);
-
-   /* Create 2 process of evaluation */
-   Gp_feev[0] = FEEV_create (Gp_rbuftrig[0], (void*) Gp_tflt[0]);
-   Gp_feev[1] = FEEV_create (Gp_rbuftrig[1], (void*) Gp_tflt[0]);
-
-   /* Create 2 thread */
-   ret = pthread_create (&G_thread_t2[0], NULL,FEEV_run, Gp_feev[0]);
-   if (ret != 0)
-   {
-      printf ("[scope_create_thread_T2] Failed create thread 1, ret=%d ", ret);
-      return(1);
-   }
-   ret = pthread_create (&G_thread_t2[1], NULL,FEEV_run, Gp_feev[1]);
-   if (ret != 0)
-   {
-      printf ("[scope_create_thread_T2] Failed create thread 2, ret=%d ", ret);
-      return(1);
-   }
-   return(0);
-}

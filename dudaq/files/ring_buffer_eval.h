@@ -44,6 +44,8 @@ void RBE_delete (S_RingBufferEval **pself);
 
 void RBE_write (S_RingBufferEval *self, const void *p_buf);
 
+uint16_t* RBE_get_address_buffer(S_RingBufferEval *self, uint16_t idx);
+
 void RBE_after_write (S_RingBufferEval *const self);
 
 void RBE_after_eval (S_RingBufferEval *self);

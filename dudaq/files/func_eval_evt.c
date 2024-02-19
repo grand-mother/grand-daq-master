@@ -22,9 +22,9 @@ int G_running = 1; // if 0 stop all thread
  * \param p_eval
  * \return
  */
-S_FuncEval* FEEV_create (S_RingBufferEval *p_rbe, void *p_eval)
+S_FuncEval* FEEV_create(S_RingBufferEval* p_rbe, void* p_eval)
 {
-   S_FuncEval *p_feev = (S_FuncEval*) malloc (sizeof(S_FuncEval));
+   S_FuncEval* p_feev = (S_FuncEval*) malloc(sizeof(S_FuncEval));
    p_feev->p_rbe = p_rbe;
    p_feev->p_eval = p_eval;
    return p_feev;
@@ -38,12 +38,12 @@ S_FuncEval* FEEV_create (S_RingBufferEval *p_rbe, void *p_eval)
  * \return
  */
 
-void FEEV_delete (S_FuncEval **pself)
+void FEEV_delete(S_FuncEval** pself)
 {
-   RBE_delete (&((*pself)->p_rbe));
+   RBE_delete(&((*pself)->p_rbe));
    /* p_eval must be free before */
    assert((*pself)->p_eval == NULL);
-   free (*pself);
+   free(*pself);
    *pself = NULL;
 }
 
@@ -53,11 +53,11 @@ void FEEV_delete (S_FuncEval **pself)
  *
  * \param p_data
  */
-void* FEEV_run (void *p_args)
+void* FEEV_run(void* p_args)
 {
-   S_FuncEval *self = (S_FuncEval*) p_args;
-   S_RingBufferEval *p_rbe = (S_RingBufferEval*) self->p_rbe;
-   void *p_eval = self->p_eval;
+   S_FuncEval* self = (S_FuncEval*) p_args;
+   S_RingBufferEval* p_rbe = (S_RingBufferEval*) self->p_rbe;
+   void* p_eval = self->p_eval;
 
    uint16_t idx;
 
@@ -66,20 +66,20 @@ void* FEEV_run (void *p_args)
       /* evaluation of all events without tempo between*/
       if (p_rbe->nb_eval > 0)
       {
-	 idx = p_rbe->inext_eval;
-	 printf ("\n=== %d JMC====", idx);
-	 /* eval and update ring buffer */
-	 FEEV_eval (p_eval, p_rbe->a_buffers + idx, p_rbe->a_prob + idx);
-	 RBE_after_eval (p_rbe);
+         idx = p_rbe->inext_eval*p_rbe->nb_elet_buffer;
+         printf("\n=== %d JMC====", idx);
+         /* eval and update ring buffer */
+         FEEV_eval(p_eval, p_rbe->a_buffers + idx, p_rbe->a_prob + idx);
+         RBE_after_eval(p_rbe);
       }
       else
       {
-	 /* all evaluation are done => sleep 0.1 ms */
-	 usleep (100);
-	 printf ("\nWake up !!!");
+         /* all evaluation are done => sleep 0.1 ms */
+         usleep(100);
+         printf("\nWake up !!!");
       }
    }
-   pthread_exit (NULL);
+   pthread_exit(NULL);
 }
 
 /**
@@ -87,7 +87,7 @@ void* FEEV_run (void *p_args)
  * \brief
  *
  */
-void FEEV_stop (void)
+void FEEV_stop(void)
 {
    G_running = 0;
 }
@@ -128,10 +128,10 @@ void FEEV_eval (void *p_eval, uint8_t *p_buf, float *p_prob)
  * \param p_prob
  */
 
-void FEEV_eval (void *p_eval, uint32_t *p_buf, float *p_prob)
+void FEEV_eval(void* p_eval, uint32_t* p_buf, float* p_prob)
 {
-   S_TFLite *p_tflt = (S_TFLite*) p_eval;
-   TFLT_preprocessing (p_tflt, p_buf);
-   TFLT_inference (p_tflt, p_prob);
+   S_TFLite* p_tflt = (S_TFLite*) p_eval;
+   TFLT_preprocessing(p_tflt, p_buf);
+   TFLT_inference(p_tflt, p_prob);
 }
 #endif
