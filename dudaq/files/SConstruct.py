@@ -43,7 +43,7 @@ sha_git = subprocess.getoutput(cmd)
 # => ENV = os.environ need to retrieve the path of aarch64-linux-gnu-gcc
 
 ARM64 = True
-ARM64 = False
+#ARM64 = False
 
 if ARM64:
 	CC_val = 'aarch64-linux-gnu-gcc'

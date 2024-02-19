@@ -849,6 +849,7 @@ int main (int argc, char **argv)
   
   printf ("\n====================================");
   printf ("\nExecutable dudaq, compiled %s %s", __DATE__, __TIME__);
+  printf ("\n T2 probability in EVT_OFFSET GPS");
   printf ("\n\nfrom git branch %s with sha1 %s", GIT_BRANCH, GIT_SHA1);
   printf ("\n====================================\n\n");
 

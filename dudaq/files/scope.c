@@ -59,7 +59,7 @@ uint32_t eventLength, ppsLength;
 uint32_t Overlap, preOverlap, postOverlap;
 
 S_TFLite *G_ptflt1 = NULL;
-float G_thresold=0.7;
+float G_thresold=0.0;
 
 void short_wait ()
 {
@@ -937,17 +937,14 @@ void scope_initialize ()
 int scope_t2 (uint32_t *evt, float thresold)
 {
    static float proba = -1.0;
+   float * p_float;
 
    int nb_sample = 2*(evt[EVT_TRACELENGTH] >> 16);
    if (nb_sample != TFLT_SAMPLE_IN_TRACE)
    {
-      if (proba < 0.0)
-      {
-	 /* print message only one time */
 	 printf ("\nTrigger ConvNet is defined for 1024 samples ONLY, no trigger T2");
 	 proba = 0.0;
-      }
-      return (1);
+     return (1);
    }
 
    if (G_ptflt1 == NULL)
@@ -958,8 +955,12 @@ int scope_t2 (uint32_t *evt, float thresold)
 
    TFLT_preprocessing (G_ptflt1, evt + EVT_START_ADC);
    TFLT_inference (G_ptflt1, &proba);
-   if (proba > thresold) return (1);
-   return (0);
+   p_float = (float*)(evt+EVT_OFFSET);
+   *p_float=proba;
+   printf("\nproba: %f", proba);
+   return(1);
+//   if (proba > thresold) return (1);
+//   return (0);
 }
 
 int scope_read_event (uint32_t index)
