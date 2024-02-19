@@ -10,6 +10,10 @@ import struct
 
 def float_to_hex(f):
     return hex(struct.unpack('<I', struct.pack('<f', f))[0])
+def float_to_int(f):
+    return int(struct.unpack('<I', struct.pack('<f', f))[0])
+def int_to_float(i):
+    return float(struct.unpack('<f', struct.pack('<I',i))[0])
 
 def testPulseRange(tp):
   value = app.getEntry(tp)
@@ -21,31 +25,7 @@ def testPulseRange(tp):
     app.setEntry(tp,int(value))
 
 def VerifyRanges(tp):
-#testpulse
-  value = app.getEntry("Test Pulse")
-  if value != None:
-    value = int(app.getEntry("Test Pulse"))
-    if value != 0:
-      if value  < 124: value = 124
-      divider  =  0
-      oldrate = 1000001
-      for idiv in range (1,255):
-        incr = 1
-        if (idiv > 224): incr = 128
-        elif (idiv > 192): incr = 64
-        elif (idiv > 160): incr = 32
-        elif (idiv > 128): incr = 16
-        elif (idiv > 96): incr = 8
-        elif (idiv > 64): incr = 4
-        elif (idiv > 32): incr = 2
-        divider += incr
-        newrate = int(1000000/divider)
-        if value >= newrate and value < oldrate :
-          value = newrate
-        oldrate = newrate
-  else:
-    value = 0;
-  app.setEntry("Test Pulse",int(value))
+#Hibernation Voltages
   voltl = app.getEntry("BatLow")
   if voltl == None: voltl = 5
   if voltl < 5: voltl = 5
@@ -69,89 +49,105 @@ def VerifyRanges(tp):
   # should add consistency checks for the temperature values !!!!!!!!!!
   app.setEntry("TempLow",templ)
   app.setEntry("TempHigh",temph)
-# All timings
-  Tover = app.getEntry("Tover")
-  if Tover != None:
-    Tover = int(32*int((Tover+15)/32))
-    if Tover < 64:
-      Tover = 64
-    elif Tover>32000:
-      Tover = 32000
-  else:
-    Tover = 64
-  app.setEntry("Tover",int(Tover))
   for ch in range(1,5):
-    TPre = app.getEntry("C"+str(ch)+"TPre")
-    if TPre == None:
-      TPre = 64
-    TPre = int(32*int((TPre+15)/32))
-    if TPre < 64:
-      TPre = 64
-    elif TPre>32000:
-      TPre = 32000
-    app.setEntry("C"+str(ch)+"TPre",int(TPre))
-    tsum = Tover+TPre
-    if tsum > 32704:
-      TPre = int(TPre+32704-tsum)
-      app.setEntry("C"+str(ch)+"TPre",int(TPre))
-    TPost = app.getEntry("C"+str(ch)+"TPost")
-    if TPost != None:
-      TPost = int(32*int((TPost+15)/32))
-      if TPost < 64:
-        TPost = 64
-      elif TPost>32000:
-        TPost = 32000
-    else:
-      TPost = 64
-    app.setEntry("C"+str(ch)+"TPost",int(TPost))
-    tsum = Tover+TPost+TPre
-    if tsum > 32768:
-      TPost = int(TPost+32768-tsum)
-      app.setEntry("C"+str(ch)+"TPost",int(TPost))
+    GaindB = app.getEntry("C"+str(ch)+"Gain")
+    if GaindB < -14: GaindB = -14
+    if GaindB > 23.5: GaindB = 23.5
+    app.setEntry("C"+str(ch)+"Gain",GaindB)
+#readout windows
+  pre_time =int(app.getEntry("TPre")/4)
+  if pre_time > (1<<12 - 1):
+    pre_time = (1<<12 - 1)
+  app.setEntry("TPre",int(4*pre_time))
+  post_time =int(app.getEntry("TPost")/4)
+  if post_time > (1<<12 - 1):
+    post_time = (1<<12 - 1)
+  app.setEntry("TPost",int(4*post_time))
+  overl_time =int(app.getEntry("Tover")/4)
+  if overl_time > (1<<5 - 1):
+    overl_time = (1<<5 - 1)
+  app.setEntry("Tover",int(4*overl_time))
+#trigger rate
+  internal = 0
+  rate = 0
+  boxlist = app.getOptionBox("Trigger Source")
+  for conf,tick in boxlist.items():
+    if tick == True:
+      if conf == "Internal":
+        internal = 1
+  if internal == 1:
+    if int(app.getEntry("Test Pulse")) != 0:
+      rate = int(app.getEntry("Test Pulse"))
+      if rate > 1000000:
+        rate = 1000000
+      if rate<2:
+        rate = 2
+      sample_pair = int(2.5e8/rate)>>8;
+      sp = sample_pair
+      msb = 0;
+      while sp != 0:
+        sp = int(sp/2)
+        msb = msb+1
+      if msb>3:
+        msb -=4
+      else:
+        msb = 0
+      if msb>15:
+        msb = 15
+        sample_pair = 15
+      else:
+        sample_pair = int(sample_pair)>>msb
+      if sample_pair == 0:
+        sample_pair = 1
+      sp = sample_pair<<msb
+      rate = 2.5e8/(sp<<8)
+  app.setEntry("Test Pulse",int(rate))
 # Other channel dependent parameters
-  for ch in range(1,5):
-    Intt = app.getEntry("C"+str(ch)+"Int")
-    if Intt != None:
-      if Intt < 0:
-        Intt = 0
-      elif Intt > 15:
-        Intt = 15
-    else:
-      Intt = 0
-    app.setEntry("C"+str(ch)+"Int",int(Intt))
+  for ch in range(1,4):
+    TrigT1 = int(app.getEntry("C"+str(ch)+"TrigT1"))
+    if TrigT1>(1<<12-1):
+      TrigT1 = 1<<12-1
+    app.setEntry("C"+str(ch)+"TrigT1",TrigT1)
+    TrigT2 = int(app.getEntry("C"+str(ch)+"TrigT2"))
+    if TrigT2>(1<<12-1):
+      TrigT2 = 1<<12-1
+    app.setEntry("C"+str(ch)+"TrigT2",TrigT2)
     value = app.getEntry("C"+str(ch)+"TrigTprev")
     if value != None:
+      value = int(value/4)
       if value < 0:
         value = 0
-      elif value > 1020:
-        value = 1020
+      elif value > ((1<<9)-1):
+        value = ((1<<9)-1)
     else:
       value = 0
-    app.setEntry("C"+str(ch)+"TrigTprev",int(4*int((value+3)/4)))
-    value = app.getEntry("C"+str(ch)+"TrigTcmax")
-    if value != None:
-      if value < 0:
-        value = 0
-      elif value > 1020:
-        value = 1020
-    else:
-      value = 0
-    app.setEntry("C"+str(ch)+"TrigTcmax",int(4*int((value+3)/4)))
+    app.setEntry("C"+str(ch)+"TrigTprev",int(4*value))
     value = app.getEntry("C"+str(ch)+"TrigTper")
     if value != None:
+      value = int(value/4)
       if value < 0:
         value = 0
-      elif value > 4080:
-        value = 4080
+      elif value > ((1<<9)-1):
+        value = ((1<<9)-1)
     else:
       value = 0
-    app.setEntry("C"+str(ch)+"TrigTper",int(16*int((value+7)/16)))
+    app.setEntry("C"+str(ch)+"TrigTper",int(4*value))
+    value = app.getEntry("C"+str(ch)+"TrigTcmax")
+    if value != None:
+      value = int(value/4)
+      if value < 0:
+        value = 0
+      elif value > 7:
+        value = 7
+    else:
+      value = 0
+    app.setEntry("C"+str(ch)+"TrigTcmax",int(4*value))
     value = app.getEntry("C"+str(ch)+"TrigNcmin")
     if value != None:
       if value < 0:
         value = 0
-      elif value > 255:
-        value = 255
+      elif value > 15:
+        value = 15
     else:
       value = 0
     app.setEntry("C"+str(ch)+"TrigNcmin",int(value))
@@ -160,38 +156,24 @@ def VerifyRanges(tp):
     if value != None:
       if value < vmin:
         value = vmin
-      elif value > 255:
-        value = 255
+      elif value > 31:
+        value = 31
     else:
       value = vmin
     app.setEntry("C"+str(ch)+"TrigNcmax",int(value))
-    value = app.getEntry("C"+str(ch)+"TrigQmin")
-    if value != None:
-      if value < 0:
-        value = 0
-      elif value > 255:
-        value = 255
+    Intt = app.getEntry("C"+str(ch)+"Baseline Averaging")
+    if Intt != None:
+      if Intt < 0:
+        Intt = 0
+      elif Intt > 5:
+        Intt = 5
     else:
-      value = 0
-    app.setEntry("C"+str(ch)+"TrigQmin",int(value))
-    value = app.getEntry("C"+str(ch)+"TrigQmax")
-    vmin = app.getEntry("C"+str(ch)+"TrigQmin")
-    if value != None:
-      if value < vmin:
-        value = vmin
-      elif value > 255:
-        value = 255
-    else:
-      value = vmin
-    app.setEntry("C"+str(ch)+"TrigQmax",int(value))
-    GaindB = app.getEntry("C"+str(ch)+"Gain")
-    if GaindB < -14: GaindB = -14
-    if GaindB > 23.5: GaindB = 23.5
-    app.setEntry("C"+str(ch)+"Gain",GaindB)
+      Intt = 0
+    app.setEntry("C"+str(ch)+"Baseline Averaging",int(Intt))
 
 
 def send_daq(msgid):
-    msg = array('H',[4,2,msgid,0x4541,0x4152]) # h = signed short, H = unsigned short
+    msg = array('I',[5,2,msgid,0x4541,0x4152]) # h = signed short, H = unsigned short
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         # Connect to server and send data
         sock.connect(("localhost", 5010))# start the GUI
@@ -242,81 +224,89 @@ def confbut(button):
         ticklist.append(False)
       elif words[0] == "EBRUN":
         print(words[1])
-        app.setEntry("Next Run",words[1])
+        app.setEntry("EBRUN",words[1])
       elif words[0] == "EBMODE":
         if words[1] == "0":
-          app.setOptionBox("Run Mode","Physics",True)
+          app.setOptionBox("EBMODE","Physics",True)
         else:
-          app.setOptionBox("Run Mode","Test",True)
+          app.setOptionBox("EBMODE","Test",True)
       elif words[0] == "EBSIZE":
-        app.setEntry("File Size",words[1])
+        app.setEntry("EBSIZE",words[1])
       elif words[0] == "EBDIR":
-        app.setEntry("Data Folder",words[1])
-        app.setEntryWidth("Data Folder",len(app.getEntry("Data Folder")))
+        app.setEntry("EBDIR",words[1])
+        app.setEntryWidth("EBDIR",len(app.getEntry("EBDIR")))
+      elif words[0] == "EBSITE":
+        app.setEntry("EBSITE",words[1])
+        app.setEntryWidth("EBSITE",len(app.getEntry("EBSITE")))
+      elif words[0] == "EBEXTRA":
+        app.setEntry("EBEXTRA",words[1])
+        app.setEntryWidth("EBEXTRA",len(app.getEntry("EBEXTRA")))
       elif words[0] == "T3RAND":
-        app.setEntry("Random",words[1])
+        app.setEntry("T3RAND",words[1])
       elif words[0] == "T3STAT":
-        app.setEntry("Nstat",words[1])
+        app.setEntry("T3STAT",words[1])
       elif words[0] == "T3TIME":
-        app.setEntry("Tcoin",words[1])
+        app.setEntry("T3TIME",words[1])
 #      else :
 #        print(words[0])
     fp.close()
-    app.changeOptionBox("Stations",statlist)
+    app.changeOptionBox("DUs",statlist)
     index=0
     for tick in ticklist:
-      app.setOptionBox("Stations",statlist[index],tick)
+      app.setOptionBox("DUs",statlist[index],tick)
       index +=1
   elif button == "Write DAQ Configuration file":
     fname = app.getEntry("conffile")
     print("Trying to write to "+fname)
     fp=open(fname,"w")
     fp.write("#Automatically generated from Gui\n")
-    boxlist=app.getOptionBox("Stations")
+    boxlist=app.getOptionBox("DUs")
     for stat,tick in boxlist.items():
       if tick == True:
         fp.write("DU "+stat+"\n")
       else:
         fp.write("#DU "+stat+"\n")
-    fp.write("EBRUN "+str(int(app.getEntry("Next Run")))+"\n")
-    if(app.getOptionBox("Run Mode") == "Physics"):
+    fp.write("EBRUN "+str(int(app.getEntry("EBRUN")))+"\n")
+    if(app.getOptionBox("EBMODE") == "Physics"):
       fp.write("EBMODE 0\n")
     else:
       fp.write("EBMODE 2\n")
-    fp.write("EBSIZE "+str(int(app.getEntry("File Size")))+"\n")
-    fp.write("EBDIR "+app.getEntry("Data Folder")+"\n")
-    fp.write("T3RAND "+str(int(app.getEntry("Random")))+"\n")
-    fp.write("T3STAT "+str(int(app.getEntry("Nstat")))+"\n")
-    fp.write("T3TIME "+str(int(app.getEntry("Tcoin")))+"\n")
+    fp.write("EBSIZE "+str(int(app.getEntry("EBSIZE")))+"\n")
+    fp.write("EBDIR "+app.getEntry("EBDIR")+"\n")
+    fp.write("EBSITE "+app.getEntry("EBSITE")+"\n")
+    fp.write("EBEXTRA "+app.getEntry("EBEXTRA")+"\n")
+    fp.write("T3RAND "+str(int(app.getEntry("T3RAND")))+"\n")
+    fp.write("T3STAT "+str(int(app.getEntry("T3STAT")))+"\n")
+    fp.write("T3TIME "+str(int(app.getEntry("T3TIME")))+"\n")
     fp.close();
-  elif button == "Add Station":
+  elif button == "Add DU":
     statlist=[]
     ticklist=[]
-    boxlist=app.getOptionBox("Stations")
+    boxlist=app.getOptionBox("DUs")
     for stat,tick in boxlist.items():
       statlist.append(stat)
       ticklist.append(tick)
       statlist.append(app.getEntry("IP adress")+" "+app.getEntry("Port"))
       ticklist.append(True)
-      app.changeOptionBox("Stations",statlist)
+      app.changeOptionBox("DUs",statlist)
       index=0
       for tick in ticklist:
         print(tick)
-        app.setOptionBox("Stations",statlist[index],tick)
+        app.setOptionBox("DUs",statlist[index],tick)
         index +=1
-  elif button == "Remove Station":
+  elif button == "Remove DU":
     statlist=[]
     ticklist=[]
-    boxlist=app.getOptionBox("Stations")
+    boxlist=app.getOptionBox("DUs")
     for stat,tick in boxlist.items():
       if stat != app.getEntry("IP adress")+" "+app.getEntry("Port"):
         statlist.append(stat)
         ticklist.append(tick)
-        app.changeOptionBox("Stations",statlist)
+        app.changeOptionBox("DUs",statlist)
         index=0
         for tick in ticklist:
           print(tick)
-          app.setOptionBox("Stations",statlist[index],tick)
+          app.setOptionBox("DUs",statlist[index],tick)
           index +=1
 
 def DUfile(button):
@@ -331,352 +321,286 @@ def DUfile(button):
         try:
           axi = int(words[0])
           address = int(words[1],0)
+          if address < 0x64:
+            value =int(words[2],0)
           if address == 0:
-            value =int(words[2],0)
-            if (value & 1<<0) == 0:
-              app.setOptionBox("Configuration","Enable DAQ",False)
+            vh = value>>16;
+            volth = (int(100*(vh*2.5*(18+91)/(18*4096))))/100
+            vl = value&0xffff;
+            voltl = (int(100*(vl*2.5*(18+91)/(18*4096))))/100
+            app.setEntry("BatLow",voltl)
+            app.setEntry("BatHigh",volth)
+          elif address == 4:
+            th = value>>16;
+            tl = value&0xffff;
+            temphA = (int(100*((th-819)/2.654+25)))/100
+            templA = (int(100*((tl-819)/2.654+25)))/100
+            temphN = int(100*(((2500/4096)*th-400)/19.5))/100
+            templN = int(100*(((2500/4096)*tl-400)/19.5))/100
+          elif address == 8:
+            temphG = int_to_float(value)
+          elif address == 0xc:
+            templG = int_to_float(value)
+          elif address == 0x4c:
+            temp_source = value&0x7
+          elif address == 0x54:
+            vh = value>>16
+            vl = value&0xffff
+            G1 = int(100*((2.5*37.5*(vh-0.5)/4096-14)))/100
+            G2 = int(100*((2.5*37.5*(vl-0.5)/4096-14)))/100
+            app.setEntry("C1Gain",G1)
+            app.setEntry("C2Gain",G2)
+          elif address == 0x58:
+            vh = value>>16
+            vl = value&0xffff
+            G1 = int(100*((2.5*37.5*(vh-0.5)/4096-14)))/100
+            G2 = int(100*((2.5*37.5*(vl-0.5)/4096-14)))/100
+            app.setEntry("C3Gain",G1)
+            app.setEntry("C4Gain",G2)
+          elif address == 0x10:
+            overl_time = 4*(value&0x1f)
+            pre_time = 4*((value>>5)&0xfff);
+            post_time = 4*((value>>17)&0xfff);
+            app.setEntry("TPre",pre_time)
+            app.setEntry("TPost",post_time)
+            app.setEntry("Tover",overl_time)
+          elif address == 0x14:
+            for ch in range(1,4):
+              vc = (value>>(5*(ch-1)))&0x1f;
+              if vc == 2:
+                app.setOptionBox("Channel "+str(ch),"ADC A")
+              if vc == 4:
+                app.setOptionBox("Channel "+str(ch),"ADC B")
+              if vc == 8:
+                app.setOptionBox("Channel "+str(ch),"ADC C")
+              if vc == 16:
+                app.setOptionBox("Channel "+str(ch),"ADC D")
+              if vc == 3:
+                app.setOptionBox("Channel "+str(ch),"ADC A Filtered")
+              if vc == 5:
+                app.setOptionBox("Channel "+str(ch),"ADC B Filtered")
+              if vc == 9:
+                app.setOptionBox("Channel "+str(ch),"ADC C Filtered")
+              if vc == 17:
+                app.setOptionBox("Channel "+str(ch),"ADC D Filtered")
+          elif address == 0x18:
+            if value&0x1 == 1:
+              app.setOptionBox("Trigger Source","Channel 1",True)
+            if (value>>1)&0x1 == 1:
+              app.setOptionBox("Trigger Source","Channel 2",True)
+            if (value>>2)&0x1 == 1:
+              app.setOptionBox("Trigger Source","Channel 3",True)
+            if (value>>4)&0x1 == 1:
+              app.setOptionBox("Trigger Source","Ch 1 AND Ch 2",True)
+            if (value>>5)&0x1 == 1:
+              app.setOptionBox("Trigger Source","Ch 1 AND Ch 2 AND Ch 3",True)
+            if (value>>6)&0x1 == 1:
+              app.setOptionBox("Trigger Source","Ch 1 AND Ch 2 AND NOT Ch 3",True)
+            if (value>>7)&0x1 == 1:
+              app.setOptionBox("Trigger Source","20 Hz",True)
+            if (value>>8)&0x1 == 1:
+             app.setOptionBox("Trigger Source","10 sec",True)
+            msb = (value>>9)&0xf;
+            sample_pair = (value>>13)&0xf;
+            sp = sample_pair<<msb
+            if sp != 0:
+              rate = 2.5e8/(sp<<8)
             else:
-              app.setOptionBox("Configuration","Enable DAQ",True)
-            if (value & 1<<1) == 0:
-              app.setOptionBox("Configuration","1PPS",False)
-            else:
-              app.setOptionBox("Configuration","1PPS",True)
-            if (value & 1<<7) == 0:
-              app.setOptionBox("Configuration","Fake ADC",False)
-            else:
-              app.setOptionBox("Configuration","Fake ADC",True)
-            if (value & 1<<8) == 0:
-              app.setOptionBox("Configuration","Filter 1",False)
-            else:
-              app.setOptionBox("Configuration","Filter 1",True)
-            if (value & 1<<9) == 0:
-              app.setOptionBox("Configuration","Filter 2",False)
-            else:
-              app.setOptionBox("Configuration","Filter 2",True)
-            if (value & 1<<10) == 0:
-              app.setOptionBox("Configuration","Filter 3",False)
-            else:
-              app.setOptionBox("Configuration","Filter 3",True)
-            if (value & 1<<11) == 0:
-              app.setOptionBox("Configuration","Filter 4",False)
-            else:
-              app.setOptionBox("Configuration","Filter 4",True)
-            if (value & 1<<15) == 0:
-              app.setOptionBox("Configuration","Auto reboot",False)
-            else:
-              app.setOptionBox("Configuration","Auto reboot",True)
-          if address == 2:
-            value =int(words[2],0)
-            if (value & 1<<0) == 0:
-              app.setOptionBox("Trigger","Ch 3 AND Ch 4",False)
-            else:
-              app.setOptionBox("Trigger","Ch 3 AND Ch 4",True)
-            if (value & 1<<1) == 0:
-              app.setOptionBox("Trigger","Ch 1 AND Ch 2, Ch2>Ch1",False)
-            else:
-              app.setOptionBox("Trigger","Ch 1 AND Ch 2, Ch2>Ch1",True)
-            if (value & 1<<2) == 0:
-              app.setOptionBox("Trigger","(not Ch 1) AND Ch 2",False)
-            else:
-              app.setOptionBox("Trigger","(not Ch 1) AND Ch 2",True)
-            if (value & 1<<4) == 0:
-              app.setOptionBox("Trigger","Internal",False)
-            else:
-              app.setOptionBox("Trigger","Internal",True)
-            if (value & 1<<5) == 0:
-              app.setOptionBox("Trigger","10 sec",False)
-            else:
-              app.setOptionBox("Trigger","10 sec",True)
-            if (value & 1<<6) == 0:
-              app.setOptionBox("Trigger","20 Hz",False)
-            else:
-              app.setOptionBox("Trigger","20 Hz",True)
-            if (value & 1<<7) == 0:
-              app.setOptionBox("Trigger","Ch 1 AND Ch 2",False)
-            else:
-              app.setOptionBox("Trigger","Ch 1 AND Ch 2",True)
-            if (value & 1<<8) == 0:
-              app.setOptionBox("Trigger","Channel 1",False)
-            else:
-              app.setOptionBox("Trigger","Channel 1",True)
-            if (value & 1<<9) == 0:
-              app.setOptionBox("Trigger","Channel 2",False)
-            else:
-              app.setOptionBox("Trigger","Channel 2",True)
-            if (value & 1<<10) == 0:
-              app.setOptionBox("Trigger","Channel 3",False)
-            else:
-              app.setOptionBox("Trigger","Channel 3",True)
-            if (value & 1<<11) == 0:
-              app.setOptionBox("Trigger","Channel 4",False)
-            else:
-              app.setOptionBox("Trigger","Channel 4",True)
-          if address == 4:
-            value =int(words[2],0)
-            rate = 0
-            chval  = value
-            for ch in range(1,5):
-              if (value & 1<<(ch-1)) == 0:
-                app.setOptionBox("Channel "+str(ch),"Off")
-            idivider = value >>8
-            if idivider != 0:
-              divider = 0
-              for idiv in range (1,idivider+1):
-                incr = 1
-                if (idiv > 224): incr = 128
-                elif (idiv > 192): incr = 64
-                elif (idiv > 160): incr = 32
-                elif (idiv > 128): incr = 16
-                elif (idiv > 96): incr = 8
-                elif (idiv > 64): incr = 4
-                elif (idiv > 32): incr = 2
-                divider += incr
-              rate = int(1000000/divider)
-            app.setEntry("Test Pulse",rate)
-          if address == 6:
-              app.setEntry("Tover",int(words[2],0)<<1)
-          if address == 8:
-            for ch in range(1,5):
-              value = ( int(words[2],0)>>(4*(ch-1))) & 0xf
-              app.setOptionBox("Channel "+str(ch),value+1,True)
-              if((chval != 0) and ((chval & 1<<(ch-1)) == 0)):
-                app.setOptionBox("Channel "+str(ch),"Off")
-          if address == 0xC:
-            volt = int(words[2],0)*(2.5*(18+91))/(18*4096)
-            volt = int(10*(volt+0.05))/10
-            app.setEntry("BatLow",volt)
-          if address == 0xE:
-            volt = int(words[2],0)*(2.5*(18+91))/(18*4096)
-            volt = int(10*(volt+0.05))/10
-            app.setEntry("BatHigh",volt)
-          if address == 0x10 or address == 0x14 or address == 0x18 or address == 0x1C:
-            app.setEntry("C"+str(axi-3)+"TPre",int(words[2],0)<<1)
-          if address == 0x12 or address == 0x16 or address == 0x1A or address == 0x1E:
-            app.setEntry("C"+str(axi-3)+"TPost",int(words[2],0)<<1)
-          if address == 0x20 or address == 0x2C or address == 0x38 or address == 0x44:
-            GainADC  = int(words[2],0)
-            GaindB = (GainADC*(37.5*2.5)/4096)-14
-            GaindB = int(100*(GaindB+0.005))/100
-            app.setEntry("C"+str((int)((axi-5)/3))+"Gain",GaindB)
-          if address == 0x22 or address == 0x2E or address == 0x3A or address == 0x46:
-            app.setEntry("C"+str((int)((axi-5)/3))+"Int",int(words[2],0)>>8)
-          if address == 0x24 or address == 0x30 or address == 0x3C or address == 0x48:
-            app.setEntry("C"+str((int)((axi-5)/3))+"BMax",int(words[2],0))
-          if address == 0x26 or address == 0x32 or address == 0x3E or address == 0x4A:
-            app.setEntry("C"+str((int)((axi-5)/3))+"BMin",int(words[2],0))
-          if address == 0x50 or address == 0x5C or address == 0x68 or address == 0x74:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigT1",int(words[2],0))
-          if address == 0x52 or address == 0x5E or address == 0x6A or address == 0x76:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigT2",int(words[2],0))
-          if address == 0x54 or address == 0x60 or address == 0x6C or address == 0x78:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigTper",16*(int(words[2],0)>>8))
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigTprev",4*(int(words[2],0) & 0xFF))
-          if address == 0x56 or address == 0x62 or address == 0x6E or address == 0x7A:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigNcmax",(int(words[2],0)>>8))
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigTcmax",4*(int(words[2],0) & 0xFF))
-          if address == 0x58 or address == 0x64 or address == 0x70 or address == 0x7C:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigQmax",(int(words[2],0)>>8))
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigNcmin",(int(words[2],0) & 0xFF))
-          if address == 0x5A or address == 0x66 or address == 0x72 or address == 0x7E:
-            app.setEntry("C"+str((int)((axi-17)/3))+"TrigQmin",(int(words[2],0) & 0xFF))
-          if address == 0x80 or address == 0x90 or address == 0xA0 or address == 0xB0:
-            app.setEntry("C"+str(int(axi/4-7))+"F1M",float(words[2]))
-            app.setEntry("C"+str(int(axi/4-7))+"F1W",float(words[3]))
-          if address == 0xC0 or address == 0xD0 or address == 0xE0 or address == 0xF0:
-            app.setEntry("C"+str(int(axi/4-11))+"F2M",float(words[2]))
-            app.setEntry("C"+str(int(axi/4-11))+"F2W",float(words[3]))
-          if address == 0x100 or address == 0x110 or address == 0x120 or address == 0x130:
-            app.setEntry("C"+str(int(axi/4-15))+"F3M",float(words[2]))
-            app.setEntry("C"+str(int(axi/4-15))+"F3W",float(words[3]))
-          if address == 0x140 or address == 0x150 or address == 0x160 or address == 0x170:
-            app.setEntry("C"+str(int(axi/4-19))+"F4M",float(words[2]))
-            app.setEntry("C"+str(int(axi/4-19))+"F4W",float(words[3]))
-          if address == 0x1E0:
-            app.setEntry("ExpRate",int(words[2],0))
+              rate = 0
+            app.setEntry("Test Pulse",int(rate))
+            if rate>0.5:
+              app.setOptionBox("Trigger Source","Internal",True)
+            for ch in range(1,4):
+              vc = (value>>(17+3*(ch-1)))&0x7;
+              app.setOptionBox("IIR C"+str(ch),vc)
+          for ch in range(1,4):
+            if address == int(16+12*ch):
+              app.setEntry("C"+str(ch)+"TrigT1",(value>>12)&0xfff)
+              app.setEntry("C"+str(ch)+"TrigT2",(value)&0xfff)
+            if address == int(20+12*ch):
+              app.setEntry("C"+str(ch)+"TrigNcmax",value&0x1f)
+              app.setEntry("C"+str(ch)+"TrigNcmin",(value>>5)&0xf)
+              app.setEntry("C"+str(ch)+"TrigTcmax",4*((value>>9)&0x7))
+              app.setEntry("C"+str(ch)+"TrigTper",4*((value>>12)&0x1ff))
+              app.setEntry("C"+str(ch)+"TrigTprev",4*((value>>21)&0x1ff))
+          if address == 0x5c:
+            app.setEntry("C1BMax",value&0x3ff)
+            app.setEntry("C1Baseline Averaging",(value>>10)&0x7)
+            app.setEntry("C2BMax",(value>>13)&0x3ff)
+            app.setEntry("C2Baseline Averaging",(value>>23)&0x7)
+          if address == 0x60:
+            app.setEntry("C3BMax",value&0x3ff)
+            app.setEntry("C3Baseline Averaging",(value>>10)&0x7)
+          for ch in range(1,4):
+            for flt in range(1,5):
+              if address == int(4+96*int(ch)+24*int(flt-1)):
+                app.setEntry("C"+str(ch)+"F"+str(flt)+"M",float(words[2]))
+                app.setEntry("C"+str(ch)+"F"+str(flt)+"W",float(words[3]))
         except:
           print("oops "+line)
     fp.close()
+    if temp_source == 1:
+        app.setOptionBox("Temp. Source","ADC chip")
+        app.setEntry("TempLow",templA)
+        app.setEntry("TempHigh",temphA)
+    elif temp_source  == 2:
+        app.setOptionBox("Temp. Source","GPS chip")
+        app.setEntry("TempLow",templG)
+        app.setEntry("TempHigh",temphG)
+    elif temp_source == 4:
+        app.setOptionBox("Temp. Source","Nut sensor")
+        app.setEntry("TempLow",templN)
+        app.setEntry("TempHigh",temphN)
   elif button == "Write DU Configuration file":
     VerifyRanges(button)
     fname = app.getEntry("DUconffile")
     print("Trying to write to "+fname)
     fp=open(fname,"w")
     fp.write("#Automatically generated from Gui\n")
-    boxlist = app.getOptionBox("Temp. Source")
-    iconf = 0
-    if boxlist == "ADC chip":
-      iconf = (1<<4)
-      selector = 0
-    elif boxlist == "GPS chip":
-      iconf = (1<<5)
-      selector = 1
-    elif boxlist == "Nut sensor":
-      iconf = (1<<6)
-      selector = 2
-#    fp.write("q "+hex(iconf)+"\n")
-    boxlist = app.getOptionBox("Configuration")
-#    iconf = 0
-    for conf,tick in boxlist.items():
-      if tick == True:
-        if conf == "Auto reboot":
-          iconf += (1<<15)
-        elif conf == "Filter 4":
-          iconf += (1<<11)
-        elif conf == "Filter 3":
-          iconf += (1<<10)
-        elif conf == "Filter 2":
-          iconf += (1<<9)
-        elif conf == "Filter 1":
-          iconf += (1<<8)
-        elif conf == "Fake ADC":
-          iconf += (1<<7)
-        elif conf == "1PPS":
-          iconf += (1<<1)
-        elif conf == "Enable DAQ":
-          iconf += (1<<0)
-        else:
-          print("Unknown configuration parameter\n")
-    fp.write("0 0x000 "+hex(iconf)+"\n")
-    boxlist = app.getOptionBox("Trigger")
-    iconf = 0
-    for conf,tick in boxlist.items():
-      if tick == True:
-        if conf == "Channel 4":
-          iconf += (1<<11)
-        elif conf == "Channel 3":
-          iconf += (1<<10)
-        elif conf == "Channel 2":
-          iconf += (1<<9)
-        elif conf == "Channel 1":
-          iconf += (1<<8)
-        elif conf == "Ch 1 AND Ch 2":
-          iconf += (1<<7)
-        elif conf == "20 Hz":
-          iconf += (1<<6)
-        elif conf == "10 sec":
-          iconf += (1<<5)
-        elif conf == "Internal":
-          iconf += (1<<4)
-        elif conf == "(not Ch 1) AND Ch 2":
-          iconf += (1<<2)
-        elif conf == "Ch 1 AND Ch 2, Ch2>Ch1":
-          iconf += (1<<1)
-        elif conf == "Ch 3 AND Ch 4":
-          iconf += (1<<0)
-        else:
-          print("Unknown trigger parameter\n")
-    fp.write("0 0x002 "+hex(iconf)+"\n")
-    iread=0
-    iselector = 0
-    if int(app.getEntry("Test Pulse")) != 0:
-      rate = int(app.getEntry("Test Pulse"))
-      if rate < 124: rate = 124
-      divider  =  0
-      oldrate = 1000001
-      for idiv in range (1,255):
-        incr = 1
-        if (idiv > 224): incr = 128
-        elif (idiv > 192): incr = 64
-        elif (idiv > 160): incr = 32
-        elif (idiv > 128): incr = 16
-        elif (idiv > 96): incr = 8
-        elif (idiv > 64): incr = 4
-        elif (idiv > 32): incr = 2
-        divider += incr
-        newrate = int(1000000/divider)
-        if rate >= newrate and rate < oldrate :
-          iread+=(idiv<<8)
-        oldrate = newrate
-    for ch in range(1,5):
-        if app.getOptionBox("Channel "+str(ch)) != "Off":
-          iread+=(1<<(ch-1))
-        if app.getOptionBox("Channel "+str(ch)) == "ADC 1":
-          iselector +=(0<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC 2":
-          iselector +=(1<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC 3":
-          iselector +=(2<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC 4":
-          iselector +=(3<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC Filtered 1":
-          iselector +=(4<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC Filtered 2":
-          iselector +=(5<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC Filtered 3":
-          iselector +=(6<<(4*(ch-1)))
-        elif app.getOptionBox("Channel "+str(ch)) == "ADC Filtered 4":
-          iselector +=(7<<(4*(ch-1)))
-    fp.write("1 0x004 "+hex(iread)+"\n")
-    fp.write("1 0x006 "+hex(int(app.getEntry("Tover")/2))+"\n")
-    fp.write("2 0x008 "+hex(iselector)+"\n")
+    #Hibernation Voltage ranges
+    fp.write("#Hibernation\n")
     voltl = app.getEntry("BatLow")
     volth = app.getEntry("BatHigh")
     value = int(voltl*(18*4096)/(2.5*(18+91)))
-    fp.write("3 0x00C "+hex(value)+"\n")
-    value = int(volth*(18*4096)/(2.5*(18+91)))
-    fp.write("3 0x00E "+hex(value)+"\n")
-#Digitizer windows
-    for ch in range(1,5):
-      TPre = hex(int(app.getEntry("C"+str(ch)+"TPre")/2))
-      TPost = hex(int(app.getEntry("C"+str(ch)+"TPost")/2))
-      fp.write(str(3+ch)+" "+hex(int(12+4*int(ch)))+" "+TPre+"\n")
-      fp.write(str(3+ch)+" "+hex(int(14+4*int(ch)))+" "+TPost+"\n")
-#Temperature Ranges
+    value = value+(int(volth*(18*4096)/(2.5*(18+91)))<<16)
+    fp.write("0 0x0000 "+hex(value)+"\n")
+    #Temperature Ranges and source
     templ = app.getEntry("TempLow")
     if templ == None: templ = 50
     temph = app.getEntry("TempHigh")
     if temph == None: temph = 55
-    if selector == 0:
-        value = int((temph-25)*2.654+819)
-        fp.write("10 0x028 "+hex(value)+"\n")
-        value = int((templ-25)*2.654+819)
-        fp.write("10 0x02A "+hex(value)+"\n")
-    elif selector == 2:
-        value = int((temph*19.5+400)/1000*4096/2.5)
-        fp.write("10 0x028 "+hex(value)+"\n")
-        value = int((templ*19.5+400)/1000*4096/2.5)
-        fp.write("10 0x02A "+hex(value)+"\n")
+    tsource =app.getOptionBox("Temp. Source")
+    if tsource == "Nut sensor":
+      valueh = int(((temph*19.5+400)/1000)*4096/2.5)
+      valuel = int(((templ*19.5+400)/1000)*4096/2.5)
     else:
-        value = float_to_hex(float(temph))
-        fp.write("13 0x036 "+value[0: 6]+"\n")
-        fp.write("13 0x034 0x"+value[6:10]+"\n")
-        value = float_to_hex(float(templ))
-        fp.write("16 0x042 "+value[0: 6]+"\n")
-        fp.write("16 0x040 0x"+value[6:10]+"\n")
-
-# Channel Property
-    for ch in range(1,5):
-      GaindB = app.getEntry("C"+str(ch)+"Gain")
-      Gain = hex(int((4096*(GaindB+14)/(37.5*2.5))+0.5))
-      ITim = hex(int(app.getEntry("C"+str(ch)+"Int"))<<8)
-      BMin = hex(int(app.getEntry("C"+str(ch)+"BMin")))
-      BMax = hex(int(app.getEntry("C"+str(ch)+"BMax")))
-      fp.write(str(5+3*ch)+" "+hex(int(20+12*int(ch)))+" "+Gain+"\n")
-      fp.write(str(5+3*ch)+" "+hex(int(22+12*int(ch)))+" "+ITim+"\n")
-      fp.write(str(6+3*ch)+" "+hex(int(24+12*int(ch)))+" "+BMax+"\n")
-      fp.write(str(6+3*ch)+" "+hex(int(26+12*int(ch)))+" "+BMin+"\n")
-# Channel Trigger
-    for ch in range(1,5):
-      TrigT1 = hex(int(app.getEntry("C"+str(ch)+"TrigT1")))
-      TrigT2 = hex(int(app.getEntry("C"+str(ch)+"TrigT2")))
-      TrigPP = int(app.getEntry("C"+str(ch)+"TrigTper")/16)<<8
-      TrigPP += int(app.getEntry("C"+str(ch)+"TrigTprev")/4)
-      TrigNT = int(app.getEntry("C"+str(ch)+"TrigNcmax"))<<8
-      TrigNT += int(app.getEntry("C"+str(ch)+"TrigTcmax")/4)
-      TrigQN = int(app.getEntry("C"+str(ch)+"TrigQmax"))<<8
-      TrigQN += int(app.getEntry("C"+str(ch)+"TrigNcmin"))
-      TrigQmin = hex(int(app.getEntry("C"+str(ch)+"TrigQmin")))
-      fp.write(str(17+3*ch)+" "+hex(int(68+12*int(ch)))+" "+TrigT1+"\n")
-      fp.write(str(17+3*ch)+" "+hex(int(70+12*int(ch)))+" "+TrigT2+"\n")
-      fp.write(str(18+3*ch)+" "+hex(int(72+12*int(ch)))+" "+hex(TrigPP)+"\n")
-      fp.write(str(18+3*ch)+" "+hex(int(74+12*int(ch)))+" "+hex(TrigNT)+"\n")
-      fp.write(str(19+3*ch)+" "+hex(int(76+12*int(ch)))+" "+hex(TrigQN)+"\n")
-      fp.write(str(19+3*ch)+" "+hex(int(78+12*int(ch)))+" "+TrigQmin+"\n")
+      valueh = int((temph-25)*2.654+819)
+      valuel = int((templ-25)*2.654+819)
+    fp.write("1 0x004 "+hex((valueh<<16) + valuel)+"\n")
+    valueh = float_to_int(float(temph))
+    fp.write("2 0x008 "+hex(valueh)+"\n")
+    valuel = float_to_int(float(templ))
+    fp.write("3 0x00c "+ hex(valuel)+"\n")
+    if tsource == "ADC chip":
+      fp.write("19 0x04C 0x1 \n")
+    elif tsource == "GPS chip":
+      fp.write("19 0x04C 0x2 \n")
+    elif tsource == "Nut sensor":
+      fp.write("19 0x04C 0x4 \n")
+    fp.write("#Gain\n")
+    GaindB1 = app.getEntry("C1Gain")
+    Gain1 = int((4096*(GaindB1+14)/(37.5*2.5))+0.5)
+    GaindB2 = app.getEntry("C2Gain")
+    Gain2 = int((4096*(GaindB2+14)/(37.5*2.5))+0.5)
+    fp.write("21 0x0054 "+hex(int((Gain1<<16)+Gain2))+"\n")
+    GaindB3 = app.getEntry("C3Gain")
+    Gain3 = int((4096*(GaindB3+14)/(37.5*2.5))+0.5)
+    GaindB4 = app.getEntry("C4Gain")
+    Gain4 = int((4096*(GaindB4+14)/(37.5*2.5))+0.5)
+    fp.write("22 0x0058 "+hex(int((Gain3<<16)+Gain4))+"\n")
+     # Trace Length
+    pre_time =app.getEntry("TPre")/4
+    post_time =app.getEntry("TPost")/4
+    overl_time =app.getEntry("Tover")/4
+    fp.write("#Trace Length\n")
+    fp.write("4 0x010 "+ hex(int((int(post_time)<<17)+(int(pre_time)<<5)+overl_time))+"\n")
+    #Channel Readout Source
+    fp.write("#Channel Readout Selection\n")
+    iselector = 0
+    for ch in range(1,4):
+      if app.getOptionBox("Channel "+str(ch)) == "ADC A":
+        iselector +=(2<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC B":
+        iselector +=(4<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC C":
+        iselector +=(8<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC D":
+        iselector +=(16<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC A Filtered":
+        iselector +=(3<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC B Filtered":
+        iselector +=(5<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC C Filtered":
+        iselector +=(9<<(5*(ch-1)))
+      elif app.getOptionBox("Channel "+str(ch)) == "ADC D Filtered":
+        iselector +=(17<<(5*(ch-1)))
+    fp.write("5 0x014 "+ hex(int(iselector))+"\n")
+    fp.write("#Trigger Configuration\n")
+    tselect = 0
+    internal = 0
+    boxlist = app.getOptionBox("Trigger Source")
+    for conf,tick in boxlist.items():
+      if tick == True:
+        if conf == "Channel 1":
+          tselect += 1
+        elif conf == "Channel 2":
+          tselect += (1<<1)
+        elif conf == "Channel 3":
+          tselect += (1<<2)
+        elif conf == "Ch 1 AND Ch 2":
+          tselect += (1<<4)
+        elif conf == "Ch 1 AND Ch 2 AND Ch 3":
+          tselect += (1<<5)
+        elif conf == "Ch 1 AND Ch 2 AND NOT Ch 3":
+          tselect += (1<<6)
+        elif conf == "20 Hz":
+          tselect += (1<<7)
+        elif conf == "10 sec":
+          tselect += (1<<8)
+        elif conf == "Internal":
+          internal = 1
+        else:
+          print("Unknown trigger parameter\n")
+    if internal == 1:
+      if int(app.getEntry("Test Pulse")) != 0:
+        rate = int(app.getEntry("Test Pulse"))
+        if rate > 1000000:
+          rate = 1000000
+        if rate<2:
+          rate = 2
+        sample_pair = int(2.5e8/rate)>>8;
+        sp = sample_pair
+        msb = 0;
+        while sp != 0:
+          sp = int(sp/2)
+          msb = msb+1
+        if msb>3:
+          msb -=4
+        else:
+          msb = 0
+        sample_pair = int(sample_pair)>>msb
+        if sample_pair == 0:
+          sample_pair = 1
+        print("Sample pairs = "+str(sample_pair)+" "+str(msb)+"\n");
+        tselect = tselect+(int(sample_pair)<<13)+(int(msb)<<9)
+    for ch in range(1,4):
+      conf = app.getOptionBox("IIR C"+str(ch))
+      tselect+=int(conf)<<int(17+3*(ch-1))
+    fp.write("6 0x018 "+ hex(int(tselect))+"\n")
+    for ch in range(1,4):
+      TrigT1 = int(app.getEntry("C"+str(ch)+"TrigT1"))<<12
+      TrigT1 += int(app.getEntry("C"+str(ch)+"TrigT2"))
+      fp.write(str(int(4+3*ch))+" " +hex(int(16+12*ch))+" "+ hex(int(TrigT1))+"\n")
+      TrigCh = int(app.getEntry("C"+str(ch)+"TrigNcmax"))
+      TrigCh += int(app.getEntry("C"+str(ch)+"TrigNcmin"))<<5
+      TrigCh += int(app.getEntry("C"+str(ch)+"TrigTcmax")/4)<<9
+      TrigCh += int(app.getEntry("C"+str(ch)+"TrigTper")/4)<<12
+      TrigCh += int(app.getEntry("C"+str(ch)+"TrigTprev")/4)<<21
+      fp.write(str(int(5+3*ch))+" "+hex(int(20+12*ch))+" " + hex(int(TrigCh))+"\n")
+    fp.write("#Baseline subtraction\n")
+    BMax = int(app.getEntry("C1BMax"))
+    BMax += int(app.getEntry("C1Baseline Averaging"))<<10
+    BMax += int(app.getEntry("C2BMax"))<<13
+    BMax += int(app.getEntry("C2Baseline Averaging"))<<23
+    fp.write("21 0x05C "+ hex(int(BMax))+"\n")
+    BMax = int(app.getEntry("C3BMax"))
+    BMax += int(app.getEntry("C3Baseline Averaging"))<<10
+    fp.write("22 0x060 "+ hex(int(BMax))+"\n")
+    fp.write("#Notch Filters\n")
 # Filters to be interpreted by Adaq
-    fp.write("#Filters to be interpreted by Adaq\n")
-    for flt in range(1,5):
-      for ch in range(1,5):
-        fp.write(str(12+4*ch+16*flt)+" "+hex(48+16*int(ch)+64*int(flt))+" ")
+    for ch in range(1,4):
+      for flt in range(1,5):
+        fp.write(str(1+24*ch+6*(flt-1))+" "+hex(4+96*int(ch)+24*int(flt-1))+" ")
         fp.write(str(app.getEntry("C"+str(ch)+"F"+str(flt)+"M"))+" ")
         fp.write(str(app.getEntry("C"+str(ch)+"F"+str(flt)+"W"))+"\n")
     fp.close()
@@ -709,23 +633,27 @@ fname = os.environ.get("GRANDDAQ_CONF","/")+"Adaq.conf"
 app.setEntry("conffile",fname)
 app.setEntryWidth("conffile",len(app.getEntry("conffile")))
 app.addButton("Write DAQ Configuration file",confbut)
-app.addLabelNumericEntry("Next Run")
-app.addLabelOptionBox("Run Mode",["- Mode -","Physics","Test"])
-app.setOptionBox("Run Mode","Physics",True)
-app.addLabelNumericEntry("File Size")
-app.addLabelNumericEntry("Random")
-app.addLabelNumericEntry("Nstat")
-app.addLabelNumericEntry("Tcoin")
+app.addLabelNumericEntry("EBRUN")
+app.addLabelOptionBox("EBMODE",["- Mode -","Physics","Test"])
+app.setOptionBox("EBMODE","Physics",True)
+app.addLabelNumericEntry("EBSIZE")
+app.addLabelNumericEntry("T3RAND")
+app.addLabelNumericEntry("T3STAT")
+app.addLabelNumericEntry("T3TIME")
 app.setSticky("w")
-app.addLabelEntry("Data Folder",colspan=2)
+app.addLabelEntry("EBDIR",colspan=2)
+app.setSticky("w")
+app.addLabelEntry("EBSITE",colspan=2)
+app.setSticky("w")
+app.addLabelEntry("EBEXTRA",colspan=2)
 app.setSticky("")
-app.addTickOptionBox("Stations","")
+app.addTickOptionBox("DUs","")
 row = app.getRow();
-app.addLabel("NS","Station",row,0)
+app.addLabel("NS","DU",row,0)
 app.addLabelEntry("IP adress",row,1)
 app.addLabelEntry("Port",row,2)
-app.addButton("Add Station",confbut,row,3)
-app.addButton("Remove Station",confbut,row,4)
+app.addButton("Add DU",confbut,row,3)
+app.addButton("Remove DU",confbut,row,4)
 app.stopSubWindow()
 
 #
@@ -743,13 +671,13 @@ app.addNamedButton("Verify","VerifyCP",VerifyRanges,row,3)
 app.addNamedButton("Exit","DigitalModule",app.hideSubWindow,row,4)
 app.addButton("Write DU Configuration file",DUfile)
 row = app.getRow()
-app.addLabel("Bat","Battery Voltages (off, on) V")
+app.addLabel("Bat","Hibernation Voltage Limits (V)")
 app.addNumericEntry("BatLow",row,1)
 app.setEntry("BatLow",9.0)
 app.addNumericEntry("BatHigh",row,2)
 app.setEntry("BatHigh",12.5)
 row = row+1
-app.addLabel("Temp","Temperature Limits (off, on) Celcius")
+app.addLabel("Temp","Hibernation Temperature Limits (off, on) Celcius")
 app.addNumericEntry("TempHigh",row,1)
 app.setEntry("TempHigh",58.0)
 app.addNumericEntry("TempLow",row,2)
@@ -757,73 +685,59 @@ app.setEntry("TempLow",50.0)
 app.addLabelOptionBox("Temp. Source",["ADC chip","GPS chip","Nut sensor"],row,3)
 app.setOptionBox("Temp. Source","GPS chip",True)
 row = row+1
-app.addLabel("DU","Detector Unit")
-app.addTickOptionBox("Configuration",["Auto reboot","Filter 1","Filter 2","Filter 3",
-  "Filter 4","Fake ADC","1PPS","Enable DAQ"],row,1)
-app.setOptionBox("Configuration","Auto reboot",True)
-app.setOptionBox("Configuration","1PPS",True)
-app.setOptionBox("Configuration","Enable DAQ",True)
-app.addTickOptionBox("Trigger",["Channel 1","Channel 2","Channel 3","Channel 4",
-  "Ch 1 AND Ch 2","(not Ch 1) AND Ch 2","Ch 1 AND Ch 2, Ch2>Ch1",
-  "Ch 3 AND Ch 4","20 Hz","10 sec","Internal"],row,2)
-app.setOptionBox("Trigger","Channel 1",True)
-app.setOptionBox("Trigger","Channel 2",True)
-app.setOptionBox("Trigger","10 sec",True)
+app.addLabel("Gain","Additional Gain (A-D) [-14, 23.5] (dB)",row,0)
+for ch in range(1,5):
+  app.addNumericEntry("C"+str(ch)+"Gain",row,ch)
+  app.setEntry("C"+str(ch)+"Gain",0)
 row = row+1
-app.addLabel("TP","Internal Trigger Rate [1000000, 124] Hz",row,0)
-app.addNumericEntry("Test Pulse",row,1)
-app.setEntry("Test Pulse",0)
-row = row+1
-app.addLabel("To","Trigger Overlap Time (ns)",row,0)
-app.addNumericEntry("Tover",row,1)
+app.addLabel("To","Readout Windows Pre, Post, Overlap (ns)",row,0)
+app.addNumericEntry("TPre",row,1)
+app.setEntry("TPre",960)
+app.addNumericEntry("TPost",row,2)
+app.setEntry("TPost",1024)
+app.addNumericEntry("Tover",row,3)
 app.setEntry("Tover",64)
 row = row+1
-app.addHorizontalSeparator(row,0,4,colour="red")
-row = row+1
-row_Input,row_Pre,row_Post,row_Gain,row_Int,row_Min,row_Max=1,2,3,4,5,6,7
-trig_T1,trig_T2,trig_Tprev,trig_Tper,trig_Tcmax,trig_Ncmin,trig_Ncmax,trig_Qmin,trig_Qmax=8,9,10,11,12,13,14,15,16
+app.addLabel("TC","Trigger Configuration",row,0)
+app.addTickOptionBox("Trigger Source",["Channel 1","Channel 2","Channel 3",
+  "Ch 1 AND Ch 2","Ch 1 AND Ch 2 AND Ch 3","Ch 1 AND Ch 2 AND NOT Ch 3", "20 Hz","10 sec","Internal"],row,1)
+app.setOptionBox("Trigger Source","Channel 1",True)
+app.setOptionBox("Trigger Source","Channel 2",True)
+app.setOptionBox("Trigger Source","10 sec",True)
+app.addLabel("TP","Internal Trigger Rate [2,1000000] Hz",row,2)
+app.addNumericEntry("Test Pulse",row,3)
+app.setEntry("Test Pulse",0)
+row=row+1
+#app.addHorizontalSeparator(row,0,4,colour="red")
+#row = row+1
+crs,filt_g,trig_T1,trig_T2,trig_Tprev,trig_Tper,trig_Tcmax,trig_Ncmin,trig_Ncmax,row_Int,row_Max=1,2,3,4,5,6,7,8,9,10,11
 filt1=17
-app.addLabel("Inp","Input",row+row_Input,0)
-app.addLabel("Tpre","Pre Trigger (ns)",row+row_Pre,0)
-app.addLabel("Tpost","Post Trigger (ns)",row+row_Post,0)
-app.addLabel("Gain","Additional Gain [-14, 23.5] (dB)",row+row_Gain,0)
-app.addLabel("Tint","Integration time",row+row_Int,0)
-app.addLabel("Bmin","Min. Baseline (ADC)",row+row_Min,0)
+app.addLabel("CRS","Channel Readout Source",row+crs,0)
+app.addLabel("IIR","Number of IIR Filters",row+filt_g,0)
+app.addLabel("TrigT1","T1 Threshold (ADC)",row+trig_T1,0)
+app.addLabel("TrigT2","T2 Threshold (ADC)",row+trig_T2,0)
+app.addLabel("TrigTrev","Quiet Time before T1 threshold (ns)",row+trig_Tprev,0)
+app.addLabel("TrigTper","Time after T1 threshold (ns)",row+trig_Tper,0)
+app.addLabel("TrigTcmax","Max Time between T2 threshold crossings (ns)",row+trig_Tcmax,0)
+app.addLabel("TrigNcmin","Min number of T2 threshold crossings",row+trig_Ncmin,0)
+app.addLabel("TrigNcmax","Max number of T2 threshold crossings",row+trig_Ncmax,0)
+app.addLabel("Tint","Baseline Integration time (2^x samples)",row+row_Int,0)
 app.addLabel("Bmax","Max. Baseline (ADC)",row+row_Max,0)
-app.addLabel("TrigT1","Signal Threshold (ADC)",row+trig_T1,0)
-app.addLabel("TrigT2","Noise Threshold (ADC)",row+trig_T2,0)
-app.addLabel("TrigTper","Time after Sig threshold (ns)",row+trig_Tper,0)
-app.addLabel("TrigTrev","Quiet Time before Sig threshold (ns)",row+trig_Tprev,0)
-app.addLabel("TrigTcmax","Max Time between threshold crossings (ns)",row+trig_Tcmax,0)
-app.addLabel("TrigNcmin","Min number of threshold crossings",row+trig_Ncmin,0)
-app.addLabel("TrigNcmax","Max number of threshold crossings",row+trig_Ncmax,0)
-app.addLabel("TrigQmin","Min charge",row+trig_Qmin,0)
-app.addLabel("TrigQmax","Max charge",row+trig_Qmax,0)
 for flt in range(1,5):
   app.addLabel("Filt"+str(flt),"IIR Notch filter"+str(flt),row+filt1+3*flt,0)
-  app.addLabel("F"+str(flt)+"Mean","\t Mean (MHz)",row+filt1+1+3*flt,0)
-  app.addLabel("F"+str(flt)+"Width","\t Width 1=small, 0=infinite",row+filt1+2+3*flt,0)
-for ch in range(1,5):
-  app.addLabel("C"+str(ch),"Channel "+str(ch),row,ch)
+  app.addLabel("F"+str(flt)+"Mean","\t Mean Frequency (MHz)",row+filt1+1+3*flt,0)
+  app.addLabel("F"+str(flt)+"Width","\t Pole Radius 1=small, 0=infinite",row+filt1+2+3*flt,0)
+for ch in range(1,4):
   app.addOptionBox("Channel "+str(ch),
-  ["Off","ADC 1","ADC 2", "ADC 3", "ADC 4", "ADC Filtered 1","ADC Filtered 2","ADC Filtered 3","ADC Filtered 4"],row+row_Input,ch)
-  app.setOptionBox("Channel "+str(ch),"ADC "+str(ch))
-  app.addNumericEntry("C"+str(ch)+"TPre",row+row_Pre,ch)
-  app.setEntry("C"+str(ch)+"TPre",1024)
-  app.addNumericEntry("C"+str(ch)+"TPost",row+row_Post,ch)
-  app.setEntry("C"+str(ch)+"TPost",960)
-  app.addNumericEntry("C"+str(ch)+"Gain",row+row_Gain,ch)
-  app.setEntry("C"+str(ch)+"Gain",0)
-  app.addNumericEntry("C"+str(ch)+"Int",row+row_Int,ch)
-  app.setEntry("C"+str(ch)+"Int",5)
-  app.addNumericEntry("C"+str(ch)+"BMin",row+row_Min,ch)
-  app.setEntry("C"+str(ch)+"BMin",6144)
-  app.addNumericEntry("C"+str(ch)+"BMax",row+row_Max,ch)
-  app.setEntry("C"+str(ch)+"BMax",10240)
+  ["Off","ADC A","ADC B", "ADC C", "ADC D", "ADC A Filtered","ADC B Filtered","ADC C Filtered","ADC D Filtered"],row+crs,ch)
+  app.setOptionBox("Channel "+str(ch),"ADC "+chr(64+ch))
+  app.addOptionBox("IIR C"+str(ch),["0","1","2","3","4"],row+filt_g,ch)
+  app.setOptionBox("IIR C"+str(ch),"0")
   app.addNumericEntry("C"+str(ch)+"TrigT1",row+trig_T1,ch)
   app.setEntry("C"+str(ch)+"TrigT1",100)
   app.addNumericEntry("C"+str(ch)+"TrigT2",row+trig_T2,ch)
   app.setEntry("C"+str(ch)+"TrigT2",50)
+  app.addLabel("C"+str(ch),"Channel "+str(ch),row,ch)
   app.addNumericEntry("C"+str(ch)+"TrigTper",row+trig_Tper,ch)
   app.setEntry("C"+str(ch)+"TrigTper",512)
   app.addNumericEntry("C"+str(ch)+"TrigTprev",row+trig_Tprev,ch)
@@ -834,10 +748,10 @@ for ch in range(1,5):
   app.setEntry("C"+str(ch)+"TrigNcmin",0)
   app.addNumericEntry("C"+str(ch)+"TrigNcmax",row+trig_Ncmax,ch)
   app.setEntry("C"+str(ch)+"TrigNcmax",10)
-  app.addNumericEntry("C"+str(ch)+"TrigQmin",row+trig_Qmin,ch)
-  app.setEntry("C"+str(ch)+"TrigQmin",0)
-  app.addNumericEntry("C"+str(ch)+"TrigQmax",row+trig_Qmax,ch)
-  app.setEntry("C"+str(ch)+"TrigQmax",255)
+  app.addNumericEntry("C"+str(ch)+"Baseline Averaging",row+row_Int,ch)
+  app.setEntry("C"+str(ch)+"Baseline Averaging",5)
+  app.addNumericEntry("C"+str(ch)+"BMax",row+row_Max,ch)
+  app.setEntry("C"+str(ch)+"BMax",512)
   for flt in range(1,5):
     app.addNumericEntry("C"+str(ch)+"F"+str(flt)+"M",row+filt1+1+3*flt,ch)
     app.setEntry("C"+str(ch)+"F"+str(flt)+"M",85+5*flt)
