@@ -72,6 +72,8 @@ int grand_read_event(FILE *fp)
 
 int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
 {
+  int Firmware = (du[EVT_VERSION]>>16)&0xff;
+  Firmware = 3;
   //step 0: do we read out this channel
   if(((du[EVT_INP_SELECT]>>5*ich)&0x1e) == 0) return(-1);
   //Step 1: Get Trigger parameters for this channel
@@ -81,6 +83,7 @@ int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
   int QuietPost = 2*((du[EVT_TRIG_C1+2*ich]>>12)&0x1ff); //samples
   int T2Time = 2*((du[EVT_TRIG_C1+2*ich]>>9)&0x7); //samples
   int T2Min =(du[EVT_TRIG_C1+2*ich]>>5)&0xf;
+  if(Firmware == 2) T2Min = 0;
   int T2Max =du[EVT_TRIG_C1+2*ich]&0x1f;
   int BLMaxValue = 0;
   int BLSamples=0;
@@ -106,7 +109,10 @@ int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
     }
   }
   short *trace = (short *)malloc(2*2*(du[EVT_TRACELENGTH]>>16));
-  short *wl = (short *)malloc(4*2*(du[EVT_TRACELENGTH]>>16)); //wavelet
+  short *wl = NULL;
+  int nwl = 1;
+  if(Firmware == 2)nwl = 2;
+  wl = (short *)malloc(2*nwl*2*(du[EVT_TRACELENGTH]>>16)); //wavelet
   short *bl = (short *)malloc(2*BLSamples); //baseline
   int BLSum = 0;
   int BLptr = 0;
@@ -137,24 +143,33 @@ int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
     trace[2*i+1] -= BLavg;
   }
   int TRlength =2*(du[EVT_TRACELENGTH]>>16);
-  for(int i=0;i<TRlength;i+=2){
-    wl[i] = (trace[i]+trace[i+1])/2;
-    wl[i+1] = -((trace[i]+trace[i+1])/2); //wrong, should be A-B
-  }
-  for(int i=1;i<(TRlength-1);i+=2){
-    wl[TRlength+i] = (trace[i]+trace[i+1])/2;
-    wl[TRlength+i+1] = -((trace[i]+trace[i+1])/2); //wrong, should be A-B
+  if(Firmware == 2){
+    for(int i=0;i<TRlength;i+=2){
+      wl[i] = (trace[i]+trace[i+1])>>1;
+      wl[i+1] = -((trace[i]+trace[i+1])>>1); //wrong, should be A-B
+    }
+    for(int i=1;i<(TRlength-1);i+=2){
+      wl[TRlength+i] = (trace[i]+trace[i+1])>>1;
+      wl[TRlength+i+1] = -((trace[i]+trace[i+1])>>1); //wrong, should be A-B
+    }
+  }else{
+    wl[0] = 0;
+    for(int i=1;i<TRlength;i+=1){
+      wl[i] = (trace[i-1]-trace[i])>>1;
+      if(wl[i]<0) wl[i] = -wl[i];
+    }
   }
   if(iprint){
     for(int i=0;i<TRlength;i++){
-      printf("%d\t%d\t%d\t%d\n",i,trace[i],wl[i],wl[TRlength+i]);
+      if(Firmware == 2) printf("%d\t%d\t%d\t%d\n",i,trace[i],wl[i],wl[TRlength+i]);
+      else printf("%d\t%d\t%d\n",i,trace[i],wl[i]);
     }
   }
   int Triggered[2] = {0,0};
   int TriggerPosition[2]={0,0};
   int ExpectedPosition =(du[EVT_TRIGGER_POS]>>16);
   int ExpectedT1 =ExpectedPosition-QuietPost;
-  for(int iwl = 0;iwl<2;iwl++){
+  for(int iwl = 0;iwl<nwl;iwl++){
     int T1position = -1;
     int T1passed = 0;
     int Plength=0;
@@ -165,11 +180,16 @@ int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
       if(i==ExpectedT1+10)Thres1 +=3;//account for bit rounding
       if(T1passed){
         Plength++;
-        if(wl[i+iwl*TRlength]>Thres2&&wl[i+iwl*TRlength]<Thres1){
+        int isT2 = 0;
+        if(Firmware == 2){
+          if(wl[i+iwl*TRlength]>Thres2 &&wl[i+iwl*TRlength]<Thres1) isT2 = 1;
+        }else
+          if(wl[i+iwl*TRlength]>Thres2) isT2 = 1;
+        if(isT2 == 1){
           if(T2prev>0 && (i-T2prev)>T2Time) Triggered[iwl] = -1;
           T2prev = i;
           NT2++;
-          if(NT2>T2Max) Triggered[iwl] = -2;
+          if(NT2>T2Max || NT2<T2Min) Triggered[iwl] = -2;
           if(iprint) printf("T2 crossing %d %d (%d %d %d)\n",i,wl[i+iwl*TRlength],Thres2,T2Time,QuietPost);
         }
         if(Plength == QuietPost){
@@ -202,8 +222,10 @@ int check_trigger(int ich,uint32_t* du,int iprint) //ich from 0 to 2
   free(wl);
   free(bl);
   int iwl = 0;
-  if((ExpectedPosition&1) &&Triggered[1] == 1 ) iwl = 1;
-  if(Triggered[0] != 1) iwl = 1;
+  if(Firmware == 2){
+    if((ExpectedPosition&1) &&Triggered[1] == 1 ) iwl = 1;
+    if(Triggered[0] != 1) iwl = 1;
+  }
   return(Triggered[iwl]*TriggerPosition[iwl]);
 }
 
@@ -216,7 +238,6 @@ void analyze_du(uint32_t *du)
       ipos = check_trigger(ich,du,0);
       if(ipos > 0) printf("\t Channel %d %d --> %d",ich+1,ipos,(du[EVT_TRIGGER_POS]>>16)-ipos);
       else if((du[EVT_TRIGGER_STAT]&0xffff)&(1<<ich)) check_trigger(ich,du,1);
-      //if(du[EVT_EVT_ID]==6037)check_trigger(ich,du,1);
     }
   }
   printf("\n");

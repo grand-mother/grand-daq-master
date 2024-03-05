@@ -16,10 +16,10 @@
 #define EVENT_HDR_FIRST_DU        4
 #define EVENT_HDR_EVENT_SEC       5
 #define EVENT_HDR_EVENT_NSEC      6
-#define EVENT_HDR_EVENT_TYPE      7
-#define EVENT_HDR_EVENT_VERS      8
-#define EVENT_HDR_NDU             9 //start of additional info to be defined
-#define EVENT_HDR_AD1            10 //                    info to be defined
+#define EVENT_HDR_EVENT_TYPE_VERS 7
+#define EVENT_HDR_NDU             8
+#define EVENT_HDR_AD1             9 //                    info to be defined
+#define EVENT_HDR_AD2            10 //                    info to be defined
 #define EVENT_DU                  11
 
 #define EVT_HDR_LENGTH    146

@@ -216,7 +216,7 @@ void eb_gett3(){
       msg = (AMSG *)(&(shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_readb)+1]));
       T3info = (T3BODY *)(&(msg->body[0])); //set the T3 info pointer
       n_t3_du = (msg->length-3)/T3STATIONSIZE; // msg == length+tag+eventnr+T3stations
-      //printf("EB: T3 event = %d; NDU = %d \n",T3info->event_nr,n_t3_du);
+      printf("EB: T3 event = %d; NDU = %d \n",T3info->event_nr,n_t3_du);
       shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_readb)] &= ~2;
     }
     *shm_t3.next_readb = (*shm_t3.next_readb) + 1;
