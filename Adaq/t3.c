@@ -210,9 +210,9 @@ void t3_maket3()
   int tdif,insertdif;
   int isten,israndom,nstat;
   int usedstat[MAXDU];
-  int is1,is2;
+  int nradio;
+  int is1,used_du;
   int ntry;
-  int nscint,nradio,nwait;
   T3STATION *t3stat;
   int evsize,evnear;
   int eventindex[MAXDU];
@@ -235,6 +235,8 @@ void t3_maket3()
     //check if there are any coincidences
     eventindex[0] = ind;
     evsize = 1;
+    usedstat[0] = t2evts[ind].stat;
+    nradio = 1;
     //evnear = 0;
     if(t2evts[ind].trigflag&0x4) isten = 1;
     else isten = 0;
@@ -250,21 +252,17 @@ void t3_maket3()
         tdif = t2evts[i].nsec-t2evts[ind].nsec;
       }
       if(tdif<0) tdif = t3_time+1;
-      /*if(tdif <= ctimes[t2evts[i].unit][t2evts[ind].unit]) { // later when we have a field
-       if ((isten && (t2evts[i].trigflag&0x4)) || (isten==0 &&(t2evts[i].trigflag&0x4))==0){
-       eventindex[evsize] = i;
-       evsize++;
-       if(evsize>=MAXDU) {
-       printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
-       evsize = MAXDU-1;
-       }
-       if((ctimes[t2evts[i].unit][t2evts[ind].unit]<=TNEAR)
-       &&(t2evts[i].unit != t2evts[ind].unit)) evnear++;
-       }
-       } else if(tdif>TCOINC) break;*/
       if(tdif<=t3_time) {
         eventindex[evsize] = i;
         evsize++;
+        used_du = 0;
+        for(is1 = 0;is1<nradio;is1++){
+          if(usedstat[is1] == t2evts[i].stat) used_du = 1;
+        }
+        if(used_du == 0){
+          usedstat[nradio] = t2evts[i].stat;
+          nradio++;
+        }
         if(evsize>=MAXDU) {
           printf("Too many DUs in an event, loosing data %d %d %d (%d %d) %d %d\n",isten,evsize,MAXDU,tdif,ctimes[t2evts[i].unit][t2evts[ind].unit],i,ind);
           evsize = MAXDU-1;
@@ -274,7 +272,7 @@ void t3_maket3()
     }
     // trigger condition is easy
     //if((evsize>=NTRIG &&evnear>=NNEAR) || isten == 1 || israndom == 1) {
-    if(evsize>=t3_stat || isten == 1 || israndom == 1) {
+    if((evsize>=t3_stat && nradio >=t3_stat) || isten == 1 || israndom == 1) {
       //if(isten == 1) printf("Found a Minbias with %d stations T=%u\n",evsize,t2evts[ind].sec);
       //start creating the list to send
       t3list[0] = 3; // length before adding a station

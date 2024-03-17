@@ -43,7 +43,7 @@ def VerifyRanges(tp):
   if templ == None: templ = 50.0
   temph = app.getEntry("TempHigh")
   if temph == None: temph = 58.0
-  if temph > 65: temph = 65
+  if temph > 85: temph = 85
   if templ < 45: templ = 45
   if templ > (temph -2): templ = temph-2
   # should add consistency checks for the temperature values !!!!!!!!!!
