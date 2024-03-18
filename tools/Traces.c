@@ -92,6 +92,7 @@ int grand_read_event(FILE *fp)
   event[0] = isize;
   if((return_code = fread(&(event[1]),1,isize,fp)) !=(isize)) {
     printf("Cannot read the full event (%d)\n",return_code);
+    if(feof(fp)) return(1);
     return(0);                                                       //cannot read the full event
   }
   return(1);

@@ -12,7 +12,7 @@ Altering the code without explicit consent of the author is forbidden
 #include <arpa/inet.h>
 #include "ad_shm.h"
 
-#define ADAQ_VERSION 2
+#define ADAQ_VERSION 3
 #define MAXDU 3 //max number of Detector Units
 #define ERROR -1
 #define NORMAL 1

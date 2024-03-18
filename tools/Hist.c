@@ -27,6 +27,7 @@ unsigned int *event=NULL;
 float *ttrace,*fmag,*fphase;
 int fftlen = 0;
 TH1F *hstep,*hfftstep;
+TH1F *hwl[100][3];
 TProfile *HFsum[100][3]; // One for each arm
 TProfile *HBattery[100];
 TProfile2D *HFTime[100][3];
@@ -111,6 +112,7 @@ int grand_read_event(FILE *fp)
   event[0] = isize;
   if((return_code = fread(&(event[1]),1,isize,fp)) !=(isize)) {
     printf("Cannot read the full event (%d)\n",return_code);
+    if(feof(fp)) return(1);
     return(0);                                                       //cannot read the full event
   }
   return(1);
@@ -127,6 +129,7 @@ void print_du(uint32_t *du)
   char hname[100],fname[100];
   static int zeroday= -1;
   float fvalue;
+  int wl;
 #define DTFMIN 50
 #define DTFMAX 110
 #define NDTFREQ 480
@@ -180,6 +183,9 @@ void print_du(uint32_t *du)
       snprintf(fname,100,"HSFTime%d_%d",DU_id[idu],ich);
       snprintf(hname,100,"HSFTime%d_%d",DU_id[idu],ich);
       HFTime[idu][ich] = new TProfile2D(fname,hname,(du[EVT_TRACELENGTH]>>16),0.-f_off,250-f_off,120*NDAY,0.,24.*NDAY);
+      snprintf(fname,100,"HW%d_%d",DU_id[idu],ich);
+      snprintf(hname,100,"Wavelet %d %d",DU_id[idu],ich);
+      hwl[idu][ich] = new TH1F(fname,hname,8193,-0.5,8192.5);
     }
     snprintf(fname,100,"HB%d",DU_id[idu]);
     snprintf(hname,100,"HB%d",DU_id[idu]);
@@ -209,6 +215,11 @@ void print_du(uint32_t *du)
       }
       ht->Write();
       ht->Delete();
+      for(int i=1;i<2*(du[EVT_TRACELENGTH]>>16);i++){
+        wl = (ttrace[i-1]-ttrace[i])/2;
+        if(wl < 0) wl = - wl;
+        hwl[idu][ich]->Fill(wl);
+      }
       mag_and_phase(ttrace,fmag,fphase);
       for(i=0;i<fftlen/2;i++){
         HFsum[0][ich]->Fill(500.*(i)/fftlen,fmag[i]);
@@ -255,7 +266,8 @@ int main(int argc, char **argv)
   if (fp != NULL) fclose(fp); // close the file
   for(ib=0;ib<n_DU;ib++){
     if(HBattery[ib]!=NULL) HBattery[ib]->Write();
-    for(ich = 0;ich<4;ich++){
+    for(ich = 0;ich<3;ich++){
+      if(hwl[ib][ich]!= NULL) hwl[ib][ich]->Write();
       if(HFsum[ib][ich]!= NULL) HFsum[ib][ich]->Write();
       if(HFTime[ib][ich]!= NULL) HFTime[ib][ich]->Write();
     }
