@@ -57,34 +57,34 @@ void eb_open(EVHDR *evhdr)
   gettimeofday(&tp,&tzp);
   printf("Trying to open eventfiles: %s %s %s\n",eb_dir,eb_site,eb_extra);
   gtime = gmtime((const time_t *)&tp);
-  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_CD_%s",eb_dir,eb_site,gtime->tm_year+1900,
-          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d%02d_RUN%06d_CD_%s.bin",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,gtime->tm_sec,
           eb_run,eb_extra);
   printf("!!%s!!\n",fname);
   fpout = fopen(fname,"r");
   while(fpout != NULL){
     eb_run +=1;
-    sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_CD_%s",eb_dir,eb_site,gtime->tm_year+1900,
-            gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+    sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d%02d_RUN%06d_CD_%s.bin",eb_dir,eb_site,gtime->tm_year+1900,
+            gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,gtime->tm_sec,
             eb_run,eb_extra);
     fpout = fopen(fname,"r");
   }
   printf("File = %s\n",fname);
   fpout = fopen(fname,"w");
-  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_MD_%s",eb_dir,eb_site,gtime->tm_year+1900,
-          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d%02d_RUN%06d_MD_%s.bin",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,gtime->tm_sec,
           eb_run,eb_extra);
   fpten = fopen(fname,"w");
-  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_UD_%s",eb_dir,eb_site,gtime->tm_year+1900,
-          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+  sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d%02d_RUN%06d_UD_%s.bin",eb_dir,eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,gtime->tm_sec,
           eb_run,eb_extra);
   fpmb = fopen(fname,"w");
   //sprintf(fname,"%s/%s_%4d%02d%02d_%02d%02d_%06d_MN_%s",eb_dir,eb_site,gtime->tm_year+1900,
   //        gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
   //        eb_run,eb_extra);
   // next write file header
-  sprintf(fname,"%s_%4d%02d%02d_%02d%02d_%06d_XX_%s",eb_site,gtime->tm_year+1900,
-          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,
+  sprintf(fname,"%s_%4d%02d%02d_%02d%02d%02d_RUN%06d_XX_%s.bin",eb_site,gtime->tm_year+1900,
+          gtime->tm_mon+1,gtime->tm_mday,gtime->tm_hour,gtime->tm_min,gtime->tm_sec,
           eb_run,eb_extra);
 
   eb_fhdr.length = sizeof(FILEHDR)-sizeof(int32_t);

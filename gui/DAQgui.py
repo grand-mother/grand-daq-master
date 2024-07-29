@@ -325,18 +325,18 @@ def DUfile(button):
             value =int(words[2],0)
           if address == 0:
             vh = value>>16;
-            volth = (int(100*(vh*2.5*(18+91)/(18*4096))))/100
+            volth = round(((vh*2.5*(18+91)/(18*4096))),1)
             vl = value&0xffff;
-            voltl = (int(100*(vl*2.5*(18+91)/(18*4096))))/100
+            voltl = round(((vl*2.5*(18+91)/(18*4096))),1)
             app.setEntry("BatLow",voltl)
             app.setEntry("BatHigh",volth)
           elif address == 4:
             th = value>>16;
             tl = value&0xffff;
-            temphA = (int(100*((th-819)/2.654+25)))/100
-            templA = (int(100*((tl-819)/2.654+25)))/100
-            temphN = int(100*(((2500/4096)*th-400)/19.5))/100
-            templN = int(100*(((2500/4096)*tl-400)/19.5))/100
+            temphA = round(((th-819)/2.654+25),1)
+            templA = round((((tl-819)/2.654+25)),1)
+            temphN = round((((2500/4096)*th-400)/19.5),1)
+            templN = round((((2500/4096)*tl-400)/19.5),1)
           elif address == 8:
             temphG = int_to_float(value)
           elif address == 0xc:
@@ -346,15 +346,15 @@ def DUfile(button):
           elif address == 0x54:
             vh = value>>16
             vl = value&0xffff
-            G1 = int(100*((2.5*37.5*(vh-0.5)/4096-14)))/100
-            G2 = int(100*((2.5*37.5*(vl-0.5)/4096-14)))/100
+            G1 = round(((2.5*37.5*(vh-0.5)/4096-14)),1)
+            G2 = round(((2.5*37.5*(vl-0.5)/4096-14)),1)
             app.setEntry("C1Gain",G1)
             app.setEntry("C2Gain",G2)
           elif address == 0x58:
             vh = value>>16
             vl = value&0xffff
-            G1 = int(100*((2.5*37.5*(vh-0.5)/4096-14)))/100
-            G2 = int(100*((2.5*37.5*(vl-0.5)/4096-14)))/100
+            G1 = round(((2.5*37.5*(vh-0.5)/4096-14)),1)
+            G2 = round(((2.5*37.5*(vl-0.5)/4096-14)),1)
             app.setEntry("C3Gain",G1)
             app.setEntry("C4Gain",G2)
           elif address == 0x10:

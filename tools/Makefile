@@ -9,7 +9,17 @@ Hist: Hist.c Traces.h Makefile
 	-I ../dudaq/files \
 	-I${ROOTSYS}/include -L${ROOTSYS}/lib -lCore -lRIO -lhist -lMathCore -lGpad -std=c++14 \
 	-o Hist
-	
+
+Quest: Quest.c Traces.h Makefile
+	clang++ Quest.c -O3 \
+	-L/usr/local/lib -lfftw3 \
+	-I /Users/timmer/Work/GRAND/Program/c_grand_utils -L /Users/timmer/Work/GRAND/Program/c_grand_utils -lgrand_utillib \
+	-I /Users/timmer/Work/GRAND/Simu/GRAND/c-antenna-test-master/src \
+	-I ../dudaq/files \
+	-I${ROOTSYS}/include -L${ROOTSYS}/lib -lCore -lRIO -lhist -lMathCore -lGpad -std=c++14 \
+	-o Quest
+
+
 MDanal: MDanal.c Traces.h Makefile
 	clang++ MDanal.c  \
 	-L/usr/local/lib -lfftw3 \

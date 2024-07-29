@@ -10,10 +10,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <sys/stat.h>
 #include <sys/time.h>
 #include <math.h>
 #include "Adaq.h"
 #include "amsg.h"
+extern int eb_remove_directory(const char *path);
 
 #define MAXRATE 2000
 #define MAXSEC 12 // has to be above 10 to avoid missing 10sec triggers!
@@ -37,7 +39,7 @@ typedef struct{
 }T2evts;
 
 T2evts t2evts[NEVT]; //storage of data directly from the shared memory. This is the local sorted storage!
-uint32_t t3list[3+2*MAXDU]; //identifiers of the T3 event
+uint32_t t3list[5+2*MAXDU]; //identifiers of the T3 event
 uint32_t t3event=0;
 
 int32_t t2write = 0;
@@ -218,6 +220,7 @@ void t3_maket3()
   int eventindex[MAXDU];
   struct timeval tp;
   struct timezone tz;
+  char foldername[100];
   
   gettimeofday(&tp,&tz);
   
@@ -289,8 +292,10 @@ void t3_maket3()
         t3stat = (T3STATION *)(&(t3list[ip]));
         t3stat->DU_id =  t2evts[eventindex[i]].stat;
         t3stat->index = t2evts[eventindex[i]].index;
-        ip+=2;
-        t3list[0]+=2;
+        t3stat->second = t2evts[eventindex[i]].sec; // event number
+        t3stat->nsec = t2evts[eventindex[i]].nsec; // event number
+        ip+=4;
+        t3list[0]+=4;
       }
       // move the event to shared memory to be sent
       ntry = 0;
@@ -302,6 +307,9 @@ void t3_maket3()
         printf("T3: No buffer, loosing data\n");
       }else{
         //printf("Requesting T3 %d %d\n",t3event,*shm_t3.next_write);
+        sprintf(foldername,"%s/%d",LOG_FOLDER,t3event);
+        eb_remove_directory(foldername);
+        mkdir(foldername,S_IRWXU);
         memcpy((void *)&(shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)+1]),(void *)t3list,4*t3list[0]);
         shm_t3.Ubuf[(*shm_t3.size)*(*shm_t3.next_write)] = 3; // to be read by du and eb, thus will be 3 (=1+2)!!
         *shm_t3.next_write = *shm_t3.next_write + 1;

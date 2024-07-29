@@ -407,10 +407,13 @@ int send_server_data(){
   char *bf = (char *)DU_output;
   int32_t length;
   DU_alength = sizeof(DU_address);
-  
+  struct timeval tnow;
+  struct timezone tzone;
+
   int ievt,imsg,iten;
   uint32_t *evt0,*evt1;
   
+  gettimeofday(&tnow,&tzone);
   if(DU_comms< 0){
     if(DU_socket < 0){
       if(make_server_connection(du_port)<0)
@@ -426,6 +429,11 @@ int send_server_data(){
     set_socketoptions(DU_comms);
   }
   ievt=*(shm_ev.next_read);
+  // lets not send old data
+  while ((tnow.tv_sec-shm_ev.Ubuf[ievt+BUFSIZE])>T_RESPOND_DAQ &&ievt != *(shm_ev.next_write)){
+    ievt++;
+    if(ievt >= *shm_ev.nbuf) ievt = 0;
+  }
   if(ievt != *(shm_ev.next_write)){
     imsg = 1;
     DU_output[imsg++] = 0;
@@ -480,7 +488,9 @@ int send_t3_event(int t3_id, int index, int evttype)
   int32_t length;
   short trflag;
   DU_alength= sizeof(DU_address);
-  
+  struct timeval tnow;
+  struct timezone tzone;
+
   if(DU_comms< 0){
     if(DU_socket < 0){
       if(make_server_connection(du_port)<0)
@@ -495,6 +505,8 @@ int send_t3_event(int t3_id, int index, int evttype)
     FD_SET(DU_comms, &sockset);
     set_socketoptions(DU_comms);
   }
+  gettimeofday(&tnow,&tzone);
+  if((tnow.tv_sec-shm_ev.Ubuf[index+BUFSIZE])>T_RESPOND_DAQ) return(0); //old data requested
   uint32_t *evt = &vadd_psddr[shm_ev.Ubuf[index]];
   if((evt[EVT_LENGTH]&0xffff)!= EVT_HDR_LENGTH){
     printf("Error requesting event. Not a proper pointer %08x ",vadd_psddr[shm_ev.Ubuf[index]]);
@@ -504,6 +516,9 @@ int send_t3_event(int t3_id, int index, int evttype)
     else printf( " %08x)\n",vadd_psddr[shm_ev.Ubuf[0]]);
     return(0);
   }
+  if(evttype == DU_GET_MINBIAS_EVENT &&(evt[EVT_TRIGGER_STAT]&0x100)==0) return(0);
+  else if(evttype != DU_GET_MINBIAS_EVENT &&(evt[EVT_TRIGGER_STAT]&0x100)!=0)
+    return(0);
   evt[EVT_EVT_ID] = t3_id;
   trflag = 0;
   if(evttype == DU_GET_MINBIAS_EVENT)trflag = TRIGGER_T3_MINBIAS;
@@ -761,8 +776,8 @@ int main(int argc, char **argv)
     i++;
   }
   if(station_id <=0) printf("Bad station id: %d\n",station_id);
-  if(ad_shm_create(&shm_ev,BUFSIZE,1) <0){
-    printf("Cannot create T3  shared memory !!\n");
+  if(ad_shm_create(&shm_ev,BUFSIZE,2) <0){ //first event pointers and after that timestamps
+    printf("Cannot create event shared memory !!\n");
     exit(-1);
   }
   *(shm_ev.next_read) = 0;

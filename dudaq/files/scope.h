@@ -219,7 +219,7 @@
   buffer definitions for the scope readout process.
  */
 
-#define BUFSIZE 30000            //!< store up to 30000 event pointers in circular buffer
+#define BUFSIZE 80000            //!< store up to 80000 event pointers in circular buffer
 
 #define GPSSIZE 35              //!< buffer upto 35 GPS pointers in circular buffer
 

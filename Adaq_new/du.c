@@ -7,6 +7,9 @@
  
  Altering the code without explicit consent of the author is forbidden
  ***/
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
@@ -21,6 +24,7 @@
 extern int idebug;
 #define MAXLOG 8 //max 8 lines output (monitor!)
 char loglines[MAXLOG][80];
+uint32_t tbuf[1<<24]; //huge buffer to hold events upto 2 msec!
 
 void coeffs(float Fnotch, float r,unsigned int *values);
 
@@ -43,8 +47,12 @@ void du_interpret(uint32_t *buffer)
 {
   AMSG *msg;
   int ntry;
-  
+  char filename[200];
+  uint32_t *DUinfo;
   int32_t i=1;
+  struct stat sb;
+  FILE *fpt;
+  
   while(i<buffer[0]-2){ // 2 tail words
     msg = (AMSG *)(&(buffer[i]));
     if(idebug)
@@ -77,24 +85,17 @@ void du_interpret(uint32_t *buffer)
         if(idebug)
           printf("Received an event\n");
       case DU_NO_EVENT:
-        if(msg->length<EVSIZE){
-          // wait until the shared memory is not full
-          ntry = 0;
-          while(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] == 1 && ntry <100) {//infinite loop, potential problem!
-            printf("DU: Wait for EB\n");
-            ntry++;
-            usleep(1000); // wait for the event builder to be ready
-          }
-          // copy the event/monitor data
-          if(ntry<100){
-            memcpy((void *)&(shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)+1]),(void *)msg,INTSIZE*msg->length);
-            shm_eb.Ubuf[(*shm_eb.size)*(*shm_eb.next_write)] = 1;
-            *shm_eb.next_write = *shm_eb.next_write + 1;
-            if(*shm_eb.next_write >= *shm_eb.nbuf) *shm_eb.next_write = 0;
-          }
-        } else{
-          printf("DU: Error: Too much EVENT information in a single message, data ignored\n");
-        }
+        // wait until the shared memory is not full
+        DUinfo = (uint32_t *)msg->body;
+        /*sprintf(filename,"%s/%d",LOG_FOLDER,DUinfo[EVT_EVT_ID]);
+        if (!(stat(filename, &sb) == 0 && S_ISDIR(sb.st_mode))) {
+          mkdir(filename,S_IRWXU);
+        }*/
+        DUinfo[EVT_VERSION] = DUinfo[EVT_VERSION]+((ADAQ_VERSION&0xff)<<8);
+        sprintf(filename,"%s/%d/%d",LOG_FOLDER,DUinfo[EVT_EVT_ID],DUinfo[EVT_STATION_ID]);
+        fpt = fopen(filename,"w");
+        fwrite(DUinfo,1,4*(DUinfo[EVT_LENGTH]>>16),fpt);
+        fclose(fpt);
         break;
       case DU_GET:
       case DU_GETMEM:
@@ -253,7 +254,7 @@ void du_connect()
  \brief read data from all sockets
  loop over all DUs
  check if there is a socket connection
- read data into a local buffer (50000 shorts long!)
+ read data into a local buffer (1<<24) ints long!)
  interpret data
  send an ALIVE message every second
  */
@@ -262,8 +263,7 @@ void du_read()
   int i,ntry;
   int bytesRead,nread;
   ssize_t recvRet,rsend;
-  uint32_t buffer[50000]; //temp!
-  uint8_t *bf = (uint8_t *)buffer;
+  uint8_t *bf = (uint8_t *)tbuf;
   struct timeval tnow;
   struct timezone tzone;
   socklen_t RDalength;
@@ -273,16 +273,16 @@ void du_read()
     RDalength = DUinfo[i].DUalength;
     if(DUinfo[i].DUsock < 0) continue;
     // first read length of buffer
-    buffer[0] = 0;
-    while((recvRet = recvfrom(DUinfo[i].DUsock,buffer,INTSIZE,0,
+    tbuf[0] = 0;
+    while((recvRet = recvfrom(DUinfo[i].DUsock,tbuf,INTSIZE,0,
                               (struct sockaddr*)&DUinfo[i].DUaddress,&RDalength))==INTSIZE){
       RDalength = DUinfo[i].DUalength;
-      if ((buffer[0] == 0) || (buffer[0]>EVSIZE)) {
-        printf("DU: du_read: The buffer from station %d cannot be handled size=%d\n",DUinfo[i].DUid,buffer[0]);
+      if (tbuf[0] == 0) {
+        printf("DU: du_read: The buffer from station %d cannot be handled size=%d\n",DUinfo[i].DUid,tbuf[0]);
         ntry = 0;
-        while((recvRet = recvfrom(DUinfo[i].DUsock,buffer,INTSIZE,0,
+        while((recvRet = recvfrom(DUinfo[i].DUsock,tbuf,INTSIZE,0,
                                   (struct sockaddr*)&DUinfo[i].DUaddress,&RDalength))==INTSIZE) {
-          if(ntry<10) printf("Data = 0x%08x %d\n",buffer[0],buffer[0]);
+          if(ntry<10) printf("Data = 0x%08x %d\n",tbuf[0],tbuf[0]);
           ntry++;
           usleep(10);
         }
@@ -291,10 +291,10 @@ void du_read()
       // read remaining data
       bytesRead = INTSIZE;
       ntry = 0;
-      //printf("Socket reading-before loop  %d %d\n",bytesRead,(INTSIZE*buffer[0]));
-      while (bytesRead < (INTSIZE*buffer[0])) { //size is in ints, including the first word!
-        nread = INTSIZE*buffer[0]-bytesRead;
-        //printf("Socket reading %d %d %d\n",bytesRead,(INTSIZE*buffer[0]),nread);
+      //printf("Socket reading-before loop  %d %d\n",bytesRead,(INTSIZE*tbuf[0]));
+      while (bytesRead < (INTSIZE*tbuf[0])) { //size is in ints, including the first word!
+        nread = INTSIZE*tbuf[0]-bytesRead;
+        //printf("Socket reading %d %d %d\n",bytesRead,(INTSIZE*tbuf[0]),nread);
         errno = 0;
         recvRet = recvfrom(DUinfo[i].DUsock,&bf[bytesRead],
                            nread,0,(struct sockaddr*)&DUinfo[i].DUaddress,&RDalength);
@@ -309,8 +309,8 @@ void du_read()
             usleep(10);
           }
           if(ntry == 20) {
-            printf("Socket read error %d %d\n",2*buffer[0],bytesRead);
-            buffer[0] = 0;
+            printf("Socket read error %d %d\n",4*tbuf[0],bytesRead);
+            tbuf[0] = 0;
             shutdown(DUinfo[i].DUsock,SHUT_RDWR);
             close(DUinfo[i].DUsock);
             DUinfo[i].DUsock = -1;
@@ -319,7 +319,7 @@ void du_read()
           }
         }else if (recvRet < 0) {
           printf("DU: du_read: The buffer from station %d cannot be read, shutting down socket\n",DUinfo[i].DUid);
-          buffer[0] = 0;
+          tbuf[0] = 0;
           shutdown(DUinfo[i].DUsock,SHUT_RDWR);
           close(DUinfo[i].DUsock);
           DUinfo[i].DUsock = -1;
@@ -335,10 +335,10 @@ void du_read()
           usleep(10);
         }
       } // while read data
-      if(buffer[0] > 0 &&bytesRead == INTSIZE*(buffer[0])&&recvRet>0) {
-        du_interpret(buffer);
+      if(tbuf[0] > 0 &&bytesRead == INTSIZE*(tbuf[0])&&recvRet>0) {
+        du_interpret(tbuf);
       }else{
-        printf("DU Error in Receive %d %d %ld\n",bytesRead,2*buffer[0],recvRet);
+        printf("DU Error in Receive %d %d %ld\n",bytesRead,4*tbuf[0],recvRet);
       }
       DUinfo[i].LSTconnect = tnow.tv_sec;
     }
@@ -351,14 +351,14 @@ void du_read()
     }
     // send an ALIVE message if the latest event was more than 1 sec ago!
     if((tnow.tv_sec-DUinfo[i].LSTconnect) > 1){
-      buffer[0] = 6;
-      buffer[1] = 3;
-      buffer[2] = ALIVE;
-      buffer[3] = DUinfo[i].DUid;
-      buffer[4] = GRND1;
-      buffer[5] = GRND2;
+      tbuf[0] = 6;
+      tbuf[1] = 3;
+      tbuf[2] = ALIVE;
+      tbuf[3] = DUinfo[i].DUid;
+      tbuf[4] = GRND1;
+      tbuf[5] = GRND2;
       //printf("Sending ALIVE\n");
-      rsend = sendto(DUinfo[i].DUsock,buffer,INTSIZE*buffer[0], 0,(struct sockaddr*)&DUinfo[i].DUaddress,
+      rsend = sendto(DUinfo[i].DUsock,tbuf,INTSIZE*tbuf[0], 0,(struct sockaddr*)&DUinfo[i].DUaddress,
                      DUinfo[i].DUalength);
       if(rsend<0 && errno != EAGAIN ) {
         shutdown(DUinfo[i].DUsock,SHUT_RDWR);

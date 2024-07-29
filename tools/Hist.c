@@ -27,11 +27,16 @@ unsigned int *event=NULL;
 float *ttrace,*fmag,*fphase;
 int fftlen = 0;
 TH1F *hstep,*hfftstep;
-TH1F *hwl[100][3];
+TProfile *hwl[100][3];
+TH1F *hwla[100][3];
+TH1F *hadc[100][3];
+
 TProfile *HFsum[100][3]; // One for each arm
 TProfile *HBattery[100];
 TProfile2D *HFTime[100][3];
 int n_DU=0,DU_id[100];
+int n_traces[100];
+int trlen[100];
 
 
 int grand_read_file_header(FILE *fp)
@@ -130,6 +135,7 @@ void print_du(uint32_t *du)
   static int zeroday= -1;
   float fvalue;
   int wl;
+  double ADC_mV = (1.E3)*1.8/16384;
 #define DTFMIN 50
 #define DTFMAX 110
 #define NDTFREQ 480
@@ -175,17 +181,24 @@ void print_du(uint32_t *du)
   }
   if(idu ==n_DU) {
     DU_id[n_DU++] = du[EVT_STATION_ID];
+    n_traces[idu] = 0;
     for(int ich=0;ich<3;ich++){
       snprintf(fname,100,"HSF%d_%d",DU_id[idu],ich);
-      snprintf(hname,100,"HSF%d_%d",DU_id[idu],ich);
+      snprintf(hname,100,"HSF%d_%d;Frequency (MHz);mV",DU_id[idu],ich);
       float f_off = 250./(2*(du[EVT_TRACELENGTH]>>16));
       HFsum[idu][ich] = new TProfile(fname,hname,(du[EVT_TRACELENGTH]>>16),0.-f_off,250-f_off);
       snprintf(fname,100,"HSFTime%d_%d",DU_id[idu],ich);
-      snprintf(hname,100,"HSFTime%d_%d",DU_id[idu],ich);
+      snprintf(hname,100,"HSFTime%d_%d;Frequency (MHz);Time (hr);mV",DU_id[idu],ich);
       HFTime[idu][ich] = new TProfile2D(fname,hname,(du[EVT_TRACELENGTH]>>16),0.-f_off,250-f_off,120*NDAY,0.,24.*NDAY);
       snprintf(fname,100,"HW%d_%d",DU_id[idu],ich);
       snprintf(hname,100,"Wavelet %d %d",DU_id[idu],ich);
-      hwl[idu][ich] = new TH1F(fname,hname,8193,-0.5,8192.5);
+      hwl[idu][ich] = new TProfile(fname,hname,2*(du[EVT_TRACELENGTH]>>16),0.,4*(du[EVT_TRACELENGTH]>>16));
+      snprintf(fname,100,"HWL%d_%d",DU_id[idu],ich);
+      snprintf(hname,100,"Wavelet %d %d; ADC; Frequency (Hz)",DU_id[idu],ich);
+      hwla[idu][ich] = new TH1F(fname,hname,8192,-0.5,8191.5);
+      snprintf(fname,100,"HADC%d_%d",DU_id[idu],ich);
+      snprintf(hname,100,"ADC %d %d; ADC; Frequency (Hz)",DU_id[idu],ich);
+      hadc[idu][ich] = new TH1F(fname,hname,8192,-0.5,8191.5);
     }
     snprintf(fname,100,"HB%d",DU_id[idu]);
     snprintf(hname,100,"HB%d",DU_id[idu]);
@@ -198,9 +211,11 @@ void print_du(uint32_t *du)
     fmag = (float *)malloc(fftlen*sizeof(float));
     fphase = (float *)malloc(fftlen*sizeof(float));
   }
+  trlen[idu] = 2*(du[EVT_TRACELENGTH]>>16);
   HBattery[idu]->Fill(fh,(du[EVT_BATTERY]>>16)*(2.5*(18.+91.))/(18*4096));
-
+  int trig_stat = du[EVT_TRIGGER_STAT]&0xffff;
   offset = EVT_START_ADC;
+  n_traces[idu]++;
   for(int ich=0;ich<3;ich++){
     sprintf(fname,"T%d_%d_%d",du[EVT_EVT_ID],DU_id[idu],ich);
     if(((du[EVT_INP_SELECT]>>5*ich)&0x1e) != 0){
@@ -212,19 +227,26 @@ void print_du(uint32_t *du)
         ht->SetBinContent(2*i+2,val2);
         ttrace[2*i] = val1;
         ttrace[2*i+1] = val2;
+        hadc[idu][ich]->Fill(val1);
+        hadc[idu][ich]->Fill(val2);
       }
       ht->Write();
       ht->Delete();
       for(int i=1;i<2*(du[EVT_TRACELENGTH]>>16);i++){
         wl = (ttrace[i-1]-ttrace[i])/2;
         if(wl < 0) wl = - wl;
-        hwl[idu][ich]->Fill(wl);
+        hwla[idu][ich]->Fill(wl);
+        if((trig_stat&(1<<ich))) hwl[idu][ich]->Fill(2*i-1,wl);
       }
       mag_and_phase(ttrace,fmag,fphase);
+      float fft_res =5.E8/(fftlen);
       for(i=0;i<fftlen/2;i++){
         HFsum[0][ich]->Fill(500.*(i)/fftlen,fmag[i]);
-        HFsum[idu][ich]->Fill(500.*(i)/fftlen,fmag[i]);
-        HFTime[idu][ich]->Fill(500.*(i)/fftlen,fh+24*(iday-zeroday),fmag[i]);
+        // time: fftlen*2 ns;  freq. width = 1/(2*fftlen) GHz
+        // time*freq.width = 1
+        // voltage = ADC*ADC_mV (mV)
+        HFsum[idu][ich]->Fill(500.*(i)/fftlen,2*(fmag[i]/fftlen)*ADC_mV);
+        HFTime[idu][ich]->Fill(500.*(i)/fftlen,fh+24*(iday-zeroday),(fmag[i]/fftlen)*ADC_mV);
       }
       offset+=(du[EVT_TRACELENGTH]>>16);
     }
@@ -267,7 +289,13 @@ int main(int argc, char **argv)
   for(ib=0;ib<n_DU;ib++){
     if(HBattery[ib]!=NULL) HBattery[ib]->Write();
     for(ich = 0;ich<3;ich++){
+      printf("%d %d\n",trlen[ib],n_traces[ib]);
+      double ScaleFactor = 5.e8/(trlen[ib]*n_traces[ib]);
+      if(hadc[ib][ich]!= NULL) hadc[ib][ich]->Scale(ScaleFactor);// to Hz
+      if(hwla[ib][ich]!= NULL) hwla[ib][ich]->Scale(ScaleFactor);// to Hz
       if(hwl[ib][ich]!= NULL) hwl[ib][ich]->Write();
+      if(hwla[ib][ich]!= NULL) hwla[ib][ich]->Write();
+      if(hadc[ib][ich]!= NULL) hadc[ib][ich]->Write();
       if(HFsum[ib][ich]!= NULL) HFsum[ib][ich]->Write();
       if(HFTime[ib][ich]!= NULL) HFTime[ib][ich]->Write();
     }

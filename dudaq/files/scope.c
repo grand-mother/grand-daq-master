@@ -28,13 +28,15 @@
 #include "scope.h"
 
 int32_t dev = 0;
+int rate = 0;
 void *axi_ptr;
 uint32_t page_offset;
 
 extern shm_struct shm_ev;
 extern shm_struct shm_gps;
 int hw_id = 0;
-uint32_t last_sec;
+uint32_t last_sec=0;
+uint32_t last_CTD=0;
 uint32_t prev_ppsid=0;
 extern int station_id;
 
@@ -59,7 +61,7 @@ uint32_t Overlap, preOverlap, postOverlap;
 
 void short_wait()
 {
-  usleep(1);
+  usleep(10);
 }
 
 unsigned int dma_wr_reg(unsigned int* dma_virtual_address, int offset, unsigned int value) {
@@ -202,12 +204,14 @@ int dma_completion()
     dma_wr_reg(vadd_cdma, CDMA_CURDESC_PNTR, SG_BASE_ADDR);
     short_wait();
     if (ppsReady == 1) {  //-- CASE 2: event + PPS DMA transfer
+      //printf("DMA completion: case 2\n");
       dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evtpps);
       short_wait();
       dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR+0x1C0);
       short_wait();
     }
     else {                //-- CASE 1: event only DMA transfer
+      //printf("DMA completion: case 1\n");
       dma_wr_reg(vadd_cdma, CDMA_CR, IRQ_MASK_AND_SG_evt);
       short_wait();
       dma_wr_reg(vadd_cdma, CDMA_TAILDESC_PNTR, SG_BASE_ADDR+0x180);
@@ -656,7 +660,11 @@ void scope_initialize()
   addr8 = addr7 + ch3En*ram7Size; //-- RAM pps
   
   eventLength = ram1Size+ch1En*(ram2Size+ram3Size)+ch2En*(ram4Size+ram5Size)+ch3En*(ram6Size+ram7Size);
-  //printf("Scope_open: Event Length =  %d\n",eventLength/4);
+  printf("Scope_open: Event Length =  %d Max number of Events in DDR %d\n",eventLength/4,DDR_MAP_SIZE/eventLength);
+  // setting the list of addresses to the appropriate length
+  if((DDR_MAP_SIZE/eventLength)<BUFSIZE) *(shm_ev.nbuf) = (DDR_MAP_SIZE/eventLength);
+  else *(shm_ev.nbuf) = BUFSIZE;
+    
   ppsLength   = ram8Size;
   
   //-- 0x00; 0x40; 0x80; 0xC0; 0x100; 0x140; 0x180; 0x1C0; 0x200;
@@ -749,12 +757,16 @@ int scope_read_event(uint32_t index)
   /** temp fix for ARG */
   //struct timeval tv;
   struct tm tt;
-  int length;
+  int length,cur_write,next_write;
   double fracsec;
   uint32_t CTP,CTD;
   uint32_t *sec;
   uint32_t *evt = &vadd_psddr[index];
+  struct timeval tnow;
+  struct timezone tzone;
+
   
+  rate++;
   if(scope_t2(evt) != 1) return(SCOPE_EVENT); // only for a T2
   length = evt[0]>>16;
   if(length <= 0) return(-2);
@@ -783,17 +795,47 @@ int scope_read_event(uint32_t index)
   if(evt[EVT_PPS_ID]> prev_ppsid) *sec = *sec + 1;
   //printf("scope_read_evt: Second = %d --> %u\n",tt.tm_sec,*sec);
   //if(*sec > 1690000000 && *sec < 2000000000)
-  last_sec = *sec;
-  fracsec = (double)(CTD)/(double)(CTP);
+  if(CTD == CTP) fracsec = 0;
+  else fracsec = (double)(CTD)/(double)(CTP);
   evt[EVT_NANOSEC] = 1.E9*fracsec;
   
   evt[EVT_STATION_ID] = station_id;
-  shm_ev.Ubuf[*shm_ev.next_write] = index;
-  *(shm_ev.next_write) = *(shm_ev.next_write)+1;
-  if(*shm_ev.next_write >= *shm_ev.nbuf) *(shm_ev.next_write) = 0;
+  if(last_sec == *sec && last_CTD == CTD) return(0); //same as previous
+  last_sec = *sec;
+  last_CTD = CTD;
+  //if(((evt[EVT_SECMINHOUR]>>24)&0xff) != 0) return(0); // bad GPS time
+  cur_write = *(shm_ev.next_write);
+  shm_ev.Ubuf[cur_write] = index;
+  gettimeofday(&tnow,&tzone);
+  shm_ev.Ubuf[cur_write+BUFSIZE] = tnow.tv_sec;
+  next_write = cur_write+1;
+  if(next_write >= *shm_ev.nbuf) next_write = 0;
+  if((tnow.tv_sec-shm_ev.Ubuf[next_write+BUFSIZE])<T_RESPOND_DAQ) return(0);
+  *(shm_ev.next_write) = next_write;
   return(SCOPE_EVENT);                  // success!
 }
 
+void change_t1(int th_mod)
+{
+  uint32_t thres;
+  uint16_t th_low,th_high,t1_min;
+  
+  for(int ich = 0;ich<3;ich++){
+    thres = DUreg_read(0x001C+ich*0xc);
+    th_low = thres&0xfff;
+    th_high = (thres>>12)&0xfff;
+    if(th_mod>0){
+      if((th_mod+th_high)>4000) th_high = 4000; //max T1 will be 4000
+      else th_high+= th_mod;
+    }else{
+      t1_min = 1.2*th_low;
+      if((th_mod+th_high)<t1_min) th_high = t1_min; // min T1 will be 1.2*T2
+      else th_high = th_high+th_mod;
+    }
+    thres = ((th_high&0xfff)<<12)+(th_low&0xfff);
+    DUreg_write(0x001C+ich*0xc,thres);
+  }
+}
 
 
 int32_t scope_read_pps(uint32_t index)
@@ -805,6 +847,12 @@ int32_t scope_read_pps(uint32_t index)
   shm_gps.Ubuf[*shm_gps.next_write] = index;
   *shm_gps.next_write = *(shm_gps.next_write)+1;
   if(*shm_gps.next_write >= *shm_gps.nbuf) *shm_gps.next_write = 0;
+  if((pps[PPS_ID]&0x1)){
+    if(rate>500) change_t1(200);
+    else if(rate> 50) change_t1(20);
+    if(rate < 20) change_t1(-10);
+  }
+  rate = 0;
   // scope_calc_t3nsec();
   return(SCOPE_GPS);
 }
@@ -816,7 +864,10 @@ int scope_read()
   if(dma_completion() == -1){
     dma_reset();
   }else{
-    if(evtReady == 1) scope_read_event(ddrPrevOffset/4);
+    if(evtReady == 1) {
+      //printf("Scope read event\n");
+      scope_read_event(ddrPrevOffset/4);
+    }
     if(ppsReady == 1){
       if(evtReady == 1) scope_read_pps((ddrPrevOffset+eventLength)/4);
       else scope_read_pps(ddrPrevOffset/4);
