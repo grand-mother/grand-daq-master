@@ -265,7 +265,7 @@ int eb_remove_directory(const char *path) {
     }
     closedir(d);
   }
-  if (!r)
+  if (d) //was if(!r)
     r = rmdir(path);
   return(r);
 }
